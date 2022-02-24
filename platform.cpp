@@ -1,6 +1,6 @@
 #include "platform.h"
 #include "graphics/graphics.h"
-#include <SDL2/SDL_joystick.h>
+#include "input.h"
 
 namespace Uboat
 {
@@ -30,6 +30,8 @@ namespace Uboat
         {
             return false;
         }
+
+        Input::init();
 
         return true;
     }
@@ -65,6 +67,8 @@ namespace Uboat
                 }
             }
         }
+
+        Input::update();
 
         return cont;
     }

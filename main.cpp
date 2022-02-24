@@ -1,4 +1,5 @@
 #include "platform.h"
+#include "input.h"
 #include "graphics/graphics.h"
 
 int main()
