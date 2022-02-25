@@ -1,10 +1,27 @@
 #include "graphics.h"
 #include "../platform.h"
 #include <GL/glew.h>
-#include <SDL2/SDL_video.h>
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#define APIENTRY
+#endif
 
 namespace Uboat
 {
+    void APIENTRY gl_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity,
+            GLsizei length, const GLchar* message, const void* user_param)
+    {
+        if (severity == GL_DEBUG_SEVERITY_NOTIFICATION && type == GL_DEBUG_TYPE_OTHER)
+        {
+            return;
+        }
+
+        printf("%s", message);
+    }
+
     namespace
     {
         void *g_context = nullptr;
@@ -26,6 +43,10 @@ namespace Uboat
 
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(gl_message_callback, nullptr);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

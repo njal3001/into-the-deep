@@ -14,6 +14,8 @@ add_executable(uboat
     platform.cpp
     input.cpp
     graphics/graphics.cpp
+    graphics/renderer.cpp
+    graphics/shader.cpp
     graphics/color.cpp
     )
 

@@ -1,0 +1,23 @@
+{
+    "configurations": {
+        "run": {
+            "adapter": "vscode-cpptools",
+            "default": true,
+            "configuration": {
+                "type": "cpp",
+                "request": "launch",
+                "cwd": "${workspaceRoot}/build",
+                "program": "${workspaceRoot}/build/uboat",
+                "stopOnEntry": true,
+                "console": "integratedTerminal",
+                "MIMode": "gdb"
+            },
+            "breakpoints": {
+                "exception": {
+                    "raised": "N",
+                    "uncaught": "Y"
+                }
+            }
+        }
+    }
+}
