@@ -23,6 +23,7 @@ namespace Uboat
         if (log_length)
         {
             glDeleteShader(vert);
+            printf("%s", log);
             assert(false);
         }
 
@@ -35,6 +36,7 @@ namespace Uboat
         {
             glDeleteShader(vert);
             glDeleteShader(frag);
+            printf("%s", log);
             assert(false);
         }
 
@@ -54,6 +56,7 @@ namespace Uboat
         // Check if shader linking failed
         if (log_length)
         {
+            printf("%s", log);
             assert(false);
         }
     }

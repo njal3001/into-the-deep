@@ -13,13 +13,16 @@ namespace Uboat
 		"layout(location=0) in vec2 a_position;\n"
 		"layout(location=1) in vec2 a_uv;\n"
 		"layout(location=2) in vec4 a_color;\n"
+		"layout(location=3) in int a_use_tex;\n"
 		"out vec2 v_uv;\n"
 		"out vec4 v_col;\n"
+        "flat out int v_use_tex;\n"
 		"void main(void)\n"
 		"{\n"
 		"	gl_Position = u_matrix * vec4(a_position.xy, 0, 1);\n"
 		"	v_uv = a_uv;\n"
 		"	v_col = a_color;\n"
+		"	v_use_tex = a_use_tex;\n"
 		"}";
 
         const std::string default_frag_str =
@@ -28,9 +31,10 @@ namespace Uboat
         "layout(location=0) out vec4 o_col;\n"
 		"in vec2 v_uv;\n"
 		"in vec4 v_col;\n"
+		"flat in int v_use_tex;\n"
 		"void main(void)\n"
 		"{\n"
-        "   o_col = v_col;\n"
+        "   o_col = v_col * texture(u_texture, v_uv);\n"
 		"}";
     }
 
@@ -48,24 +52,30 @@ namespace Uboat
         glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 
         // Specify vertex buffer layout
-        size_t pos_offset = 2 * sizeof(GLfloat);
-        size_t uv_offset = 2 * sizeof(GLfloat);
-        size_t color_offset = 4 * sizeof(GLubyte);
+        const size_t pos_offset = 2 * sizeof(GLfloat);
+        const size_t uv_offset = 2 * sizeof(GLfloat);
+        const size_t color_offset = 4 * sizeof(GLubyte);
+        const size_t use_tex_offset = sizeof(GLint);
 
-        GLsizei stride = pos_offset + uv_offset + color_offset;
+        const GLsizei stride = pos_offset + uv_offset + color_offset + use_tex_offset;
 
-        // position
+        // Position
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid*)0);
 
-        // texture uv
+        // Texture uv
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid*)pos_offset);
 
-        // color
+        // Color
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride,
                 (const GLvoid*)(pos_offset + uv_offset));
+
+        // Use texture
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 1, GL_INT, GL_FALSE, stride,
+                (const GLvoid*)(pos_offset + uv_offset + color_offset));
 
         // Allocate vertex buffer memory
         glBufferData(GL_ARRAY_BUFFER, RENDERER_MAX_VERTICES * sizeof(Vertex), nullptr,
@@ -128,25 +138,36 @@ namespace Uboat
         return m_matrix;
     }
 
-    void Renderer::make_vertex(float px, float py, float tx, float ty, Color color)
+    void Renderer::make_vertex(float px, float py, float tx, float ty, Color color, int use_tex)
     {
         m_vertex_map->pos.x = m_matrix[0][0] * px + m_matrix[1][0] * py + m_matrix[2][0];
         m_vertex_map->pos.y = m_matrix[0][1] * px + m_matrix[1][1] * py + m_matrix[2][1];
         m_vertex_map->uv.x = tx;
         m_vertex_map->uv.y = ty;
         m_vertex_map->color = color;
+        m_vertex_map->use_tex = use_tex;
 
         m_vertex_map++;
     }
 
 
-    void Renderer::update_batch(unsigned int count)
+    void Renderer::update_batch(const size_t count, const unsigned int texture)
     {
-        if (m_batches.empty())
+        assert(!m_batches.empty());
+
+        if (m_batches.back().texture != texture)
         {
-            m_batches.push_back({
-                .count = 0
-            });
+            if (m_batches.back().texture > 0)
+            {
+                m_batches.push_back({
+                    .count = 0,
+                    .texture = texture
+                });
+            }
+            else
+            {
+                m_batches.back().texture = texture;
+            }
         }
 
         m_batches.back().count += count;
@@ -157,9 +178,10 @@ namespace Uboat
              float ty0, float tx1, float ty1, float tx2, float ty2,
              Color c0, Color c1, Color c2)
     {
-        make_vertex(px0, py0, tx0, ty0, c0);
-        make_vertex(px1, py1, tx1, ty1, c1);
-        make_vertex(px2, py2, tx2, ty2, c2);
+        const int ut = tex > 0;
+        make_vertex(px0, py0, tx0, ty0, c0, ut);
+        make_vertex(px1, py1, tx1, ty1, c1, ut);
+        make_vertex(px2, py2, tx2, ty2, c2, ut);
 
         *m_index_map = m_vertex_count;
         m_index_map++;
@@ -168,7 +190,7 @@ namespace Uboat
         *m_index_map = m_vertex_count + 2;
         m_index_map++;
 
-        update_batch(3);
+        update_batch(3, tex);
         m_vertex_count += 3;
     }
 
@@ -178,10 +200,11 @@ namespace Uboat
             float ty1, float tx2, float ty2, float tx3, float ty3,
             Color c0, Color c1, Color c2, Color c3)
     {
-        make_vertex(px0, py0, tx0, ty0, c0);
-        make_vertex(px1, py1, tx1, ty1, c1);
-        make_vertex(px2, py2, tx2, ty2, c2);
-        make_vertex(px3, py3, tx3, ty3, c3);
+        const int ut = tex > 0;
+        make_vertex(px0, py0, tx0, ty0, c0, ut);
+        make_vertex(px1, py1, tx1, ty1, c1, ut);
+        make_vertex(px2, py2, tx2, ty2, c2, ut);
+        make_vertex(px3, py3, tx3, ty3, c3, ut);
 
         *m_index_map = m_vertex_count;
         m_index_map++;
@@ -197,7 +220,7 @@ namespace Uboat
         *m_index_map = m_vertex_count;
         m_index_map++;
 
-        update_batch(6);
+        update_batch(6, tex);
         m_vertex_count += 4;
     }
 
@@ -210,6 +233,12 @@ namespace Uboat
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index_buffer);
         m_index_map = (GLushort*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        // Put starting batch
+        m_batches.push_back({
+            .count = 0,
+            .texture = 0
+        });
     }
 
     void Renderer::tri(const glm::vec2& pos0, const glm::vec2& pos1, const glm::vec2& pos2,
@@ -258,6 +287,16 @@ namespace Uboat
         }
     }
 
+    void Renderer::tex(const Texture& texture, const glm::vec2& pos, const Color color)
+    {
+        assert(m_vertex_map && m_index_map);
+
+        unsigned int w = texture.width();
+        unsigned int h = texture.height();
+
+        push_quad(pos.x, pos.y, pos.x, pos.y + h, pos.x + w, pos.y + h, pos.x + w, pos.y,
+                texture.id(), 0, 1, 0, 0, 1, 0, 1, 1, color, color, color, color);
+    }
 
     void Renderer::end()
     {
@@ -282,12 +321,17 @@ namespace Uboat
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_index_buffer);
 
         glUseProgram(m_default_shader->id());
+        m_default_shader->set_uniform_mat4("u_matrix", matrix);
 
         // Render batches
         size_t offset = 0;
         for (auto& batch : m_batches)
         {
-            m_default_shader->set_uniform_mat4("u_matrix", matrix);
+            if (batch.texture > 0)
+            {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, batch.texture);
+            }
 
             glDrawElements(GL_TRIANGLES, batch.count, GL_UNSIGNED_SHORT,
                     (void*)(offset * sizeof(GLushort)));

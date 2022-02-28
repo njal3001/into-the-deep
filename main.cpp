@@ -3,6 +3,7 @@
 #include "graphics/graphics.h"
 #include "graphics/renderer.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "graphics/image.h"
 
 int main()
 {
@@ -10,6 +11,9 @@ int main()
 
     Platform::init();
     Renderer renderer;
+
+    Image img("charger.png");
+    Texture texture(img);
 
     glm::mat4 matrix = glm::ortho(0.0f, 320.0f, 0.0f, 180.0f);
     while (Platform::update())
@@ -23,6 +27,7 @@ int main()
 
         renderer.rect(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 90.0f), Color::green);
         renderer.circ(glm::vec2(160.0f, 90.0f), 10.0f, 128, Color::red);
+        renderer.tex(texture, glm::vec2(0.0f, 0.0f), Color::white);
         renderer.end();
 
         renderer.render(matrix);

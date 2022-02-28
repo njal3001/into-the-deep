@@ -17,6 +17,8 @@ add_executable(uboat
     graphics/renderer.cpp
     graphics/shader.cpp
     graphics/color.cpp
+    graphics/image.cpp
+    graphics/texture.cpp
     )
 
 target_link_libraries(uboat ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})

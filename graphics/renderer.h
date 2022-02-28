@@ -5,6 +5,7 @@
 #include <vector>
 #include "color.h"
 #include "shader.h"
+#include "texture.h"
 
 namespace Uboat
 {
@@ -21,12 +22,13 @@ namespace Uboat
             glm::vec2 pos;
             glm::vec2 uv;
             Color color;
-            //uint8_t use_tex;
+            int use_tex;
         };
 
         struct Batch
         {
             size_t count;
+            unsigned int texture;
         };
 
         GLuint m_vertex_array;
@@ -69,8 +71,10 @@ namespace Uboat
         void circ(const glm::vec2& center, const float radius, const unsigned int steps,
                 const Color color);
 
+        void tex(const Texture& texture, const glm::vec2& pos, const Color color);
+
     private:
-        void make_vertex(float px, float py, float tx, float ty, Color color);
+        void make_vertex(float px, float py, float tx, float ty, Color color, int use_tex);
 
         void push_triangle(float px0, float py0, float px1, float py1,
                  float px2, float py2, unsigned int tex, float tx0,
@@ -83,6 +87,6 @@ namespace Uboat
                 float ty1, float tx2, float ty2, float tx3, float ty3,
                 Color c0, Color c1, Color c2, Color c3);
 
-        void update_batch(const unsigned int count);
+        void update_batch(const size_t count, const unsigned int texture);
     };
 }
