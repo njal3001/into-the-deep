@@ -27,7 +27,9 @@ int main()
 
         renderer.rect(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 90.0f), Color::green);
         renderer.circ(glm::vec2(160.0f, 90.0f), 10.0f, 128, Color::red);
-        renderer.tex(texture, glm::vec2(0.0f, 0.0f), Color::white);
+        renderer.tex(&texture, glm::vec2(0.0f, 0.0f), Color::white);
+        renderer.tex(&texture, glm::vec2(100.0f, 0.0f), Color::blue);
+        renderer.circ(glm::vec2(10.0f, 10.0f), 10.0f, 128, Color::red);
         renderer.end();
 
         renderer.render(matrix);

@@ -59,6 +59,29 @@ namespace Uboat
             printf("%s", log);
             assert(false);
         }
+
+        // Get uniforms
+        const size_t max_name_length = 256;
+        GLint active_uniforms;
+        glGetProgramiv(m_id, GL_ACTIVE_UNIFORMS, &active_uniforms);
+
+        for (int i = 0; i < active_uniforms; i++)
+        {
+            GLsizei length;
+            GLsizei size;
+            GLenum type;
+            GLchar name[max_name_length + 1];
+
+            glGetActiveUniform(m_id, i, max_name_length, &length, &size, &type, name);
+            name[length] = '\0';
+
+            m_uniforms.push_back({
+                .name = std::string(name),
+                .type = type,
+            });
+
+            m_locations[m_uniforms.back().name] = glGetUniformLocation(m_id, name);
+        }
     }
 
     Shader::~Shader()
@@ -74,26 +97,13 @@ namespace Uboat
         return m_id;
     }
 
-    void Shader::set_uniform_1i(const GLchar* name, int value)
+    const std::vector<Uniform>& Shader::uniforms() const
     {
-        glUniform1i(uniform_location(name), value);
+        return m_uniforms;
     }
 
-    void Shader::set_uniform_mat4(const GLchar* name, const glm::mat4& value)
+    GLint Shader::uniform_location(const std::string& name) const
     {
-        glUniformMatrix4fv(uniform_location(name), 1, GL_FALSE, &value[0][0]);
-    }
-
-    GLint Shader::uniform_location(const GLchar* name)
-    {
-        if (m_uniform_cache.find(name) != m_uniform_cache.end())
-        {
-            return m_uniform_cache[name];
-        }
-
-        GLint location = glGetUniformLocation(m_id, name);
-        m_uniform_cache[name] = location;
-
-        return location;
+        return m_locations.at(name);
     }
 }
