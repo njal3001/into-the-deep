@@ -89,4 +89,43 @@ namespace Uboat
     {
         return g_joystick;
     }
+
+    std::string Platform::app_path()
+    {
+        const char *path = SDL_GetBasePath();
+        return std::string(path);
+    }
+
+    File Platform::read_file(const std::string& file_path)
+    {
+        File file =
+            {
+                .path = file_path,
+                .size = 0,
+                .data = nullptr
+            };
+
+        SDL_RWops* rw = SDL_RWFromFile(file_path.c_str(), "rb");
+        if (!rw)
+        {
+            return file;
+        }
+
+        Sint64 size = SDL_RWsize(rw);
+        char* buffer = new char[size];
+
+        Sint64 read = SDL_RWread(rw, buffer, sizeof(char), size);
+
+        SDL_RWclose(rw);
+        if (read != size)
+        {
+            delete[] buffer;
+            return file;
+        }
+
+        file.size = (unsigned int)size;
+        file.data = buffer;
+
+        return file;
+    }
 }

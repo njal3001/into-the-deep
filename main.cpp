@@ -4,6 +4,7 @@
 #include "graphics/renderer.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "graphics/image.h"
+#include "gameplay/tilemap.h"
 
 int main()
 {
@@ -12,8 +13,14 @@ int main()
     Platform::init();
     Renderer renderer;
 
+    printf("App path: %s\n", Platform::app_path().c_str());
     Image img("charger.png");
     Texture texture(img);
+
+    Scene scene;
+    Tilemap map("tilemap");
+
+    map.load(&scene);
 
     glm::mat4 matrix = glm::ortho(0.0f, 320.0f, 0.0f, 180.0f);
     while (Platform::update())
@@ -22,14 +29,15 @@ int main()
         Graphics::clear(Color::blue);
 
         renderer.begin();
-        renderer.tri(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 180.0f), glm::vec2(320.0f, 0.0f),
-                Color::white);
+        /* renderer.tri(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 180.0f), glm::vec2(320.0f, 0.0f), */
+        /*         Color::white); */
 
-        renderer.rect(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 90.0f), Color::green);
-        renderer.circ(glm::vec2(160.0f, 90.0f), 10.0f, 128, Color::red);
-        renderer.tex(&texture, glm::vec2(0.0f, 0.0f), Color::white);
-        renderer.tex(&texture, glm::vec2(100.0f, 0.0f), Color::blue);
-        renderer.circ(glm::vec2(10.0f, 10.0f), 10.0f, 128, Color::red);
+        /* renderer.rect(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 90.0f), Color::green); */
+        /* renderer.circ(glm::vec2(160.0f, 90.0f), 10.0f, 128, Color::red); */
+        /* renderer.tex(&texture, glm::vec2(0.0f, 0.0f), Color::white); */
+        /* renderer.tex(&texture, glm::vec2(100.0f, 0.0f), Color::blue); */
+        /* renderer.circ(glm::vec2(10.0f, 10.0f), 10.0f, 128, Color::red); */
+        map.render(&renderer);
         renderer.end();
 
         renderer.render(matrix);

@@ -7,7 +7,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm REQUIRED)
 
-include_directories(${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
+include_directories(${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${RAPIDXML_INCLUDE_DIRS})
 
 add_executable(uboat
     main.cpp
@@ -20,6 +20,10 @@ add_executable(uboat
     graphics/image.cpp
     graphics/texture.cpp
     graphics/material.cpp
+    gameplay/entity.cpp
+    gameplay/component.cpp
+    gameplay/scene.cpp
+    gameplay/tilemap.cpp
     )
 
 target_link_libraries(uboat ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
