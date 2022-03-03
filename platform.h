@@ -23,5 +23,7 @@ namespace Uboat
 
         std::string app_path();
         File read_file(const std::string& file_path);
+
+        uint64_t ticks();
     }
 }

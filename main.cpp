@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "graphics/image.h"
 #include "gameplay/tilemap.h"
+#include "maths/shapes.h"
 
 int main()
 {
@@ -13,7 +14,6 @@ int main()
     Platform::init();
     Renderer renderer;
 
-    printf("App path: %s\n", Platform::app_path().c_str());
     Image img("charger.png");
     Texture texture(img);
 
@@ -22,10 +22,15 @@ int main()
 
     map.load(&scene);
 
+    Rectf rect(glm::vec2(50.0f, 50.0f), glm::vec2(20.0f, 40.0f));
+    float rotation = 0.0f;
+
     glm::mat4 matrix = glm::ortho(0.0f, 320.0f, 0.0f, 180.0f);
     while (Platform::update())
     {
         // Game loop
+        Quadf quad(rect, rotation);
+        rotation += 0.01f;
         Graphics::clear(Color::blue);
 
         renderer.begin();
@@ -38,6 +43,7 @@ int main()
         /* renderer.tex(&texture, glm::vec2(100.0f, 0.0f), Color::blue); */
         /* renderer.circ(glm::vec2(10.0f, 10.0f), 10.0f, 128, Color::red); */
         map.render(&renderer);
+        renderer.quad(quad.a, quad.b, quad.c, quad.d, Color::black);
         renderer.end();
 
         renderer.render(matrix);

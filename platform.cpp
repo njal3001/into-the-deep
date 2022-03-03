@@ -8,6 +8,7 @@ namespace Uboat
     {
         SDL_Window *g_window = nullptr;
         SDL_Joystick *g_joystick = nullptr;
+        uint64_t g_ticks = 0;
     }
 
     bool Platform::init()
@@ -70,6 +71,8 @@ namespace Uboat
 
         Input::update();
 
+        g_ticks++;
+
         return cont;
     }
 
@@ -127,5 +130,10 @@ namespace Uboat
         file.data = buffer;
 
         return file;
+    }
+
+    uint64_t Platform::ticks()
+    {
+        return g_ticks;
     }
 }
