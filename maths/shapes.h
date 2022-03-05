@@ -84,7 +84,7 @@ namespace Uboat
             const glm::tvec3<T> pivot3 = glm::tvec3<T>(pivot, 0);
             const glm::tmat4x4<T> rotate = glm::translate(
                     glm::rotate(glm::translate(glm::tmat4x4<T>(1), pivot3),
-                        glm::radians(amount), glm::tvec3<T>(0, 0, 1)), -pivot3);
+                        amount, glm::tvec3<T>(0, 0, 1)), -pivot3);
 
             a = glm::tvec2<T>(rotate * glm::tvec4<T>(a, 0, 1));
             b = glm::tvec2<T>(rotate * glm::tvec4<T>(b, 0, 1));

@@ -1,11 +1,15 @@
-#include "platform.h"
-#include "input.h"
-#include "graphics/graphics.h"
-#include "graphics/renderer.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include "graphics/image.h"
+#include "gameplay/player.h"
 #include "gameplay/tilemap.h"
+#include "graphics/graphics.h"
+#include "graphics/image.h"
+#include "graphics/renderer.h"
+#include "input.h"
 #include "maths/shapes.h"
+#include "platform.h"
+#include <glm/gtc/matrix_transform.hpp>
+
+uint64_t prev_ticks = 0;
+float elapsed = 0.0f; // In seconds
 
 int main()
 {
@@ -14,36 +18,29 @@ int main()
     Platform::init();
     Renderer renderer;
 
-    Image img("charger.png");
-    Texture texture(img);
-
-    Scene scene;
     Tilemap map("tilemap");
-
-    map.load(&scene);
-
-    Rectf rect(glm::vec2(50.0f, 50.0f), glm::vec2(20.0f, 40.0f));
-    float rotation = 0.0f;
+    Scene scene(&map);
 
     glm::mat4 matrix = glm::ortho(0.0f, 320.0f, 0.0f, 180.0f);
+
+    prev_ticks = Platform::ticks();
+
     while (Platform::update())
     {
-        // Game loop
-        Quadf quad(rect, rotation);
-        rotation += 0.01f;
+        // Calculate elapsed time
+        uint64_t current_ticks = Platform::ticks();
+        uint64_t tick_diff = current_ticks - prev_ticks;
+        elapsed = (tick_diff) / (float)Platform::ticks_per_sec;
+        prev_ticks = current_ticks;
+
+        // Update
+        scene.update(elapsed);
+
+        // Render
         Graphics::clear(Color::blue);
 
         renderer.begin();
-        /* renderer.tri(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 180.0f), glm::vec2(320.0f, 0.0f), */
-        /*         Color::white); */
-
-        /* renderer.rect(glm::vec2(0.0f, 0.0f), glm::vec2(160.0f, 90.0f), Color::green); */
-        /* renderer.circ(glm::vec2(160.0f, 90.0f), 10.0f, 128, Color::red); */
-        /* renderer.tex(&texture, glm::vec2(0.0f, 0.0f), Color::white); */
-        /* renderer.tex(&texture, glm::vec2(100.0f, 0.0f), Color::blue); */
-        /* renderer.circ(glm::vec2(10.0f, 10.0f), 10.0f, 128, Color::red); */
-        map.render(&renderer);
-        renderer.quad(quad.a, quad.b, quad.c, quad.d, Color::black);
+        scene.render(&renderer);
         renderer.end();
 
         renderer.render(matrix);

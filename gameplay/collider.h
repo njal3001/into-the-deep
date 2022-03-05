@@ -13,19 +13,48 @@ namespace Uboat
     class Collider : public Component
     {
     public:
+        struct Axes
+        {
+            glm::vec2 ax1;
+            glm::vec2 ax2;
+        };
+
+        struct Projection
+        {
+            float start;
+            float end;
+        };
+
+    public:
         Rectf bounds;
         float rotation;
         bool dynamic;
+        uint32_t mask;
 
-        Collider(const Rectf& bounds, const bool dynamic, const float rotation = 0);
+    public:
+        Collider(const Rectf& bounds, const bool dynamic = true, const float rotation = 0.0f);
 
-        Quadf get();
+        void awake() override;
+
+        const Quadf& get();
+        const Axes& axes();
+
+        // Assumes that the collider is refreshed
+        Projection project(const glm::vec2& axis) const;
+
         void invalidate_cache();
+
+        bool overlaps(Collider& other);
+        glm::vec2 push_out(Collider& other);
 
     private:
         Quadf m_cached;
-        uint64_t m_timestamp;
+        Axes m_axes;
 
+        int m_timestamp;
+
+    private:
+        void refresh();
         void recalculate();
     };
 }

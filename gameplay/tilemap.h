@@ -20,6 +20,6 @@ namespace Uboat
         void render(Renderer *renderer);
 
     private:
-        void add_entity(const size_t id, Scene *scene);
+        void add_entity(const size_t id, Scene *scene, const size_t x, const size_t y);
     };
 }

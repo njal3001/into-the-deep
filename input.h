@@ -48,6 +48,7 @@ namespace Uboat
 
             float axes[CONTROLLER_AXES_MAX];
 
+            bool active() const;
             void clear();
             void update();
         };

@@ -25,6 +25,8 @@ add_executable(uboat
     gameplay/scene.cpp
     gameplay/tilemap.cpp
     gameplay/collider.cpp
+    gameplay/player.cpp
+    gameplay/factory.cpp
     )
 
 target_link_libraries(uboat ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})

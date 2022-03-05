@@ -13,6 +13,8 @@ namespace Uboat
 
     namespace Platform
     {
+        constexpr uint64_t ticks_per_sec = 10000;
+
         bool init();
         bool update();
         void present();

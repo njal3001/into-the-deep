@@ -93,6 +93,8 @@ namespace Uboat
         void update_lists();
     };
 
+    class Tilemap;
+
     class Scene
     {
     public:
@@ -102,9 +104,10 @@ namespace Uboat
         std::vector<Entity*> m_entities;
         std::vector<Entity*> m_to_add;
         std::vector<Component*> m_components[max_component_types];
+        Tilemap *m_tilemap;
 
     public:
-        Scene();
+        Scene(Tilemap *map);
         ~Scene();
 
         Entity* add_entity(const glm::vec2& pos);

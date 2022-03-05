@@ -55,6 +55,11 @@ namespace Uboat
         pos.y = y;
     }
 
+    bool Input::Controller::active() const
+    {
+        return Platform::get_joystick();
+    }
+
     void Input::Controller::clear()
     {
         for (size_t b = 0; b < CONTROLLER_BUTTON_MAX; b++)

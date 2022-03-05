@@ -1,10 +1,14 @@
 #include "ecs.h"
 #include <algorithm>
+#include "tilemap.h"
 
 namespace Uboat
 {
-    Scene::Scene()
-    {}
+    Scene::Scene(Tilemap *map)
+        : m_tilemap(map)
+    {
+        map->load(this);
+    }
 
     Scene::~Scene()
     {
@@ -93,6 +97,8 @@ namespace Uboat
 
     void Scene::render(Renderer *renderer)
     {
+        m_tilemap->render(renderer);
+
         for (const auto& c_vec : m_components)
         {
             for (auto c : c_vec)

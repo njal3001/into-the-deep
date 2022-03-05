@@ -1,6 +1,8 @@
 #include "tilemap.h"
 #include "../platform.h"
 #include "rapidxml/rapidxml.hpp"
+#include "factory.h"
+#include "player.h"
 
 namespace Uboat
 {
@@ -30,8 +32,10 @@ namespace Uboat
 
         xml_node<> *map_node = doc.first_node("map");
 
-        const size_t width = (size_t)strtol(map_node->first_attribute("width")->value(), nullptr, 10);
-        const size_t height = (size_t)strtol(map_node->first_attribute("height")->value(), nullptr, 10);
+        const int width = (size_t)strtol(map_node->first_attribute("width")->value(),
+                nullptr, 10);
+        const int height = (size_t)strtol(map_node->first_attribute("height")->value(),
+                nullptr, 10);
 
         map.resize(width * height);
 
@@ -40,38 +44,63 @@ namespace Uboat
         char *data = layer_node->first_node("data")->value();
 
         char *replace;
-        for (size_t i = 0; i < width * height - 1; i++)
+        for (int y = height - 1; y >= 0; y--)
         {
-            replace = strchr(data, ',');
-            *replace = '\0';
-            map[i] = (size_t)strtol(data, nullptr, 10);
-            data = replace + 1;
-        }
+            for (int x = 0; x < width; x++)
+            {
+                replace = strchr(data, ',');
+                if (replace)
+                {
+                    *replace = '\0';
+                }
 
-        map[width * height] = (size_t)strtol(data, nullptr, 10);
+                const size_t id = strtol(data, nullptr, 10);
+                map[y * width + x] = id;
+                data = replace + 1;
+                add_entity(id, scene, x, y);
+            }
+        }
 
         // Object tiles
         layer_node = layer_node->next_sibling();
         data = layer_node->first_node("data")->value();
 
-        for (size_t i = 0; i < width * height - 1; i++)
+        for (int y = height - 1; y >= 0; y--)
         {
-            replace = strchr(data, ',');
-            *replace = '\0';
-            size_t val = (size_t)strtol(data, nullptr, 10);
-            data = replace + 1;
+            for (int x = 0; x < width; x++)
+            {
+                replace = strchr(data, ',');
+                if (replace)
+                {
+                    *replace = '\0';
+                }
 
-            add_entity(val, scene);
+                const size_t id = strtol(data, nullptr, 10);
+                data = replace + 1;
+                add_entity(id, scene, x, y);
+            }
         }
-
-        add_entity((size_t)strtol(data, nullptr, 10), scene);
 
         delete[] file.data;
     }
 
-    void Tilemap::add_entity(const size_t id, Scene *scene)
+    void Tilemap::add_entity(const size_t id, Scene *scene, const size_t x, const size_t y)
     {
-        if (id == 0) return;
+        glm::vec2 pos(x * 8.0f, y * 8.0f);
+
+        switch (id)
+        {
+            case 2:
+            {
+                Factory::wall(scene, pos);
+                break;
+            }
+            case 3:
+            {
+                Player::create(scene, pos);
+                break;
+            }
+        }
     }
 
     void Tilemap::render(Renderer *renderer)
