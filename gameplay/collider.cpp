@@ -114,4 +114,9 @@ namespace Uboat
         m_axes.ax1 = glm::normalize(m_cached.d - m_cached.a);
         m_axes.ax2 = glm::normalize(m_cached.b - m_cached.a);
     }
+    
+    void Collider::render(Renderer *renderer)
+    {
+        renderer->quad(m_cached.a, m_cached.b, m_cached.c, m_cached.d, Color::red);
+    }
 }

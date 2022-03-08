@@ -1,9 +1,11 @@
 #include "ecs.h"
+#include <string.h>
 
 namespace Uboat
 {
     Component::Component()
-        : visible(true), m_type(0), m_alive(true), m_entity(nullptr)
+        : visible(true), m_type(0), m_alive(true), m_entity(nullptr), 
+        m_next(nullptr), m_prev(nullptr)
     {}
 
     Component::~Component()
@@ -27,6 +29,16 @@ namespace Uboat
     Scene* Component::scene() const
     {
         return (m_entity ? m_entity->scene() : nullptr);
+    }
+
+    Component* Component::next() const
+    {
+        return m_next;
+    }
+
+    Component* Component::prev() const
+    {
+        return m_prev;
     }
 
     void Component::destroy()

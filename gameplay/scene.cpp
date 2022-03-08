@@ -7,19 +7,25 @@ namespace Uboat
     Scene::Scene(Tilemap *map)
         : m_tilemap(map)
     {
-        map->load(this);
+        map->fill_scene(this);
     }
 
     Scene::~Scene()
     {
-        for (auto e : m_to_add)
+        Entity *to_add = m_to_add.head;
+        while (to_add)
         {
-            delete e;
+            Entity *next = to_add->m_next;
+            delete to_add;
+            to_add = next;
         }
 
-        for (auto e : m_entities)
+        Entity *ent = m_entities.head;
+        while (ent)
         {
-            delete e;
+            Entity *next = ent->m_next;
+            delete ent;
+            ent = next;
         }
     }
 
@@ -28,40 +34,46 @@ namespace Uboat
         Entity* entity = new Entity(pos);
         entity->m_scene = this;
 
-        m_to_add.push_back(entity);
+        m_to_add.insert(entity);
 
         return entity;
     }
 
     void Scene::track_component(Component* component)
     {
-        m_components[component->type()].push_back(component);
+        m_components[component->type()].insert(component);
     }
 
     void Scene::untrack_component(Component* component)
     {
         assert(component->scene() == this);
-
-        auto& c_vec = m_components[component->m_type];
-        c_vec.erase(std::find(std::begin(c_vec), std::end(c_vec), component));
+        m_components[component->type()].remove(component);
     }
 
     void Scene::update(float elapsed)
     {
         update_lists();
 
-        for (auto e : m_entities)
+        auto ent = m_entities.head;
+        while (ent)
         {
-            e->update_lists();
+            ent->update_lists();
+            ent = ent->m_next;
         }
 
-        for (auto& c_vec : m_components)
+        for (size_t i = 0; i < Component::Types::count(); i++)
         {
-            for (auto c : c_vec)
+            if (Component::Types::prop_mask(i) & Property::Updatable)
             {
-                if (c->m_alive && c->entity()->m_alive)
+                auto comp = m_components[i].head;
+                while (comp)
                 {
-                    c->update(elapsed);
+                    if (comp->alive())
+                    {
+                        comp->update(elapsed);
+                    }
+
+                    comp = comp->m_next;
                 }
             }
         }
@@ -69,43 +81,49 @@ namespace Uboat
 
     void Scene::update_lists()
     {
-        auto it = m_entities.begin();
-
-        while (it != m_entities.end())
+        Entity *ent = m_entities.head;
+        while (ent)
         {
-            Entity* e = *it;
-            if (!e->m_alive)
+            Entity *next = ent->m_next;
+            if (!ent->m_alive)
             {
-                it = m_entities.erase(it);
+                m_entities.remove(ent);
+                ent->removed();
+                delete ent;
+            }
 
-                e->removed();
-                delete e;
-            }
-            else
-            {
-                it++;
-            }
+            ent = next;
         }
 
-        for (auto entity : m_to_add)
+        Entity *to_add = m_to_add.head;
+        while (to_add)
         {
-            m_entities.push_back(entity);
-        }
+            Entity *next = to_add->m_next;
 
-        m_to_add.clear();
+            m_to_add.remove(to_add);
+            m_entities.insert(to_add);
+
+            to_add = next;
+        }
     }
 
     void Scene::render(Renderer *renderer)
     {
         m_tilemap->render(renderer);
 
-        for (const auto& c_vec : m_components)
+        for (size_t i = 0; i < Component::Types::count(); i++)
         {
-            for (auto c : c_vec)
+            if (Component::Types::prop_mask(i) & Property::Renderable)
             {
-                if (c->alive() && c->visible && c->entity()->visible)
+                auto comp = m_components[i].head;
+                while (comp)
                 {
-                    c->render(renderer);
+                    if (comp->alive() && comp->visible && comp->entity()->visible)
+                    {
+                        comp->render(renderer);
+                    }
+
+                    comp = comp->m_next;
                 }
             }
         }

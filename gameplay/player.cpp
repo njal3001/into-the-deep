@@ -36,16 +36,29 @@ namespace Uboat
 
         m_entity->pos += 70.0f * dir * elapsed;
 
-        std::vector<Collider*> out;
-        scene()->all(&out);
+        // std::vector<Collider*> out;
+        // scene()->all(&out);
+        //
+        // for (auto other : out)
+        // {
+        //     if (other != col)
+        //     {
+        //         const glm::vec2 push = col->push_out(*other);
+        //         m_entity->pos += push;
+        //     }
+        // }
 
-        for (auto other : out)
+        Collider *other = scene()->first<Collider>();
+
+        while (other)
         {
             if (other != col)
             {
                 const glm::vec2 push = col->push_out(*other);
                 m_entity->pos += push;
             }
+
+            other = (Collider*)other->next();
         }
     }
 

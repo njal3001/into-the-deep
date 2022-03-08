@@ -47,6 +47,8 @@ namespace Uboat
         bool overlaps(Collider& other);
         glm::vec2 push_out(Collider& other);
 
+        void render(Renderer *renderer) override;
+
     private:
         Quadf m_cached;
         Axes m_axes;
@@ -56,5 +58,14 @@ namespace Uboat
     private:
         void refresh();
         void recalculate();
+    };
+
+    template<>
+    struct Properties<Collider>
+    {
+        static uint8_t get()
+        {
+            return Property::None;
+        }
     };
 }

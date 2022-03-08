@@ -5,7 +5,7 @@
 namespace Uboat
 {
     Entity::Entity(const glm::vec2& pos)
-        : pos(pos), visible(true), m_scene(nullptr), m_alive(true)
+        : pos(pos), visible(true), m_scene(nullptr), m_alive(true), m_next(nullptr), m_prev(nullptr)
     {}
 
     Entity::~Entity()

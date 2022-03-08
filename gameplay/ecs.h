@@ -5,8 +5,23 @@
 
 namespace Uboat
 {
+    #define MAX_COMPONENT_TYPES 256
+
     class Entity;
     class Scene;
+    
+    struct Property
+    {
+        static constexpr uint8_t None = 0;
+        static constexpr uint8_t Updatable = 1;
+        static constexpr uint8_t Renderable = 1 << 1;
+    };
+
+    template <class T>
+    struct Properties
+    {
+        static uint8_t get();
+    };
 
     class Component
     {
@@ -15,21 +30,37 @@ namespace Uboat
 
     public:
         bool visible;
+        uint32_t prop_mask;
 
     private:
         uint8_t m_type;
         bool m_alive;
 
+        Component *m_next;
+        Component *m_prev;
+
         class Types
         {
             inline static uint8_t s_counter = 0;
+            inline static uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = { Property::None };
 
         public:
+            static uint8_t count()
+            {
+                return s_counter;
+            }
+
             template<class T>
             static uint8_t id()
             {
                 static const uint8_t val = s_counter++;
+                s_prop_masks[val] = Properties<T>::get();
                 return val;
+            }
+
+            static uint8_t prop_mask(const uint8_t id)
+            {
+                return s_prop_masks[id];
             }
         };
 
@@ -46,6 +77,9 @@ namespace Uboat
         Entity* entity() const;
         Scene* scene() const;
 
+        Component* next() const;
+        Component* prev() const;
+
         template <class T>
         T* get() const;
 
@@ -54,6 +88,15 @@ namespace Uboat
 
         virtual void update(const float elapsed);
         virtual void render(Renderer* renderer);
+    };
+
+    template<>
+    struct Properties<Component>
+    {
+        static uint8_t get()
+        {
+            return Property::None;
+        }
     };
 
     class Entity
@@ -70,6 +113,9 @@ namespace Uboat
         std::vector<Component*> m_to_add;
 
         bool m_alive;
+
+        Entity *m_next;
+        Entity *m_prev;
 
     public:
         Entity(const glm::vec2& pos);
@@ -97,13 +143,20 @@ namespace Uboat
 
     class Scene
     {
-    public:
-        static constexpr int max_component_types = 256;
-
     private:
-        std::vector<Entity*> m_entities;
-        std::vector<Entity*> m_to_add;
-        std::vector<Component*> m_components[max_component_types];
+        template<class T>
+        struct Pool
+        {
+            T* head = nullptr;
+            T* tail = nullptr;
+
+            void insert(T *instance);
+            void remove(T *instance);
+        };
+
+        Pool<Entity> m_entities;
+        Pool<Entity> m_to_add;
+        Pool<Component> m_components[MAX_COMPONENT_TYPES];
         Tilemap *m_tilemap;
 
     public:
@@ -124,10 +177,6 @@ namespace Uboat
 
         template<class T>
         void all(std::vector<T*> *out) const;
-
-        size_t tile_size() const;
-        size_t width() const;
-        size_t height() const;
 
     private:
         void update_lists();
@@ -170,31 +219,40 @@ namespace Uboat
     T* Scene::first() const
     {
         const uint8_t type = Component::Types::id<T>();
-        auto& c_vec = m_components[type];
-
-        for (auto c : c_vec)
-        {
-            if (c->alive())
-            {
-                return (T*)c;
-            }
-        }
-
-        return nullptr;
+        return (T*)m_components[type].head;
     }
 
     template<class T>
-    void Scene::all(std::vector<T*>* out) const
+    void Scene::Pool<T>::insert(T *instance)
     {
-        const uint8_t type = Component::Types::id<T>();
-        auto& c_vec = m_components[type];
-
-        for (auto c : c_vec)
+        if (tail)
         {
-            if (c->alive())
-            {
-                out->push_back((T*)c);
-            }
+            tail->m_next = instance;
+            instance->m_prev = tail;
+            tail = instance;
         }
+        else
+        {
+            tail = head = instance;
+            instance->m_prev = instance->m_next = nullptr;
+        }
+    }
+
+    template<class T>
+    void Scene::Pool<T>::remove(T *instance)
+    {
+        if (instance->m_prev)
+            instance->m_prev->m_next = instance->m_next;
+
+        if (instance->m_next)
+            instance->m_next->m_prev = instance->m_prev;
+
+        if (head == instance)
+            head = instance->m_next;
+
+        if (tail == instance)
+            tail = instance->m_prev;
+
+        instance->m_next = instance->m_prev = nullptr;
     }
 }
