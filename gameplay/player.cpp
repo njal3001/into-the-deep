@@ -1,5 +1,6 @@
 #include "player.h"
 #include "collider.h"
+#include "mover.h"
 #include "../input.h"
 #include "../maths/calc.h"
 #include <glm/gtx/vector_angle.hpp>
@@ -28,38 +29,14 @@ namespace Uboat
 
         dir = Calc::normalize(dir);
 
-        Collider *col = get<Collider>();
+        auto col = get<Collider>();
         if (dir.x != 0 || dir.y != 0)
         {
             col->rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f));
         }
 
-        m_entity->pos += 70.0f * dir * elapsed;
-
-        // std::vector<Collider*> out;
-        // scene()->all(&out);
-        //
-        // for (auto other : out)
-        // {
-        //     if (other != col)
-        //     {
-        //         const glm::vec2 push = col->push_out(*other);
-        //         m_entity->pos += push;
-        //     }
-        // }
-
-        Collider *other = scene()->first<Collider>();
-
-        while (other)
-        {
-            if (other != col)
-            {
-                const glm::vec2 push = col->push_out(*other);
-                m_entity->pos += push;
-            }
-
-            other = (Collider*)other->next();
-        }
+        auto mover = get<Mover>();
+        mover->vel = 70.0f * dir;
     }
 
     void Player::render(Renderer *renderer)
@@ -72,11 +49,16 @@ namespace Uboat
 
     Entity* Player::create(Scene *scene, const glm::vec2& pos)
     {
-        Entity* e = scene->add_entity(pos);
+        Entity *e = scene->add_entity(pos);
         e->add(new Player());
 
-        Collider* c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(12.0f, 8.0f)));
+        Collider *c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(12.0f, 8.0f)));
         e->add(c);
+
+        Mover *m = new Mover();
+        m->collider = c;
+        e->add(m);
+
         return e;
     }
 }

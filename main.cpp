@@ -1,4 +1,4 @@
-#include "gameplay/player.h"
+#include <glm/gtc/matrix_transform.hpp>
 #include "gameplay/tilemap.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
@@ -6,7 +6,9 @@
 #include "input.h"
 #include "maths/shapes.h"
 #include "platform.h"
-#include <glm/gtc/matrix_transform.hpp>
+#include "gameplay/collider.h"
+#include "gameplay/player.h"
+#include "gameplay/mover.h"
 
 int main()
 {
@@ -14,6 +16,10 @@ int main()
 
     Platform::init();
     Renderer renderer;
+
+    Scene::register_component<Collider>();
+    Scene::register_component<Player>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Mover>(Property::Updatable);
 
     Tilemap map("tilemap");
     Scene scene(&map);

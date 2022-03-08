@@ -38,6 +38,7 @@ namespace Uboat
         xml_node<> *objects_node = tiles_node->next_sibling();
         create_layer(&m_object_layer, objects_node, m_width, m_height);
 
+        // TODO: This should be done in the struct
         delete[] file.data;
     }
 

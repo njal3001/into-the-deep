@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <vector>
 #include "../graphics/renderer.h"
+#include "collisionhandler.h"
 
 namespace Uboat
 {
@@ -15,12 +16,6 @@ namespace Uboat
         static constexpr uint8_t None = 0;
         static constexpr uint8_t Updatable = 1;
         static constexpr uint8_t Renderable = 1 << 1;
-    };
-
-    template <class T>
-    struct Properties
-    {
-        static uint8_t get();
     };
 
     class Component
@@ -42,7 +37,6 @@ namespace Uboat
         class Types
         {
             inline static uint8_t s_counter = 0;
-            inline static uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = { Property::None };
 
         public:
             static uint8_t count()
@@ -54,13 +48,7 @@ namespace Uboat
             static uint8_t id()
             {
                 static const uint8_t val = s_counter++;
-                s_prop_masks[val] = Properties<T>::get();
                 return val;
-            }
-
-            static uint8_t prop_mask(const uint8_t id)
-            {
-                return s_prop_masks[id];
             }
         };
 
@@ -88,15 +76,6 @@ namespace Uboat
 
         virtual void update(const float elapsed);
         virtual void render(Renderer* renderer);
-    };
-
-    template<>
-    struct Properties<Component>
-    {
-        static uint8_t get()
-        {
-            return Property::None;
-        }
     };
 
     class Entity
@@ -158,10 +137,16 @@ namespace Uboat
         Pool<Entity> m_to_add;
         Pool<Component> m_components[MAX_COMPONENT_TYPES];
         Tilemap *m_tilemap;
+        CollisionHandler m_collision_handler;
+
+        static inline uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = { Property::None };
 
     public:
         Scene(Tilemap *map);
         ~Scene();
+
+        template <class T>
+        static void register_component(const uint8_t prop_mask = Property::None);
 
         Entity* add_entity(const glm::vec2& pos);
         void remove_entity(Entity *entity);
@@ -213,6 +198,13 @@ namespace Uboat
         }
 
         return nullptr;
+    }
+
+    template <class T>
+    void Scene::register_component(const uint8_t prop_mask)
+    {
+        const uint32_t id = Component::Types::id<T>();
+        s_prop_masks[id] = prop_mask;
     }
 
     template<class T>

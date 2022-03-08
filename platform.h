@@ -13,7 +13,7 @@ namespace Uboat
 
     namespace Platform
     {
-        constexpr uint64_t ticks_per_sec = 10000;
+        constexpr uint64_t ticks_per_sec = 100000;
 
         bool init();
         bool update();
@@ -27,5 +27,6 @@ namespace Uboat
         File read_file(const std::string& file_path);
 
         uint64_t ticks();
+        uint8_t frame();
     }
 }

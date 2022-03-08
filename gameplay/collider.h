@@ -59,13 +59,4 @@ namespace Uboat
         void refresh();
         void recalculate();
     };
-
-    template<>
-    struct Properties<Collider>
-    {
-        static uint8_t get()
-        {
-            return Property::None;
-        }
-    };
 }

@@ -11,14 +11,4 @@ namespace Uboat
 
         static Entity* create(Scene *scene, const glm::vec2& pos);
     };
-
-
-    template<>
-    struct Properties<Player>
-    {
-        static uint8_t get()
-        {
-            return Property::Updatable | Property::Renderable;
-        }
-    };
 }

@@ -8,6 +8,7 @@ namespace Uboat
         : m_tilemap(map)
     {
         map->fill_scene(this);
+        m_collision_handler.init(this);
     }
 
     Scene::~Scene()
@@ -63,7 +64,7 @@ namespace Uboat
 
         for (size_t i = 0; i < Component::Types::count(); i++)
         {
-            if (Component::Types::prop_mask(i) & Property::Updatable)
+            if (s_prop_masks[i] & Property::Updatable)
             {
                 auto comp = m_components[i].head;
                 while (comp)
@@ -77,6 +78,8 @@ namespace Uboat
                 }
             }
         }
+
+        m_collision_handler.update();
     }
 
     void Scene::update_lists()
@@ -113,7 +116,7 @@ namespace Uboat
 
         for (size_t i = 0; i < Component::Types::count(); i++)
         {
-            if (Component::Types::prop_mask(i) & Property::Renderable)
+            if (s_prop_masks[i] & Property::Renderable)
             {
                 auto comp = m_components[i].head;
                 while (comp)
