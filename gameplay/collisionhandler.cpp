@@ -20,14 +20,17 @@ namespace Uboat
 
     void CollisionHandler::update()
     {
-        auto mover = m_scene->first<Mover>();
-        while (mover)
+        auto mnode = m_scene->first<Mover>();
+        while (mnode)
         {
+            auto mover = mnode->data;
             auto col = mover->collider;
-            auto ocol = m_scene->first<Collider>();
 
-            while (ocol)
+            auto onode = m_scene->first<Collider>();
+
+            while (onode)
             {
+                auto ocol = onode->data;
                 if (col != ocol && (mover->stop_mask & ocol->mask))
                 {
                     const glm::vec2 push = col->push_out(*ocol);
@@ -38,10 +41,10 @@ namespace Uboat
                     }
                 }
 
-                ocol = (Collider*)ocol->next();
+                onode = onode->next;
             }
 
-            mover = (Mover*)mover->next();
+            mnode = mnode->next;
         }
     }
 }

@@ -13,20 +13,26 @@ namespace Uboat
 
     Scene::~Scene()
     {
-        Entity *to_add = m_to_add.head;
-        while (to_add)
         {
-            Entity *next = to_add->m_next;
-            delete to_add;
-            to_add = next;
+            auto addnode = m_to_add.head;
+            while (addnode)
+            {
+                auto next = addnode->next;
+                auto ent = addnode->data;
+                delete ent;
+                addnode = next;
+            }
         }
 
-        Entity *ent = m_entities.head;
-        while (ent)
         {
-            Entity *next = ent->m_next;
-            delete ent;
-            ent = next;
+            auto enode = m_entities.head;
+            while (enode)
+            {
+                auto next = enode->next;
+                auto ent = enode->data;
+                delete ent;
+                enode = next;
+            }
         }
     }
 
@@ -35,46 +41,48 @@ namespace Uboat
         Entity* entity = new Entity(pos);
         entity->m_scene = this;
 
-        m_to_add.insert(entity);
+        m_to_add.insert(&entity->m_node);
 
         return entity;
     }
 
     void Scene::track_component(Component* component)
     {
-        m_components[component->type()].insert(component);
+        m_components[component->type()].insert(&component->m_node);
     }
 
     void Scene::untrack_component(Component* component)
     {
         assert(component->scene() == this);
-        m_components[component->type()].remove(component);
+        m_components[component->type()].remove(&component->m_node);
     }
 
     void Scene::update(float elapsed)
     {
         update_lists();
 
-        auto ent = m_entities.head;
-        while (ent)
+        auto enode = m_entities.head;
+        while (enode)
         {
+            auto ent = enode->data;
             ent->update_lists();
-            ent = ent->m_next;
+            enode = enode->next;
         }
 
         for (size_t i = 0; i < Component::Types::count(); i++)
         {
             if (s_prop_masks[i] & Property::Updatable)
             {
-                auto comp = m_components[i].head;
-                while (comp)
+                auto cnode = m_components[i].head;
+                while (cnode)
                 {
+                    auto comp = cnode->data;
                     if (comp->alive())
                     {
                         comp->update(elapsed);
                     }
 
-                    comp = comp->m_next;
+                    cnode = cnode->next;
                 }
             }
         }
@@ -84,29 +92,33 @@ namespace Uboat
 
     void Scene::update_lists()
     {
-        Entity *ent = m_entities.head;
-        while (ent)
         {
-            Entity *next = ent->m_next;
-            if (!ent->m_alive)
+            auto enode = m_entities.head;
+            while (enode)
             {
-                m_entities.remove(ent);
-                ent->removed();
-                delete ent;
-            }
+                auto next = enode->next;
+                auto ent = enode->data;
+                if (!ent->m_alive)
+                {
+                    m_entities.remove(enode);
+                    ent->removed();
+                    delete ent;
+                }
 
-            ent = next;
+                enode = next;
+            }
         }
 
-        Entity *to_add = m_to_add.head;
-        while (to_add)
         {
-            Entity *next = to_add->m_next;
+            auto addnode = m_to_add.head;
+            while (addnode)
+            {
+                auto next = addnode->next;
+                m_to_add.remove(addnode);
+                m_entities.insert(addnode);
 
-            m_to_add.remove(to_add);
-            m_entities.insert(to_add);
-
-            to_add = next;
+                addnode = next;
+            }
         }
     }
 
@@ -118,15 +130,16 @@ namespace Uboat
         {
             if (s_prop_masks[i] & Property::Renderable)
             {
-                auto comp = m_components[i].head;
-                while (comp)
+                auto cnode = m_components[i].head;
+                while (cnode)
                 {
+                    auto comp = cnode->data;
                     if (comp->alive() && comp->visible && comp->entity()->visible)
                     {
                         comp->render(renderer);
                     }
 
-                    comp = comp->m_next;
+                    cnode = cnode->next;
                 }
             }
         }

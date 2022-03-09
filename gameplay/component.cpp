@@ -6,7 +6,9 @@ namespace Uboat
     Component::Component()
         : visible(true), m_type(0), m_alive(true), m_entity(nullptr), 
         m_next(nullptr), m_prev(nullptr)
-    {}
+    {
+        m_node.data = this;
+    }
 
     Component::~Component()
     {}

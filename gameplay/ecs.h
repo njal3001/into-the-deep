@@ -3,6 +3,7 @@
 #include <vector>
 #include "../graphics/renderer.h"
 #include "collisionhandler.h"
+#include "pool.h"
 
 namespace Uboat
 {
@@ -31,6 +32,7 @@ namespace Uboat
         uint8_t m_type;
         bool m_alive;
 
+        Node<Component> m_node;
         Component *m_next;
         Component *m_prev;
 
@@ -95,6 +97,7 @@ namespace Uboat
 
         Entity *m_next;
         Entity *m_prev;
+        Node<Entity> m_node;
 
     public:
         Entity(const glm::vec2& pos);
@@ -123,16 +126,6 @@ namespace Uboat
     class Scene
     {
     private:
-        template<class T>
-        struct Pool
-        {
-            T* head = nullptr;
-            T* tail = nullptr;
-
-            void insert(T *instance);
-            void remove(T *instance);
-        };
-
         Pool<Entity> m_entities;
         Pool<Entity> m_to_add;
         Pool<Component> m_components[MAX_COMPONENT_TYPES];
@@ -158,10 +151,7 @@ namespace Uboat
         void render(Renderer *renderer);
 
         template<class T>
-        T* first() const;
-
-        template<class T>
-        void all(std::vector<T*> *out) const;
+        Node<T>* first() const;
 
     private:
         void update_lists();
@@ -208,43 +198,9 @@ namespace Uboat
     }
 
     template<class T>
-    T* Scene::first() const
+    Node<T>* Scene::first() const
     {
         const uint8_t type = Component::Types::id<T>();
-        return (T*)m_components[type].head;
-    }
-
-    template<class T>
-    void Scene::Pool<T>::insert(T *instance)
-    {
-        if (tail)
-        {
-            tail->m_next = instance;
-            instance->m_prev = tail;
-            tail = instance;
-        }
-        else
-        {
-            tail = head = instance;
-            instance->m_prev = instance->m_next = nullptr;
-        }
-    }
-
-    template<class T>
-    void Scene::Pool<T>::remove(T *instance)
-    {
-        if (instance->m_prev)
-            instance->m_prev->m_next = instance->m_next;
-
-        if (instance->m_next)
-            instance->m_next->m_prev = instance->m_prev;
-
-        if (head == instance)
-            head = instance->m_next;
-
-        if (tail == instance)
-            tail = instance->m_prev;
-
-        instance->m_next = instance->m_prev = nullptr;
+        return (Node<T>*)m_components[type].head;
     }
 }
