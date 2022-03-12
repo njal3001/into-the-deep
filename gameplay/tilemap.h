@@ -21,6 +21,9 @@ namespace Uboat
         void fill_scene(Scene *scene);
         void render(Renderer *renderer);
 
+        size_t width() const;
+        size_t height() const;
+
     private:
         void create_layer(std::vector<size_t> *out, const rapidxml::xml_node<> *node, 
                 const int width, const int height);

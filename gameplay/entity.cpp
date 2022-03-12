@@ -38,6 +38,7 @@ namespace Uboat
         for (auto c : m_components)
         {
             m_scene->untrack_component(c);
+            c->on_removed();
         }
 
         m_scene = nullptr;

@@ -12,6 +12,8 @@ namespace Uboat
 
     class Collider : public Component
     {
+        friend class CollisionHandler;
+
     public:
         struct Axes
         {
@@ -31,13 +33,21 @@ namespace Uboat
         bool dynamic;
         uint32_t mask;
 
+    private:
+        Quadf m_quad;
+        Axes m_axes;
+        Rectf m_bbox;
+        Recti m_bucket_box;
+        bool m_in_bucket;
+
+        int m_timestamp;
+
     public:
-        Collider(const Rectf& bounds, const bool dynamic = true, const float rotation = 0.0f);
+        Collider(const Rectf& bounds, const float rotation = 0.0f);
 
-        void awake() override;
-
-        const Quadf& get();
+        const Quadf& quad();
         const Axes& axes();
+        const Rectf& bbox();
 
         // Assumes that the collider is refreshed
         Projection project(const glm::vec2& axis) const;
@@ -49,11 +59,9 @@ namespace Uboat
 
         void render(Renderer *renderer) override;
 
-    private:
-        Quadf m_cached;
-        Axes m_axes;
-
-        int m_timestamp;
+    protected:
+        void awake() override;
+        void on_removed() override;
 
     private:
         void refresh();

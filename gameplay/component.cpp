@@ -51,6 +51,9 @@ namespace Uboat
     void Component::awake()
     {}
 
+    void Component::on_removed()
+    {}
+
     void Component::update(const float elapsed)
     {}
 

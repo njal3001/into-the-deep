@@ -144,4 +144,14 @@ namespace Uboat
             }
         }
     }
+
+    const Tilemap* Scene::map() const
+    {
+        return m_tilemap;
+    }
+
+    CollisionHandler* Scene::collision_handler()
+    {
+        return &m_collision_handler;
+    }
 }

@@ -73,11 +73,14 @@ namespace Uboat
         template <class T>
         T* get() const;
 
-        virtual void awake();
         virtual void destroy();
 
         virtual void update(const float elapsed);
         virtual void render(Renderer* renderer);
+
+    protected:
+        virtual void awake();
+        virtual void on_removed();
     };
 
     class Entity
@@ -152,6 +155,9 @@ namespace Uboat
 
         template<class T>
         Node<T>* first() const;
+
+        const Tilemap* map() const;
+        CollisionHandler* collision_handler();
 
     private:
         void update_lists();

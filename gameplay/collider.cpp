@@ -1,25 +1,33 @@
 #include "collider.h"
 #include "../platform.h"
+#include "mover.h"
 #include <algorithm>
 
 namespace Uboat
 {
-    Collider::Collider(const Rectf& bounds, const bool dynamic, const float rotation)
-        : bounds(bounds), dynamic(dynamic), rotation(rotation),
+    Collider::Collider(const Rectf& bounds, const float rotation)
+        : bounds(bounds), rotation(rotation), m_in_bucket(false),
         m_timestamp(-1)
     {}
 
     void Collider::awake()
     {
+        Mover *mover = get<Mover>();
         if (!dynamic)
         {
             recalculate();
+            scene()->collision_handler()->update_buckets(this);
         }
+    }
+
+    void Collider::on_removed()
+    {
+        scene()->collision_handler()->remove(this);
     }
 
     void Collider::refresh()
     {
-        const int ticks = Platform::ticks();
+        const int ticks = Platform::frame();
         if (ticks != m_timestamp && dynamic)
         {
             recalculate();
@@ -27,16 +35,22 @@ namespace Uboat
         }
     }
 
-    const Quadf& Collider::get()
+    const Quadf& Collider::quad()
     {
         refresh();
-        return m_cached;
+        return m_quad;
     }
 
     const Collider::Axes& Collider::axes()
     {
         refresh();
         return m_axes;
+    }
+
+    const Rectf& Collider::bbox()
+    {
+        refresh();
+        return m_bbox;
     }
 
     void Collider::invalidate_cache()
@@ -46,10 +60,10 @@ namespace Uboat
 
     Collider::Projection Collider::project(const glm::vec2& axis) const
     {
-        const float p0 = glm::dot(m_cached.a, axis);
-        const float p1 = glm::dot(m_cached.b, axis);
-        const float p2 = glm::dot(m_cached.c, axis);
-        const float p3 = glm::dot(m_cached.d, axis);
+        const float p0 = glm::dot(m_quad.a, axis);
+        const float p1 = glm::dot(m_quad.b, axis);
+        const float p2 = glm::dot(m_quad.c, axis);
+        const float p3 = glm::dot(m_quad.d, axis);
 
         std::initializer_list<float> all = { p0, p1, p2, p3 };
 
@@ -108,15 +122,38 @@ namespace Uboat
 
     void Collider::recalculate()
     {
-        m_cached = Quadf(bounds, rotation);
-        m_cached.offset(m_entity->pos);
+        m_quad = Quadf(bounds, rotation);
+        m_quad.offset(m_entity->pos);
 
-        m_axes.ax1 = glm::normalize(m_cached.d - m_cached.a);
-        m_axes.ax2 = glm::normalize(m_cached.b - m_cached.a);
+        m_axes.ax1 = glm::normalize(m_quad.d - m_quad.a);
+        m_axes.ax2 = glm::normalize(m_quad.b - m_quad.a);
+
+        float max_x = m_quad.a.x;
+        max_x = std::max(m_quad.b.x, max_x);
+        max_x = std::max(m_quad.c.x, max_x);
+        max_x = std::max(m_quad.d.x, max_x);
+
+        float min_x = m_quad.a.x;
+        min_x = std::min(m_quad.b.x, min_x);
+        min_x = std::min(m_quad.c.x, min_x);
+        min_x = std::min(m_quad.d.x, min_x);
+
+        float max_y = m_quad.a.y;
+        max_y = std::max(m_quad.b.y, max_y);
+        max_y = std::max(m_quad.c.y, max_y);
+        max_y = std::max(m_quad.d.y, max_y);
+
+        float min_y = m_quad.a.y;
+        min_y = std::min(m_quad.b.y, min_y);
+        min_y = std::min(m_quad.c.y, min_y);
+        min_y = std::min(m_quad.d.y, min_y);
+
+        m_bbox.pos = glm::vec2(min_x, min_y);
+        m_bbox.size = glm::vec2(max_x - min_x, max_y - min_y);
     }
     
     void Collider::render(Renderer *renderer)
     {
-        renderer->quad(m_cached.a, m_cached.b, m_cached.c, m_cached.d, Color::red);
+        renderer->quad(m_quad.a, m_quad.b, m_quad.c, m_quad.d, Color::red);
     }
 }

@@ -139,4 +139,14 @@ namespace Uboat
     {
         renderer->tex(m_texture, glm::vec2(), Color::white);
     }
+
+    size_t Tilemap::width() const
+    {
+        return m_width;
+    }
+
+    size_t Tilemap::height() const
+    {
+        return m_height;
+    }
 }

@@ -43,7 +43,10 @@ namespace Uboat
     {
         Collider *col = get<Collider>();
 
-        const Quadf& quad = col->get();
+        const Rectf& bbox = col->bbox();
+        renderer->rect(bbox.pos, bbox.size, Color::white);
+
+        const Quadf& quad = col->quad();
         renderer->quad(quad.a, quad.b, quad.c, quad.d, Color::black);
     }
 

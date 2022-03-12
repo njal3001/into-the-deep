@@ -9,6 +9,7 @@ namespace Uboat
     template<class T> struct Quad;
 
     using Rectf = Rect<float>;
+    using Recti = Rect<int>;
     using Quadf = Quad<float>;
 
     template<class T>
@@ -52,6 +53,13 @@ namespace Uboat
         glm::tvec2<T> center() const
         {
             return pos + (size / 2.0f);
+        }
+
+        bool contains(glm::tvec2<T> point) const
+        {
+            return 
+                pos.x <= point.x && point.x + size.x >= point.x &&
+                pos.y <= point.y && point.y + size.y >= point.y;
         }
     };
 
