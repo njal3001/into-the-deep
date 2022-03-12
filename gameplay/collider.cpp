@@ -148,8 +148,8 @@ namespace Uboat
         min_y = std::min(m_quad.c.y, min_y);
         min_y = std::min(m_quad.d.y, min_y);
 
-        m_bbox.pos = glm::vec2(min_x, min_y);
-        m_bbox.size = glm::vec2(max_x - min_x, max_y - min_y);
+        m_bbox.bl = glm::vec2(min_x, min_y);
+        m_bbox.tr = glm::vec2(max_x, max_y);
     }
     
     void Collider::render(Renderer *renderer)

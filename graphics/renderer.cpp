@@ -272,12 +272,12 @@ namespace Uboat
                 color, color, color, 0, 0, 255);
     }
 
-    void Renderer::rect(const glm::vec2& pos, const glm::vec2& size, const Color color)
+    void Renderer::rect(const glm::vec2& bl, const glm::vec2& tr, const Color color)
     {
         assert(m_vertex_map && m_index_map);
 
-        push_quad(pos.x, pos.y, pos.x, pos.y + size.y, pos.x + size.x, pos.y + size.y,
-                pos.x + size.x, pos.y, 0, 0, 0, 0, 0, 0, 0, 0, color, color, color, color,
+        push_quad(bl.x, bl.y, bl.x, tr.y, tr.x, tr.y, tr.x, bl.y, 
+                0, 0, 0, 0, 0, 0, 0, 0, color, color, color, color,
                 0, 0, 255);
     }
 

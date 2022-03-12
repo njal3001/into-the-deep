@@ -77,7 +77,7 @@ namespace Uboat
         void tri(const glm::vec2& pos0, const glm::vec2& pos1, const glm::vec2& pos2,
                 const Color color);
 
-        void rect(const glm::vec2& pos, const glm::vec2& size, const Color color);
+        void rect(const glm::vec2& bl, const glm::vec2& tr, const Color color);
 
         void quad(const glm::vec2& a, const glm::vec2& b, const glm::vec2& c,
                 const glm::vec2& d, const Color color);

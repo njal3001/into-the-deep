@@ -15,51 +15,37 @@ namespace Uboat
     template<class T>
     struct Rect
     {
-        glm::tvec2<T> pos;
-        glm::tvec2<T> size;
+        glm::tvec2<T> bl;
+        glm::tvec2<T> tr;
 
         Rect()
-            : pos(glm::tvec2<T>()), size(glm::tvec2<T>())
+            : bl(glm::tvec2<T>()), tr(glm::tvec2<T>())
         {}
 
-        Rect(const glm::tvec2<T>& pos, const glm::tvec2<T>& size)
-            : pos(pos), size(size)
+        Rect(const glm::tvec2<T>& bl, const glm::tvec2<T>& tr)
+            : bl(bl), tr(tr)
         {}
-
-        Rect(const T x, const T y, const T w, const T h)
-            : pos(glm::tvec2<T>(x, y)), size(glm::tvec2<T>(w, h))
-        {}
-
-        glm::tvec2<T> bot_left() const
-        {
-            return pos;
-        }
 
         glm::tvec2<T> bot_right() const
         {
-            return pos + glm::tvec2<T>(size.x, 0);
+            return glm::tvec2<T>(tr.x, bl.y);
         }
 
         glm::tvec2<T> top_left() const
         {
-            return pos + glm::tvec2<T>(0, size.y);
-        }
-
-        glm::tvec2<T> top_right() const
-        {
-            return pos + size;
+            return glm::tvec2<T>(bl.x, tr.y);
         }
 
         glm::tvec2<T> center() const
         {
-            return pos + (size / 2.0f);
+            return bl + (tr - bl) / 2.0f;
         }
 
         bool contains(glm::tvec2<T> point) const
         {
             return 
-                pos.x <= point.x && point.x + size.x >= point.x &&
-                pos.y <= point.y && point.y + size.y >= point.y;
+                bl.x <= point.x && tr.x >= point.x &&
+                bl.y <= point.y && tr.y >= point.y;
         }
     };
 
@@ -80,7 +66,7 @@ namespace Uboat
         {}
 
         Quad(const Rect<T> rect, const float rotation)
-            : a(rect.bot_left()), b(rect.top_left()), c(rect.top_right()), d(rect.bot_right())
+            : a(rect.bl), b(rect.top_left()), c(rect.tr), d(rect.bot_right())
         {
             rotate(rotation, rect.center());
         }

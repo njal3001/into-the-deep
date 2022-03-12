@@ -32,5 +32,6 @@ namespace Uboat
         glm::ivec2 bucket_index(const glm::vec2& pos);
         Recti bucket_box(const Rectf& bbox);
         void update_all_buckets();
+        bool valid_bucket_index(const size_t bx, const size_t by);
     };
 }

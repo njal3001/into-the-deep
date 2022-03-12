@@ -30,14 +30,15 @@ namespace Uboat
 
         const Recti& prev_buc_box = collider->m_bucket_box;
 
+        // Remove from previous buckets
         if (collider->m_in_bucket)
         {
-            glm::ivec2 prev_bot_left = prev_buc_box.bot_left();
-            glm::ivec2 prev_top_right = prev_buc_box.top_right();
+            const glm::ivec2& prev_bl = prev_buc_box.bl;
+            const glm::ivec2& prev_tr = prev_buc_box.tr;
 
-            for (int y = prev_bot_left.y; y <= prev_top_right.y; y++)
+            for (int y = prev_bl.y; y <= prev_tr.y; y++)
             {
-                for (int x = prev_bot_left.x; x <= prev_top_right.x; x++)
+                for (int x = prev_bl.x; x <= prev_tr.x; x++)
                 {
                     if (!buc_box.contains(glm::ivec2(x, y)))
                     {
@@ -47,14 +48,15 @@ namespace Uboat
             }
         }
 
-        glm::ivec2 bot_left = buc_box.bot_left();
-        glm::ivec2 top_right = buc_box.top_right();
+        // Add to new buckets
+        const glm::ivec2& bl = buc_box.bl;
+        const glm::ivec2& tr = buc_box.tr;
 
-        for (int y = bot_left.y; y <= top_right.y; y++)
+        for (int y = bl.y; y <= tr.y; y++)
         {
-            for (int x = bot_left.x; x <= top_right.x; x++)
+            for (int x = bl.x; x <= tr.x; x++)
             {
-                if (collider->m_in_bucket && !prev_buc_box.contains(glm::ivec2(x, y)))
+                if (!collider->m_in_bucket || !prev_buc_box.contains(glm::ivec2(x, y)))
                 {
                     add_bucket(collider, x, y);
                 }
@@ -67,11 +69,16 @@ namespace Uboat
 
     void CollisionHandler::add_bucket(Collider *collider, const size_t bx, const size_t by)
     {
-        m_buckets[by * m_grid_width + bx].push_back(collider);
+        if (valid_bucket_index(bx, by))
+        {
+            m_buckets[by * m_grid_width + bx].push_back(collider);
+        }
     }
 
     void CollisionHandler::remove_bucket(Collider *collider, const size_t bx, const size_t by)
     {
+        if (!valid_bucket_index(bx, by)) return;
+
         std::vector<Collider*> *bucket = &m_buckets[by * m_grid_width + bx];
 
         const size_t bsize = bucket->size();
@@ -97,12 +104,12 @@ namespace Uboat
         if (collider->m_in_bucket)
         {
             const Recti& prev_buc_box = collider->m_bucket_box;
-            glm::ivec2 prev_bot_left = prev_buc_box.bot_left();
-            glm::ivec2 prev_top_right = prev_buc_box.top_right();
+            glm::ivec2 prev_bl = prev_buc_box.bl;
+            glm::ivec2 prev_tr = prev_buc_box.tr;
 
-            for (int y = prev_bot_left.y; y <= prev_top_right.y; y++)
+            for (int y = prev_bl.y; y <= prev_tr.y; y++)
             {
-                for (int x = prev_bot_left.x; x <= prev_top_right.x; x++)
+                for (int x = prev_bl.x; x <= prev_tr.x; x++)
                 {
                     remove_bucket(collider, x, y);
                 }
@@ -123,15 +130,21 @@ namespace Uboat
 
     Recti CollisionHandler::bucket_box(const Rectf& bbox)
     {
-        const glm::ivec2 bot_index = bucket_index(bbox.bot_left());
-        const glm::ivec2 top_index = bucket_index(bbox.top_right());
+        const glm::ivec2 bot_index = bucket_index(bbox.bl);
+        const glm::ivec2 top_index = bucket_index(bbox.tr);
 
-        return Recti(bot_index, top_index - bot_index);
+        return Recti(bot_index, top_index);
     }
 
     glm::ivec2 CollisionHandler::bucket_index(const glm::vec2& pos)
     {
         return glm::ivec2(((int)pos.x) >> 4, ((int)pos.y) >> 4);
+    }
+
+    bool CollisionHandler::valid_bucket_index(const size_t bx, const size_t by)
+    {
+        return bx >= 0 && bx < m_grid_width && 
+            by >= 0 && by < m_grid_height;
     }
 
     void CollisionHandler::update()
@@ -144,13 +157,15 @@ namespace Uboat
             auto col = mover->collider;
 
             const Recti& buc_box = col->m_bucket_box;
-            glm::ivec2 bot_left = buc_box.bot_left();
-            glm::ivec2 top_right = buc_box.top_right();
+            glm::ivec2 bl = buc_box.bl;
+            glm::ivec2 tr = buc_box.tr;
 
-            for (int y = bot_left.y; y <= top_right.y; y++)
+            for (int y = bl.y; y <= tr.y; y++)
             {
-                for (int x = bot_left.x; x <= top_right.x; x++)
+                for (int x = bl.x; x <= tr.x; x++)
                 {
+                    if (!valid_bucket_index(x, y)) continue;
+
                     std::vector<Collider*>* bucket = &m_buckets[y * m_grid_width + x];
 
                     for (Collider *ocol : *bucket)
@@ -167,24 +182,6 @@ namespace Uboat
                     }
                 }
             }
-
-            // auto onode = m_scene->first<Collider>();
-            //
-            // while (onode)
-            // {
-            //     auto ocol = onode->data;
-            //     if (col != ocol && (mover->stop_mask & ocol->mask))
-            //     {
-            //         const glm::vec2 push = col->push_out(*ocol);
-            //         if (push != glm::vec2())
-            //         {
-            //             col->entity()->pos += push;
-            //             col->invalidate_cache();
-            //         }
-            //     }
-            //
-            //     onode = onode->next;
-            // }
 
             mnode = mnode->next;
         }
