@@ -13,7 +13,7 @@ namespace Uboat
         }
 
         Sint64 size = SDL_RWsize(rw);
-        char *buffer = new char[size];
+        char *buffer = new char[size + 1];
 
         Sint64 read = SDL_RWread(rw, buffer, sizeof(char), size);
 
@@ -23,6 +23,8 @@ namespace Uboat
             delete[] buffer;
             return;
         }
+
+        buffer[size] = '\0';
 
         size = (size_t)size;
         data = buffer;

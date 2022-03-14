@@ -14,6 +14,8 @@ namespace Uboat
         std::vector<size_t> m_tile_layer;
         std::vector<size_t> m_object_layer;
 
+        static constexpr size_t tile_size = 8;
+
     public:
         Tilemap(const std::string& name);
 
@@ -27,5 +29,6 @@ namespace Uboat
         void create_layer(std::vector<size_t> *out, const rapidxml::xml_node<> *node, 
                 const int width, const int height);
         void add_entity(const size_t id, Scene *scene, const size_t x, const size_t y);
+        void build_texture(const rapidxml::xml_node<> *tile_set_node);
     };
 }
