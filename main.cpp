@@ -17,7 +17,7 @@ int main()
     Platform::init();
     Renderer renderer;
 
-    Scene::register_component<Collider>();
+    Scene::register_component<Collider>(Property::Renderable);
     Scene::register_component<Player>(Property::Updatable | Property::Renderable);
     Scene::register_component<Mover>(Property::Updatable);
 

@@ -6,15 +6,16 @@
 namespace Uboat
 {
     Collider::Collider(const Rectf& bounds, const float rotation)
-        : bounds(bounds), rotation(rotation), m_in_bucket(false),
-        m_timestamp(-1)
+        : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None),
+        m_in_bucket(false), m_timestamp(-1)
     {}
 
     void Collider::awake()
     {
         Mover *mover = get<Mover>();
-        if (!dynamic)
+        if (!mover)
         {
+            dynamic = false;
             recalculate();
             scene()->collision_handler()->update_buckets(this);
         }

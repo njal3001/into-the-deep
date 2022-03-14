@@ -12,12 +12,14 @@ namespace Uboat
         using namespace rapidxml;
 
         // Load texture
+        // TODO: Build texture from tilemap
         const std::string image_path = Platform::app_path() + "../res/" + name + ".png";
         Image img(image_path);
 
         m_texture.load(img);
 
         // Load map
+        // TODO: Use tileset for mask
         const std::string map_path = Platform::app_path() + "../res/" + m_name + ".tmx";
         File file(map_path);
 
@@ -52,9 +54,9 @@ namespace Uboat
                 {
                     // Remove redundant solid tiles
                     bool redundant = true;
-                    for (int ox = std::max(0, x - 1); ox <= std::min(m_width - 1, x + 1); ox++)
+                    for (int oy = std::max(0, y - 1); oy <= std::min(m_height - 1, y + 1); oy++)
                     {
-                        for (int oy = std::max(0, y - 1); oy <= std::min(m_height - 1, y + 1); oy++)
+                        for (int ox = std::max(0, x - 1); ox <= std::min(m_width - 1, x + 1); ox++)
                         {
                             if (m_tile_layer[oy * m_width + ox] != solid_id)
                             {
