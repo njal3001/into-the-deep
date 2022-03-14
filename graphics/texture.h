@@ -12,11 +12,15 @@ namespace Uboat
 
     public:
         Texture(const size_t width, const size_t height, const unsigned char* data);
-        Texture(Image& image);
+        Texture(const Image& image);
+        Texture();
         ~Texture();
 
         Texture(const Texture& other) = delete;
         Texture& operator=(const Texture& other) = delete;
+
+        void load(const size_t width, const size_t height, const unsigned char* data);
+        void load(const Image& image);
 
         GLuint id() const;
         size_t width() const;

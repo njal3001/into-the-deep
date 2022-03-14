@@ -1,12 +1,13 @@
 #include "tilemap.h"
 #include "../platform.h"
+#include "../file.h"
 #include "factory.h"
 #include "player.h"
 
 namespace Uboat
 {
     Tilemap::Tilemap(const std::string& name)
-        : m_name(name), m_width(0), m_height(0), m_texture(nullptr)
+        : m_name(name), m_width(0), m_height(0)
     {
         using namespace rapidxml;
 
@@ -14,11 +15,11 @@ namespace Uboat
         const std::string image_path = Platform::app_path() + "../res/" + name + ".png";
         Image img(image_path);
 
-        m_texture = new Texture(img);
+        m_texture.load(img);
 
         // Load map
         const std::string map_path = Platform::app_path() + "../res/" + m_name + ".tmx";
-        File file = Platform::read_file(map_path);
+        File file(map_path);
 
         xml_document<> doc;
         doc.parse<0>(file.data);
@@ -37,14 +38,6 @@ namespace Uboat
         // Object layer
         xml_node<> *objects_node = tiles_node->next_sibling();
         create_layer(&m_object_layer, objects_node, m_width, m_height);
-
-        // TODO: This should be done in the struct
-        delete[] file.data;
-    }
-
-    Tilemap::~Tilemap()
-    {
-        delete m_texture;
     }
 
     void Tilemap::fill_scene(Scene *scene)
@@ -137,7 +130,7 @@ namespace Uboat
 
     void Tilemap::render(Renderer *renderer)
     {
-        renderer->tex(m_texture, glm::vec2(), Color::white);
+        renderer->tex(&m_texture, glm::vec2(), Color::white);
     }
 
     size_t Tilemap::width() const

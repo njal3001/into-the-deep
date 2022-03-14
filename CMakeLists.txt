@@ -13,6 +13,7 @@ add_executable(uboat
     main.cpp
     platform.cpp
     input.cpp
+    file.cpp
     graphics/graphics.cpp
     graphics/renderer.cpp
     graphics/shader.cpp

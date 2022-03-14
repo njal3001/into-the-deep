@@ -4,9 +4,28 @@
 namespace Uboat
 {
     Texture::Texture(const size_t width, const size_t height, const unsigned char* data)
-        : m_id(0), m_width(width), m_height(height)
+        : Texture()
     {
+        load(width, height, data);
+    }
+
+    Texture::Texture(const Image& image)
+        : Texture()
+    {
+        load(image);
+    }
+
+    Texture::Texture()
+        : m_id(0), m_width(0), m_height(0)
+    {}
+
+    void Texture::load(const size_t width, const size_t height, const unsigned char* data)
+    {
+        assert(m_id == 0);
         assert(width > 0 && height > 0);
+
+        m_width = width;
+        m_height = height;
 
         glGenTextures(1, &m_id);
 
@@ -21,9 +40,10 @@ namespace Uboat
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    Texture::Texture(Image& image)
-        : Texture(image.width(), image.height(), (unsigned char*)image.pixels())
-    {}
+    void Texture::load(const Image& image)
+    {
+        load(image.width(), image.height(), (unsigned char*)image.pixels());
+    }
 
     Texture::~Texture()
     {

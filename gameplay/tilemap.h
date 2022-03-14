@@ -10,13 +10,12 @@ namespace Uboat
     private:
         std::string m_name;
         int m_width, m_height;
-        Texture *m_texture;
+        Texture m_texture;
         std::vector<size_t> m_tile_layer;
         std::vector<size_t> m_object_layer;
 
     public:
         Tilemap(const std::string& name);
-        ~Tilemap();
 
         void fill_scene(Scene *scene);
         void render(Renderer *renderer);

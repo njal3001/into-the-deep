@@ -4,13 +4,6 @@
 
 namespace Uboat
 {
-    struct File
-    {
-        std::string path;
-        unsigned int size;
-        char* data;
-    };
-
     namespace Platform
     {
         constexpr uint64_t ticks_per_sec = 100000;
@@ -24,7 +17,6 @@ namespace Uboat
         SDL_Joystick* get_joystick();
 
         std::string app_path();
-        File read_file(const std::string& file_path);
 
         uint64_t ticks();
         uint8_t frame();
