@@ -7,6 +7,10 @@
 
 namespace Uboat
 {
+    Player::Player()
+        : m_dash_dir(glm::vec2(0.0f, 1.0f)), m_dash_timer(0.0f), m_dash_cooldown_timer(0.0f)
+    {}
+
     void Player::update(const float elapsed)
     {
         glm::vec2 dir;
@@ -33,10 +37,51 @@ namespace Uboat
         if (dir.x != 0 || dir.y != 0)
         {
             col->rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f));
+            m_dash_dir = dir;
         }
 
         auto mover = get<Mover>();
-        mover->vel = Calc::approach(mover->vel, dir * 100.0f, 150.0f * elapsed);
+
+        if (m_dash_timer > 0.0f)
+        {
+            m_dash_timer -= elapsed;
+        }
+        else
+        {
+            if (glm::length2(mover->vel) > max_speed * max_speed)
+            {
+                mover->vel = Calc::approach(mover->vel, dir * max_speed, dash_deaccel * elapsed);
+            }
+            else
+            {
+                mover->vel = Calc::approach(mover->vel, dir * max_speed, accel * elapsed);
+            }
+        }
+
+        // Check for dash input
+        if (m_dash_cooldown_timer <= 0.0f)
+        {
+            bool dash_started = false;
+            if (controller->active())
+            {
+                dash_started = controller->pressed[0];
+            }
+            else
+            {
+                dash_started = Input::keyboard()->pressed[SDL_SCANCODE_X];
+            }
+
+            if (dash_started)
+            {
+                mover->vel = m_dash_dir * dash_speed;
+                m_dash_timer = dash_time;
+                m_dash_cooldown_timer = dash_cooldown;
+            }
+        }
+        else if (m_dash_timer <= 0.0f)
+        {
+            m_dash_cooldown_timer -= elapsed;
+        }
     }
 
     void Player::render(Renderer *renderer)

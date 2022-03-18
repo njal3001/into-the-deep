@@ -7,12 +7,12 @@ namespace Uboat
 {
     void Chaser::update(const float elapsed)
     {
-        Node<Player> *pnode = scene()->first<Player>();
-        Player* player = pnode->data;
-
         Mover *mover = get<Mover>();
-        if (player)
+
+        Node<Player> *pnode = scene()->first<Player>();
+        if (pnode)
         {
+            Player* player = pnode->data;
             const glm::vec2 dir = Calc::normalize(player->entity()->pos - entity()->pos);
             mover->vel = Calc::approach(mover->vel, dir * 30.0f, 50.0f * elapsed);
         }

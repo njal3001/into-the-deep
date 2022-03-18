@@ -118,8 +118,12 @@ namespace Uboat
     void Renderer::make_vertex(float px, float py, float tx, float ty, Color color,
             uint8_t mult, uint8_t wash, uint8_t fill)
     {
-        m_vertex_map->pos.x = m_matrix[0][0] * px + m_matrix[1][0] * py + m_matrix[2][0];
-        m_vertex_map->pos.y = m_matrix[0][1] * px + m_matrix[1][1] * py + m_matrix[2][1];
+        m_vertex_map->pos.x = m_matrix[0][0] * px + 
+            m_matrix[1][0] * py + m_matrix[2][0] + m_matrix[3][0];
+
+        m_vertex_map->pos.y = m_matrix[0][1] * px + 
+            m_matrix[1][1] * py + m_matrix[2][1] + m_matrix[3][1];
+
         m_vertex_map->uv.x = tx;
         m_vertex_map->uv.y = ty;
         m_vertex_map->color = color;
@@ -222,7 +226,7 @@ namespace Uboat
         return was;
     }
 
-    void Renderer::push_matrix(const glm::mat3& matrix, const bool absolute)
+    void Renderer::push_matrix(const glm::mat4& matrix, const bool absolute)
     {
         m_matrix_stack.push_back(m_matrix);
 
@@ -234,20 +238,23 @@ namespace Uboat
         {
             m_matrix = m_matrix * matrix;
         }
+
+        // printf("matrix (x: %f), (y: %f), (z: %f)\n", 
+        //         m_matrix[2][0], m_matrix[2][1], m_matrix[2][2]);
     }
 
-    glm::mat3 Renderer::pop_matrix()
+    glm::mat4 Renderer::pop_matrix()
     {
         assert(m_matrix_stack.size() > 0);
 
-        glm::mat3 was = m_matrix;
+        glm::mat4 was = m_matrix;
         m_matrix = m_matrix_stack.back();
         m_matrix_stack.pop_back();
 
         return was;
     }
 
-    glm::mat3 Renderer::peek_matrix()
+    glm::mat4 Renderer::peek_matrix()
     {
         return m_matrix;
     }

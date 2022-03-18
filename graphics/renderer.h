@@ -46,8 +46,8 @@ namespace Uboat
         std::vector<Batch> m_batches;
         Batch m_batch_front;
 
-        glm::mat3x3 m_matrix;
-        std::vector<glm::mat3x3> m_matrix_stack;
+        glm::mat4 m_matrix;
+        std::vector<glm::mat4> m_matrix_stack;
 
         std::vector<Material*> m_material_stack;
 
@@ -66,9 +66,9 @@ namespace Uboat
         void push_material(Material *material);
         Material* pop_material();
 
-        void push_matrix(const glm::mat3x3& matrix, const bool absolute = false);
-        glm::mat3x3 pop_matrix();
-        glm::mat3x3 peek_matrix();
+        void push_matrix(const glm::mat4& matrix, const bool absolute = false);
+        glm::mat4 pop_matrix();
+        glm::mat4 peek_matrix();
 
         void begin();
         void render(const glm::mat4& matrix);

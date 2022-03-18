@@ -10,6 +10,10 @@
 #include "gameplay/player.h"
 #include "gameplay/mover.h"
 #include "gameplay/chaser.h"
+#include <algorithm>
+
+constexpr float screen_width = 320.0f;
+constexpr float screen_height = 180.f;
 
 int main()
 {
@@ -26,7 +30,10 @@ int main()
     Tilemap map("tilemap");
     Scene scene(&map);
 
-    glm::mat4 matrix = glm::ortho(0.0f, 320.0f, 0.0f, 180.0f);
+    glm::mat4 matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
+    glm::vec3 screen_center = glm::vec3(screen_width, screen_height, 0.0f) / 2.0f;
+    const float map_pwidth = map.width() * 8.0f;
+    const float map_pheight = map.height() * 8.0f;
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f; // In seconds
@@ -45,8 +52,22 @@ int main()
         // Render
         Graphics::clear(Color::blue);
 
+        // Player camera
+        glm::mat4 camera = glm::mat4(1.0f);
+        auto pnode = scene.first<Player>();
+        if (pnode)
+        {
+            Player *player = pnode->data;
+            glm::vec3 offset = screen_center - glm::vec3(player->entity()->pos, 1.0f);
+            offset.x = std::clamp(offset.x, screen_width - map_pwidth, 0.0f);
+            offset.y = std::clamp(offset.y, screen_height - map_pheight, 0.0f);
+            camera = glm::translate(camera, offset);
+        }
+
         renderer.begin();
+        renderer.push_matrix(camera);
         scene.render(&renderer);
+        renderer.pop_matrix();
         renderer.end();
 
         renderer.render(matrix);
