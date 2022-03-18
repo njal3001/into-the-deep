@@ -3,6 +3,7 @@
 #include "../file.h"
 #include "factory.h"
 #include "player.h"
+#include "chaser.h"
 
 namespace Uboat
 {
@@ -124,6 +125,11 @@ namespace Uboat
             case 3:
             {
                 Player::create(scene, pos);
+                break;
+            }
+            case 4:
+            {
+                Chaser::create(scene, pos);
                 break;
             }
         }

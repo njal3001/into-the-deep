@@ -36,7 +36,7 @@ namespace Uboat
         }
 
         auto mover = get<Mover>();
-        mover->vel = 70.0f * dir;
+        mover->vel = Calc::approach(mover->vel, dir * 100.0f, 150.0f * elapsed);
     }
 
     void Player::render(Renderer *renderer)
@@ -56,9 +56,11 @@ namespace Uboat
         e->add(new Player());
 
         Collider *c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(12.0f, 8.0f)));
+        c->mask = Mask::Player;
         e->add(c);
 
         Mover *m = new Mover();
+        m->stop_mask |= Mask::Enemy;
         m->collider = c;
         e->add(m);
 

@@ -8,6 +8,8 @@ namespace Uboat
     {
         static constexpr uint32_t None = 0;
         static constexpr uint32_t Solid = 1;
+        static constexpr uint32_t Player = 1 << 1;
+        static constexpr uint32_t Enemy = 1 << 2;
     };
 
     class Collider : public Component

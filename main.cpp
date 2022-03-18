@@ -9,6 +9,7 @@
 #include "gameplay/collider.h"
 #include "gameplay/player.h"
 #include "gameplay/mover.h"
+#include "gameplay/chaser.h"
 
 int main()
 {
@@ -18,8 +19,9 @@ int main()
     Renderer renderer;
 
     Scene::register_component<Collider>();
-    Scene::register_component<Player>(Property::Updatable | Property::Renderable);
     Scene::register_component<Mover>(Property::Updatable);
+    Scene::register_component<Player>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Chaser>(Property::Updatable | Property::Renderable);
 
     Tilemap map("tilemap");
     Scene scene(&map);

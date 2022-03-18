@@ -30,6 +30,7 @@ add_executable(uboat
     gameplay/factory.cpp
     gameplay/collisionhandler.cpp
     gameplay/mover.cpp
+    gameplay/chaser.cpp
     )
 
 target_link_libraries(uboat ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})

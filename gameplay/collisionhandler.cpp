@@ -4,6 +4,7 @@
 #include "ecs.h"
 #include "tilemap.h"
 #include <memory>
+#include "../maths/calc.h"
 
 namespace Uboat
 {
@@ -149,41 +150,66 @@ namespace Uboat
 
     void CollisionHandler::update()
     {
-        update_all_buckets();
-        auto mnode = m_scene->first<Mover>();
-        while (mnode)
+        for (size_t i = 0; i < collision_iterations; i++)
         {
-            auto mover = mnode->data;
-            auto col = mover->collider;
-
-            const Recti& buc_box = col->m_bucket_box;
-            glm::ivec2 bl = buc_box.bl;
-            glm::ivec2 tr = buc_box.tr;
-
-            for (int y = bl.y; y <= tr.y; y++)
+            update_all_buckets();
+            auto mnode = m_scene->first<Mover>();
+            while (mnode)
             {
-                for (int x = bl.x; x <= tr.x; x++)
+                auto mover = mnode->data;
+                auto col = mover->collider;
+
+                const Recti& buc_box = col->m_bucket_box;
+                glm::ivec2 bl = buc_box.bl;
+                glm::ivec2 tr = buc_box.tr;
+
+                for (int y = bl.y; y <= tr.y; y++)
                 {
-                    if (!valid_bucket_index(x, y)) continue;
-
-                    std::vector<Collider*>* bucket = &m_buckets[y * m_grid_width + x];
-
-                    for (Collider *ocol : *bucket)
+                    for (int x = bl.x; x <= tr.x; x++)
                     {
-                        if (col != ocol && (mover->stop_mask & ocol->mask))
+                        if (!valid_bucket_index(x, y)) continue;
+
+                        std::vector<Collider*>* bucket = &m_buckets[y * m_grid_width + x];
+
+                        for (Collider *ocol : *bucket)
                         {
-                            const glm::vec2 push = col->push_out(*ocol);
-                            if (push != glm::vec2())
+                            if (col != ocol && (mover->stop_mask & ocol->mask))
                             {
-                                col->entity()->pos += push;
-                                col->invalidate_cache();
+                                const glm::vec2 push = col->push_out(*ocol);
+                                if (push != glm::vec2())
+                                {
+                                    const glm::vec2 push_norm = Calc::normalize(push);
+
+                                    auto omover = ocol->get<Mover>();
+                                    if (omover)
+                                    {
+                                        mover->entity()->pos += push / 2.0f;
+                                        omover->entity()->pos -= push / 2.0f;
+
+                                        const glm::vec2 vel_diff = mover->vel - omover->vel;
+                                        const float p = glm::dot(push_norm, vel_diff);
+
+                                        mover->vel -= push_norm * p * collision_elasticity;
+                                        omover->vel += push_norm * p * collision_elasticity;
+                                        
+                                        ocol->invalidate_cache();
+                                    }
+                                    else
+                                    {
+                                        col->entity()->pos += push;
+                                        const float p = glm::dot(push_norm, mover->vel);
+                                        mover->vel -= push_norm * p * collision_elasticity;
+                                    }
+
+                                    col->invalidate_cache();
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            mnode = mnode->next;
+                mnode = mnode->next;
+            }
         }
     }
 }

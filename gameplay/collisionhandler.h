@@ -16,6 +16,9 @@ namespace Uboat
         size_t m_grid_width;
         size_t m_grid_height;
 
+        static constexpr size_t collision_iterations = 3;
+        static constexpr float collision_elasticity = 0.1f;
+
     public:
         CollisionHandler();
 
