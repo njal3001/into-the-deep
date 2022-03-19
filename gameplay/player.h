@@ -12,10 +12,14 @@ namespace Uboat
         static constexpr float dash_time = 0.01f;
         static constexpr float dash_deaccel = 600.0f;
         static constexpr float dash_cooldown = 1.0f;
+        static constexpr float shoot_cooldown = 1.0f;
+        static constexpr float shoot_speed = 250.0f;
+        static constexpr float shoot_knockback = 35.0f;
 
-        glm::vec2 m_dash_dir;
+        glm::vec2 m_facing;
         float m_dash_timer;
         float m_dash_cooldown_timer;
+        float m_shoot_cooldown_timer;
 
     public:
         Player();

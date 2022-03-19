@@ -1,4 +1,5 @@
 #include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
 #include "gameplay/tilemap.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
@@ -10,7 +11,8 @@
 #include "gameplay/player.h"
 #include "gameplay/mover.h"
 #include "gameplay/chaser.h"
-#include <algorithm>
+#include "gameplay/bullet.h"
+#include "gameplay/hurtable.h"
 
 constexpr float screen_width = 320.0f;
 constexpr float screen_height = 180.f;
@@ -26,6 +28,8 @@ int main()
     Scene::register_component<Mover>(Property::Updatable);
     Scene::register_component<Player>(Property::Updatable | Property::Renderable);
     Scene::register_component<Chaser>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Bullet>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Hurtable>();
 
     Tilemap map("tilemap");
     Scene scene(&map);

@@ -193,12 +193,20 @@ namespace Uboat
                                         omover->vel += push_norm * p * collision_elasticity;
                                         
                                         ocol->invalidate_cache();
+
+                                        if (mover->on_hit)
+                                            mover->on_hit(mover, ocol, push_norm);
+                                        if (omover->on_hit)
+                                            omover->on_hit(omover, col, -push_norm);
                                     }
                                     else
                                     {
                                         col->entity()->pos += push;
                                         const float p = glm::dot(push_norm, mover->vel);
                                         mover->vel -= push_norm * p * collision_elasticity;
+
+                                        if (mover->on_hit)
+                                            mover->on_hit(mover, ocol, push_norm);
                                     }
 
                                     col->invalidate_cache();

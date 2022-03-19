@@ -1,5 +1,6 @@
 #pragma once
 #include "ecs.h"
+#include <functional>
 #include "collider.h"
 
 namespace Uboat
@@ -13,6 +14,7 @@ namespace Uboat
         Collider* collider;
         glm::vec2 vel;
         uint32_t stop_mask;
+        std::function<void (Mover *mover, Collider *other, const glm::vec2 &dir)> on_hit;
 
     public:
         Mover();

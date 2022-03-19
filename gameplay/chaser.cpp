@@ -2,6 +2,7 @@
 #include "player.h"
 #include "mover.h"
 #include "../maths/calc.h"
+#include "hurtable.h"
 
 namespace Uboat
 {
@@ -43,6 +44,10 @@ namespace Uboat
         m->collider = c;
         m->stop_mask |= Mask::Player | Mask::Enemy;
         e->add(m);
+
+        Hurtable *h = new Hurtable();
+        h->health = 2;
+        e->add(h);
 
         return e;
     }
