@@ -73,8 +73,7 @@ namespace Uboat
         m->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
         {
             Bullet *b = mover->get<Bullet>();
-            if (b)
-                b->on_hit(other, dir);
+            b->on_hit(other, dir);
         };
 
         e->add(m);

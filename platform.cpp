@@ -10,6 +10,7 @@ namespace Uboat
         SDL_Joystick *g_joystick = nullptr;
         uint64_t g_ticks = 0;
         uint8_t g_frame = 0;
+        const char *g_app_path;
     }
 
     bool Platform::init()
@@ -34,6 +35,8 @@ namespace Uboat
         }
 
         Input::init();
+
+        g_app_path = SDL_GetBasePath();
 
         return true;
     }
@@ -81,6 +84,7 @@ namespace Uboat
     {
         Graphics::shutdown();
         SDL_DestroyWindow(g_window);
+        SDL_free((void*)g_app_path);
         SDL_Quit();
     }
 
@@ -96,8 +100,7 @@ namespace Uboat
 
     std::string Platform::app_path()
     {
-        const char *path = SDL_GetBasePath();
-        return std::string(path);
+        return std::string(g_app_path);
     }
 
     uint64_t Platform::ticks()

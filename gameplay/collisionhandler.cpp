@@ -169,7 +169,7 @@ namespace Uboat
                     {
                         if (!valid_bucket_index(x, y)) continue;
 
-                        std::vector<Collider*>* bucket = &m_buckets[y * m_grid_width + x];
+                        std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
 
                         for (Collider *ocol : *bucket)
                         {

@@ -187,7 +187,7 @@ namespace Uboat
         const uint8_t type = Component::Types::id<T>();
         for (auto c : m_components)
         {
-            if (c->alive() && c->m_type == type)
+            if (c->m_type == type)
             {
                 return (T*)c;
             }
