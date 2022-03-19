@@ -44,7 +44,7 @@ namespace Uboat
         Hurtable *hurtable = other->get<Hurtable>();
         if (hurtable)
         {
-            hurtable->hurt();
+            hurtable->hurt(-dir);
         }
 
         m_entity->destroy();
@@ -67,13 +67,15 @@ namespace Uboat
         e->add(c);
 
         Mover *m = new Mover();
-        m->stop_mask |= Mask::Enemy;
+        m->collides_with |= Mask::Enemy;
         m->collider = c;
         m->vel = vel;
         m->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
         {
             Bullet *b = mover->get<Bullet>();
             b->on_hit(other, dir);
+
+            return true;
         };
 
         e->add(m);

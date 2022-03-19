@@ -21,6 +21,7 @@ add_executable(uboat
     graphics/image.cpp
     graphics/texture.cpp
     graphics/material.cpp
+    maths/calc.cpp
     gameplay/entity.cpp
     gameplay/component.cpp
     gameplay/scene.cpp

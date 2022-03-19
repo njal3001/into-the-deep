@@ -1,3 +1,4 @@
+#pragma once
 #include "ecs.h"
 
 namespace Uboat

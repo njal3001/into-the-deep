@@ -119,7 +119,7 @@ namespace Uboat
         e->add(c);
 
         Mover *m = new Mover();
-        m->stop_mask |= Mask::Enemy;
+        m->collides_with |= Mask::Enemy;
         m->collider = c;
         e->add(m);
 

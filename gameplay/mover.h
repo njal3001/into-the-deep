@@ -13,8 +13,8 @@ namespace Uboat
     public:
         Collider* collider;
         glm::vec2 vel;
-        uint32_t stop_mask;
-        std::function<void (Mover *mover, Collider *other, const glm::vec2 &dir)> on_hit;
+        uint32_t collides_with;
+        std::function<bool (Mover *mover, Collider *other, const glm::vec2 &dir)> on_hit;
 
     public:
         Mover();

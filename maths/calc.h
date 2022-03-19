@@ -21,7 +21,8 @@ namespace Uboat
         }
 
         template <class T>
-        glm::tvec2<T> approach(const glm::tvec2<T>& val, const glm::tvec2<T>& target, const T amount)
+        glm::tvec2<T> approach(const glm::tvec2<T>& val, const glm::tvec2<T>& target, 
+                const T amount)
         {
             if (glm::distance(val, target) <= amount)
             {
@@ -32,5 +33,7 @@ namespace Uboat
 
             return val + dir * amount;
         }
+
+        size_t hash_combine(size_t lhs, size_t rhs);
     }
 }

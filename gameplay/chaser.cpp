@@ -1,4 +1,5 @@
 #include "chaser.h"
+#include <glm/gtx/vector_angle.hpp>
 #include "player.h"
 #include "mover.h"
 #include "../maths/calc.h"
@@ -6,8 +7,12 @@
 
 namespace Uboat
 {
+    Chaser::Chaser()
+    {}
+
     void Chaser::update(const float elapsed)
     {
+        glm::vec2 facing;
         Mover *mover = get<Mover>();
 
         Node<Player> *pnode = scene()->first<Player>();
@@ -15,12 +20,20 @@ namespace Uboat
         {
             Player* player = pnode->data;
             const glm::vec2 dir = Calc::normalize(player->entity()->pos - entity()->pos);
-            mover->vel = Calc::approach(mover->vel, dir * 30.0f, 50.0f * elapsed);
+            mover->vel = Calc::approach(mover->vel, dir * max_speed, accel * elapsed);
+            facing = dir;
         }
         else
         {
-            mover->vel = Calc::approach(mover->vel, glm::vec2(), 50.0f * elapsed);
+            mover->vel = Calc::approach(mover->vel, glm::vec2(), accel * elapsed);
+            facing = mover->vel;
         }
+
+        Collider *collider = get<Collider>();
+        collider->rotation = glm::orientedAngle(glm::vec2(facing.x, -facing.y), 
+                glm::vec2(1.0f, 0.0f));
+
+        printf("vel: (%f, %f)\n", mover->vel.x, mover->vel.y);
     }
 
     void Chaser::render(Renderer *renderer)
@@ -42,12 +55,18 @@ namespace Uboat
 
         Mover *m = new Mover();
         m->collider = c;
-        m->stop_mask |= Mask::Player | Mask::Enemy;
+        m->collides_with |= Mask::Player | Mask::Enemy;
         e->add(m);
 
         Hurtable *h = new Hurtable();
         h->health = 2;
+        h->on_hurt = [](Hurtable *self, const glm::vec2 &dir)
+        {
+            Mover *mov = self->get<Mover>();
+            mov->vel = dir * hurt_knockback; 
+        };
         e->add(h);
+
 
         return e;
     }
