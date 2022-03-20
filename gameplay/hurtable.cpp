@@ -2,18 +2,33 @@
 
 namespace Uboat
 {
+
+    Hurtable::Hurtable()
+        : m_invincible_timer(0.0f), invincible_time(0.5f)
+    {}
+
     void Hurtable::hurt(const glm::vec2 &dir)
     {
-        health--;
-
-        if (on_hurt)
+        if (m_invincible_timer <= 0.0f)
         {
-            on_hurt(this, dir);
-        }
+            health--;
 
-        if (health <= 0)
-        {
-            m_entity->destroy();
+            if (on_hurt)
+            {
+                on_hurt(this, dir);
+            }
+
+            if (health <= 0)
+            {
+                m_entity->destroy();
+            }
+
+            m_invincible_timer = invincible_time;
         }
+    }
+
+    void Hurtable::update(const float elapsed)
+    {
+        m_invincible_timer -= elapsed;
     }
 }

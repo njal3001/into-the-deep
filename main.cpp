@@ -13,6 +13,7 @@
 #include "gameplay/chaser.h"
 #include "gameplay/bullet.h"
 #include "gameplay/hurtable.h"
+#include "gameplay/playerhud.h"
 
 constexpr float screen_width = 320.0f;
 constexpr float screen_height = 180.f;
@@ -29,7 +30,8 @@ int main()
     Scene::register_component<Player>(Property::Updatable | Property::Renderable);
     Scene::register_component<Chaser>(Property::Updatable | Property::Renderable);
     Scene::register_component<Bullet>(Property::Updatable | Property::Renderable);
-    Scene::register_component<Hurtable>();
+    Scene::register_component<Hurtable>(Property::Updatable);
+    Scene::register_component<PlayerHUD>(Property::HUD);
 
     Tilemap map("tilemap");
     Scene scene(&map);
@@ -72,6 +74,7 @@ int main()
         renderer.push_matrix(camera);
         scene.render(&renderer);
         renderer.pop_matrix();
+        scene.render_hud(&renderer);
         renderer.end();
 
         renderer.render(matrix);

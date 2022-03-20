@@ -17,6 +17,7 @@ namespace Uboat
         static constexpr uint8_t None = 0;
         static constexpr uint8_t Updatable = 1;
         static constexpr uint8_t Renderable = 1 << 1;
+        static constexpr uint8_t HUD = 1 << 2;
     };
 
     class Component
@@ -153,6 +154,7 @@ namespace Uboat
 
         void update(float elapsed);
         void render(Renderer *renderer);
+        void render_hud(Renderer *renderer);
 
         template<class T>
         Node<T>* first() const;

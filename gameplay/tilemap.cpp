@@ -4,6 +4,7 @@
 #include "factory.h"
 #include "player.h"
 #include "chaser.h"
+#include "playerhud.h"
 
 namespace Uboat
 {
@@ -125,6 +126,7 @@ namespace Uboat
             case 3:
             {
                 Player::create(scene, pos);
+                PlayerHUD::create(scene);
                 break;
             }
             case 4:

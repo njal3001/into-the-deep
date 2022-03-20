@@ -34,6 +34,7 @@ add_executable(uboat
     gameplay/chaser.cpp
     gameplay/bullet.cpp
     gameplay/hurtable.cpp
+    gameplay/playerhud.cpp
     )
 
 target_link_libraries(uboat ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})

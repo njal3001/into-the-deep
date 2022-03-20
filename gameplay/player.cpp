@@ -5,6 +5,7 @@
 #include "../maths/calc.h"
 #include <glm/gtx/vector_angle.hpp>
 #include "bullet.h"
+#include "hurtable.h"
 
 namespace Uboat
 {
@@ -124,6 +125,10 @@ namespace Uboat
         m->collides_with |= Mask::Enemy;
         m->collider = c;
         e->add(m);
+
+        Hurtable *h = new Hurtable();
+        h->health = 5;
+        e->add(h);
 
         return e;
     }

@@ -54,6 +54,17 @@ namespace Uboat
         Mover *m = new Mover();
         m->collider = c;
         m->collides_with |= Mask::Player | Mask::Enemy;
+        m->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
+        {
+            if (other->mask & Mask::Player)
+            {
+                Hurtable *hurtable = other->get<Hurtable>();
+                hurtable->hurt(-dir);
+            }
+
+            return false;
+        };
+
         e->add(m);
 
         Hurtable *h = new Hurtable();

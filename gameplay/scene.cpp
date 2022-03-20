@@ -151,6 +151,27 @@ namespace Uboat
         }
     }
 
+    void Scene::render_hud(Renderer *renderer)
+    {
+        for (size_t i = 0; i < Component::Types::count(); i++)
+        {
+            if (s_prop_masks[i] & Property::HUD)
+            {
+                auto cnode = m_components[i].head;
+                while (cnode)
+                {
+                    auto comp = cnode->data;
+                    if (comp->alive() && comp->visible && comp->entity()->visible)
+                    {
+                        comp->render(renderer);
+                    }
+
+                    cnode = cnode->next;
+                }
+            }
+        }
+    }
+
     void Scene::freeze(const float amount)
     {
         m_freeze_timer += amount;
