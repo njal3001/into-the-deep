@@ -5,7 +5,7 @@
 namespace Uboat
 {
     Scene::Scene(Tilemap *map)
-        : m_tilemap(map)
+        : m_tilemap(map), m_freeze_timer(0.0f)
     {
         map->fill_scene(this);
         m_collision_handler.init(this);
@@ -59,6 +59,12 @@ namespace Uboat
 
     void Scene::update(float elapsed)
     {
+        if (m_freeze_timer > 0)
+        {
+            m_freeze_timer = std::max(0.0f, m_freeze_timer - elapsed);
+            return;
+        }
+
         update_lists();
 
         auto enode = m_entities.head;
@@ -143,6 +149,11 @@ namespace Uboat
                 }
             }
         }
+    }
+
+    void Scene::freeze(const float amount)
+    {
+        m_freeze_timer += amount;
     }
 
     const Tilemap* Scene::map() const

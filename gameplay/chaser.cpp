@@ -12,28 +12,26 @@ namespace Uboat
 
     void Chaser::update(const float elapsed)
     {
-        glm::vec2 facing;
+        Collider *collider = get<Collider>();
         Mover *mover = get<Mover>();
+        glm::vec2 dir;
 
         Node<Player> *pnode = scene()->first<Player>();
         if (pnode)
         {
             Player* player = pnode->data;
-            const glm::vec2 dir = Calc::normalize(player->entity()->pos - entity()->pos);
+            dir = Calc::normalize(player->entity()->pos - entity()->pos);
             mover->vel = Calc::approach(mover->vel, dir * max_speed, accel * elapsed);
-            facing = dir;
         }
         else
         {
             mover->vel = Calc::approach(mover->vel, glm::vec2(), accel * elapsed);
-            facing = mover->vel;
+            dir = mover->vel;
         }
 
-        Collider *collider = get<Collider>();
-        collider->rotation = glm::orientedAngle(glm::vec2(facing.x, -facing.y), 
-                glm::vec2(1.0f, 0.0f));
-
-        printf("vel: (%f, %f)\n", mover->vel.x, mover->vel.y);
+        const glm::vec2 right = glm::vec2(1.0f, 0.0f);
+        const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
+        collider->rotation = Calc::shortest_rotation_approach(collider->rotation, target_rotation, rotation_multiplier * elapsed);
     }
 
     void Chaser::render(Renderer *renderer)

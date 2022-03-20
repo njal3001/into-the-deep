@@ -34,6 +34,25 @@ namespace Uboat
             return val + dir * amount;
         }
 
+        template<class T>
+        T approach(const T val, const T target, const T amount)
+        {
+            if (val + amount < target)
+            {
+                return std::min(val + amount, target);
+            }
+
+            return std::max(val - amount, target);
+        }
+
+        template<class T>
+        T sgn(const T val)
+        {
+            return (T(0) < val) - (T(0) > val);
+        }
+
         size_t hash_combine(size_t lhs, size_t rhs);
+
+        float shortest_rotation_approach(const float val, const float target, const float period_multiplier);
     }
 }

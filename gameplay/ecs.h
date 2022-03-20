@@ -134,6 +134,7 @@ namespace Uboat
         Pool<Component> m_components[MAX_COMPONENT_TYPES];
         Tilemap *m_tilemap;
         CollisionHandler m_collision_handler;
+        float m_freeze_timer;
 
         static inline uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = { Property::None };
 
@@ -155,6 +156,8 @@ namespace Uboat
 
         template<class T>
         Node<T>* first() const;
+
+        void freeze(const float amount);
 
         const Tilemap* map() const;
         CollisionHandler* collision_handler();

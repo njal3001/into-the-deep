@@ -9,6 +9,7 @@ namespace Uboat
         static constexpr float max_speed = 80.0f;
         static constexpr float accel = 100.0f;
         static constexpr float hurt_knockback = 10.0f;
+        static constexpr float rotation_multiplier = 0.5f;
 
     public:
         Chaser();

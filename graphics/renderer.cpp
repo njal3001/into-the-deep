@@ -238,9 +238,6 @@ namespace Uboat
         {
             m_matrix = m_matrix * matrix;
         }
-
-        // printf("matrix (x: %f), (y: %f), (z: %f)\n", 
-        //         m_matrix[2][0], m_matrix[2][1], m_matrix[2][2]);
     }
 
     glm::mat4 Renderer::pop_matrix()

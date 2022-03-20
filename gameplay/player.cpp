@@ -35,8 +35,10 @@ namespace Uboat
         auto col = get<Collider>();
         if (dir.x != 0 || dir.y != 0)
         {
-            col->rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f));
-            m_facing = dir;
+            const glm::vec2 right = glm::vec2(1.0f, 0.0f);
+            const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
+            col->rotation = Calc::shortest_rotation_approach(col->rotation, target_rotation, rotation_multiplier * elapsed);
+            m_facing = glm::rotate(right, col->rotation);
         }
 
         auto mover = get<Mover>();

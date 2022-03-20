@@ -45,6 +45,7 @@ namespace Uboat
         if (hurtable)
         {
             hurtable->hurt(-dir);
+            scene()->freeze(0.05f);
         }
 
         m_entity->destroy();
