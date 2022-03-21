@@ -8,6 +8,8 @@ namespace Uboat
 {
     namespace Calc
     {
+        static constexpr glm::vec2 right = glm::vec2(1.0f, 0.0f);
+
         template <class T>
         glm::tvec2<T> normalize(const glm::tvec2<T>& vec)
         {
@@ -49,6 +51,17 @@ namespace Uboat
         T sgn(const T val)
         {
             return (T(0) < val) - (T(0) > val);
+        }
+
+        template<class T>
+        glm::tvec2<T> rotate(const glm::tvec2<T> &point, const T amount, const glm::tvec2<T> &pivot)
+        {
+            const glm::tvec3<T> pivot3 = glm::tvec3<T>(pivot, 0);
+            const glm::tmat4x4<T> rotate = glm::translate(
+                    glm::rotate(glm::translate(glm::tmat4x4<T>(1), pivot3),
+                        amount, glm::tvec3<T>(0, 0, 1)), -pivot3);
+
+            return glm::tvec2<T>(rotate * glm::tvec4<T>(point, 0, 1));
         }
 
         size_t hash_combine(size_t lhs, size_t rhs);

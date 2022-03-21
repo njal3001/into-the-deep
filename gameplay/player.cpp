@@ -4,7 +4,7 @@
 #include "../input.h"
 #include "../maths/calc.h"
 #include <glm/gtx/vector_angle.hpp>
-#include "bullet.h"
+#include "rocket.h"
 #include "hurtable.h"
 
 namespace Uboat
@@ -32,6 +32,7 @@ namespace Uboat
         }
 
         dir = Calc::normalize(dir);
+        float moving = 1.0f;
 
         auto col = get<Collider>();
         if (dir.x != 0 || dir.y != 0)
@@ -40,6 +41,10 @@ namespace Uboat
             const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
             col->rotation = Calc::shortest_rotation_approach(col->rotation, target_rotation, rotation_multiplier * elapsed);
             m_facing = glm::rotate(right, col->rotation);
+        }
+        else
+        {
+            moving = 0.0f;
         }
 
         auto mover = get<Mover>();
@@ -50,14 +55,8 @@ namespace Uboat
         }
         else
         {
-            if (glm::length2(mover->vel) > max_speed * max_speed)
-            {
-                mover->vel = Calc::approach(mover->vel, dir * max_speed, dash_deaccel * elapsed);
-            }
-            else
-            {
-                mover->vel = Calc::approach(mover->vel, dir * max_speed, accel * elapsed);
-            }
+            const float a = glm::length2(mover->vel) > max_speed * max_speed ? dash_deaccel : accel;
+            mover->vel = Calc::approach(mover->vel, m_facing * moving * max_speed, a * elapsed);
         }
 
         // Check for dash input
@@ -92,7 +91,7 @@ namespace Uboat
 
             if (shoot)
             {
-                Bullet::create(scene(), m_entity->pos, m_facing * shoot_speed);
+                Rocket::create(scene(), m_entity->pos, m_facing * shoot_speed);
                 m_shoot_cooldown_timer = shoot_cooldown;
 
                 mover->vel -= m_facing * shoot_knockback;

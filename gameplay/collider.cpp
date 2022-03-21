@@ -5,19 +5,16 @@
 
 namespace Uboat
 {
-    Collider::Collider(const Rectf& bounds, const float rotation)
-        : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None),
+    Collider::Collider(const Rectf &bounds, const float rotation, const bool dynamic)
+        : bounds(bounds), rotation(rotation), dynamic(dynamic), mask(Mask::None),
         m_in_bucket(false), m_timestamp(-1)
     {}
 
     void Collider::awake()
     {
-        Mover *mover = get<Mover>();
-        if (!mover)
+        if (!dynamic)
         {
-            dynamic = false;
             recalculate();
-            scene()->collision_handler()->update_buckets(this);
         }
     }
 
@@ -31,24 +28,24 @@ namespace Uboat
         const int ticks = Platform::frame();
         if (ticks != m_timestamp && dynamic)
         {
-            recalculate();
             m_timestamp = ticks;
+            recalculate();
         }
     }
 
-    const Quadf& Collider::quad()
+    const Quadf &Collider::quad()
     {
         refresh();
         return m_quad;
     }
 
-    const Collider::Axes& Collider::axes()
+    const Collider::Axes &Collider::axes()
     {
         refresh();
         return m_axes;
     }
 
-    const Rectf& Collider::bbox()
+    const Rectf &Collider::bbox()
     {
         refresh();
         return m_bbox;
@@ -59,7 +56,7 @@ namespace Uboat
         m_timestamp = -1;
     }
 
-    Collider::Projection Collider::project(const glm::vec2& axis) const
+    Collider::Projection Collider::project(const glm::vec2 &axis) const
     {
         const float p0 = glm::dot(m_quad.a, axis);
         const float p1 = glm::dot(m_quad.b, axis);
@@ -75,12 +72,12 @@ namespace Uboat
         };
     }
 
-    bool Collider::overlaps(Collider& other)
+    bool Collider::overlaps(Collider &other)
     {
         return push_out(other) != glm::vec2();
     }
 
-    glm::vec2 Collider::push_out(Collider& other)
+    glm::vec2 Collider::push_out(Collider &other)
     {
         const Axes* all_axes[2] = { &axes(), &other.axes() };
 
@@ -94,7 +91,7 @@ namespace Uboat
         {
             const Axes *axes = all_axes[i];
 
-            for (const auto& axis : { axes->ax1, axes->ax2 })
+            for (const auto &axis : { axes->ax1, axes->ax2 })
             {
                 const Projection prj1 = project(axis);
                 const Projection prj2 = other.project(axis);
@@ -119,6 +116,44 @@ namespace Uboat
         }
 
         return push_dir * min_push;
+    }
+
+    float Collider::distance(Collider &other)
+    {
+        const Axes* all_axes[2] = { &axes(), &other.axes() };
+
+        // No need to check both colliders axes if the rotation is the same
+        const size_t naxes = 2 - (rotation == other.rotation);
+
+        float max_dist = 0.0f;
+
+        for (size_t i = 0; i < naxes; i++)
+        {
+            const Axes *axes = all_axes[i];
+
+            for (const auto &axis : { axes->ax1, axes->ax2 })
+            {
+                const Projection prj1 = project(axis);
+                const Projection prj2 = other.project(axis);
+
+                const float dist = std::max(prj1.start, prj2.start) - std::min(prj1.end, prj2.end);
+                max_dist = std::max(dist, max_dist);
+            }
+        }
+
+        return max_dist;
+    }
+
+    Collider *Collider::check(const uint32_t mask)
+    {
+        refresh();
+        return scene()->collision_handler()->check(this, mask);
+    }
+
+    void Collider::check_all(const uint32_t mask, std::vector<Collider*> *out)
+    {
+        refresh();
+        scene()->collision_handler()->check_all(this, mask, out);
     }
 
     void Collider::recalculate()
@@ -151,6 +186,8 @@ namespace Uboat
 
         m_bbox.bl = glm::vec2(min_x, min_y);
         m_bbox.tr = glm::vec2(max_x, max_y);
+
+        scene()->collision_handler()->update_buckets(this);
     }
     
     void Collider::render(Renderer *renderer)

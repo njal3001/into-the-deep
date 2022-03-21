@@ -11,12 +11,12 @@
 #include "gameplay/player.h"
 #include "gameplay/mover.h"
 #include "gameplay/chaser.h"
-#include "gameplay/bullet.h"
+#include "gameplay/rocket.h"
 #include "gameplay/hurtable.h"
 #include "gameplay/playerhud.h"
 
-constexpr float screen_width = 320.0f;
-constexpr float screen_height = 180.f;
+constexpr float screen_width = 540.0f;
+constexpr float screen_height = 360.f;
 
 int main()
 {
@@ -29,7 +29,7 @@ int main()
     Scene::register_component<Mover>(Property::Updatable);
     Scene::register_component<Player>(Property::Updatable | Property::Renderable);
     Scene::register_component<Chaser>(Property::Updatable | Property::Renderable);
-    Scene::register_component<Bullet>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Rocket>(Property::Updatable | Property::Renderable);
     Scene::register_component<Hurtable>(Property::Updatable);
     Scene::register_component<PlayerHUD>(Property::HUD);
 

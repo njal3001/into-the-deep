@@ -16,7 +16,7 @@ namespace Uboat
             for (int i = 0; i < hurtable->health; i++)
             {
                 // TODO: Don't hardcode screen height
-                const glm::vec2 pos = glm::vec2(offset_x + margin * i, 180.0f - offset_y);
+                const glm::vec2 pos = glm::vec2(offset_x + margin * i, 360.0f - offset_y);
                 renderer->rect(pos, pos + size, Color::green);
             }
         }

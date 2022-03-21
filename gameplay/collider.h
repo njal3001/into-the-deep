@@ -45,19 +45,23 @@ namespace Uboat
         int m_timestamp;
 
     public:
-        Collider(const Rectf& bounds, const float rotation = 0.0f);
+        Collider(const Rectf &bounds, const float rotation = 0.0f, const bool dynamic = true);
 
-        const Quadf& quad();
-        const Axes& axes();
-        const Rectf& bbox();
+        const Quadf &quad();
+        const Axes &axes();
+        const Rectf &bbox();
 
         // Assumes that the collider is refreshed
-        Projection project(const glm::vec2& axis) const;
+        Projection project(const glm::vec2 &axis) const;
 
         void invalidate_cache();
 
-        bool overlaps(Collider& other);
-        glm::vec2 push_out(Collider& other);
+        bool overlaps(Collider &other);
+        glm::vec2 push_out(Collider &other);
+        float distance(Collider &other);
+
+        Collider *check(const uint32_t mask);
+        void check_all(const uint32_t mask, std::vector<Collider*> *out);
 
         void render(Renderer *renderer) override;
 

@@ -9,5 +9,6 @@ namespace Uboat
     void Mover::update(const float elapsed)
     {
         m_entity->pos += vel * elapsed;
+        collider->invalidate_cache();
     }
 }

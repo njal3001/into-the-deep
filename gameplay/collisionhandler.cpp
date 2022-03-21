@@ -151,10 +151,10 @@ namespace Uboat
     void CollisionHandler::update()
     {
         std::unordered_map<size_t, bool> collided_map;
+        update_all_buckets();
 
         for (size_t i = 0; i < collision_iterations; i++)
         {
-            update_all_buckets();
             auto mnode = m_scene->first<Mover>();
             while (mnode)
             {
@@ -243,6 +243,67 @@ namespace Uboat
                 }
 
                 mnode = mnode->next;
+            }
+        }
+    }
+
+    Collider *CollisionHandler::check(Collider *collider, const uint32_t mask)
+    {
+        if (!collider->m_in_bucket) return nullptr;
+
+        const Recti& buc_box = collider->m_bucket_box;
+        glm::ivec2 bl = buc_box.bl;
+        glm::ivec2 tr = buc_box.tr;
+
+        for (int y = bl.y; y <= tr.y; y++)
+        {
+            for (int x = bl.x; x <= tr.x; x++)
+            {
+                if (!valid_bucket_index(x, y)) continue;
+
+                std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
+                for (Collider *other : *bucket)
+                {
+                    if (collider != other && (mask & other->mask))
+                    {
+                        if (collider->overlaps(*other))
+                        {
+                            return other;
+                        }
+                    }
+                }
+            }
+        }
+
+        return nullptr;
+    }
+
+    void CollisionHandler::check_all(Collider *collider, const uint32_t mask, 
+            std::vector<Collider*> *out)
+    {
+        if (!collider->m_in_bucket) return;
+
+        const Recti& buc_box = collider->m_bucket_box;
+        glm::ivec2 bl = buc_box.bl;
+        glm::ivec2 tr = buc_box.tr;
+
+        for (int y = bl.y; y <= tr.y; y++)
+        {
+            for (int x = bl.x; x <= tr.x; x++)
+            {
+                if (!valid_bucket_index(x, y)) continue;
+
+                std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
+                for (Collider *other : *bucket)
+                {
+                    if (collider != other && (mask & other->mask))
+                    {
+                        if (collider->overlaps(*other))
+                        {
+                            out->push_back(other);
+                        }
+                    }
+                }
             }
         }
     }

@@ -32,8 +32,8 @@ add_executable(uboat
     gameplay/collisionhandler.cpp
     gameplay/mover.cpp
     gameplay/chaser.cpp
-    gameplay/bullet.cpp
     gameplay/hurtable.cpp
+    gameplay/rocket.cpp
     gameplay/playerhud.cpp
     )
 

@@ -16,7 +16,7 @@ namespace Uboat
         size_t m_grid_width;
         size_t m_grid_height;
 
-        static constexpr size_t collision_iterations = 3;
+        static constexpr size_t collision_iterations = 1;
         static constexpr float collision_elasticity = 0.01f;
 
     public:
@@ -30,6 +30,9 @@ namespace Uboat
         void remove(Collider *collider);
 
         void update();
+        Collider *check(Collider *collider, const uint32_t mask);
+        void check_all(Collider *collider, const uint32_t mask, 
+            std::vector<Collider*> *out);
 
     private:
         glm::ivec2 bucket_index(const glm::vec2& pos);

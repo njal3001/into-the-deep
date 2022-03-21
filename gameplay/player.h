@@ -13,7 +13,7 @@ namespace Uboat
         static constexpr float dash_deaccel = 600.0f;
         static constexpr float dash_cooldown = 1.0f;
         static constexpr float shoot_cooldown = 1.0f;
-        static constexpr float shoot_speed = 250.0f;
+        static constexpr float shoot_speed = 150.0f;
         static constexpr float shoot_knockback = 35.0f;
         static constexpr float rotation_multiplier = 1.0f;
 
