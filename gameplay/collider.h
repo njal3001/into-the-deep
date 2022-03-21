@@ -45,7 +45,7 @@ namespace Uboat
         int m_timestamp;
 
     public:
-        Collider(const Rectf &bounds, const float rotation = 0.0f, const bool dynamic = true);
+        Collider(const Rectf &bounds, const float rotation = 0.0f);
 
         const Quadf &quad();
         const Axes &axes();

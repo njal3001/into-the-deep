@@ -37,7 +37,6 @@ namespace Uboat
                 const glm::vec2 tracker_dir = glm::rotate(Calc::right, collider->rotation);
                 tracker->pos = m_entity->pos + tracker_dir * (tracker_width - collider_width) / 2.0f;
                 tracker_collider->rotation = collider->rotation;
-                tracker_collider->invalidate_cache();
 
                 std::vector<Collider*> in_range;
                 tracker_collider->check_all(Mask::Enemy, &in_range);
@@ -126,6 +125,10 @@ namespace Uboat
         Collider *tracker_collider = new Collider(Rectf(tracker_bl, tracker_tr));
 
         tracker->add(tracker_collider);
+        Mover *tracker_mover = new Mover();
+        tracker_mover->collider = tracker_collider;
+        tracker->add(tracker_mover);
+
         rocket->tracker = tracker;
 
         return ent;

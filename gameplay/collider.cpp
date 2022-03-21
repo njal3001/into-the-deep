@@ -5,16 +5,19 @@
 
 namespace Uboat
 {
-    Collider::Collider(const Rectf &bounds, const float rotation, const bool dynamic)
-        : bounds(bounds), rotation(rotation), dynamic(dynamic), mask(Mask::None),
+    Collider::Collider(const Rectf &bounds, const float rotation)
+        : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None),
         m_in_bucket(false), m_timestamp(-1)
     {}
 
     void Collider::awake()
     {
-        if (!dynamic)
+        Mover *mover = get<Mover>();
+        if (!mover)
         {
+            dynamic = false;
             recalculate();
+            scene()->collision_handler()->update_buckets(this);
         }
     }
 
@@ -146,13 +149,11 @@ namespace Uboat
 
     Collider *Collider::check(const uint32_t mask)
     {
-        refresh();
         return scene()->collision_handler()->check(this, mask);
     }
 
     void Collider::check_all(const uint32_t mask, std::vector<Collider*> *out)
     {
-        refresh();
         scene()->collision_handler()->check_all(this, mask, out);
     }
 
@@ -186,8 +187,6 @@ namespace Uboat
 
         m_bbox.bl = glm::vec2(min_x, min_y);
         m_bbox.tr = glm::vec2(max_x, max_y);
-
-        scene()->collision_handler()->update_buckets(this);
     }
     
     void Collider::render(Renderer *renderer)
