@@ -6,6 +6,7 @@
 #include <glm/gtx/vector_angle.hpp>
 #include "rocket.h"
 #include "hurtable.h"
+#include "chaser.h"
 
 namespace ITD
 {
@@ -13,6 +14,15 @@ namespace ITD
         : m_facing(glm::vec2(1.0f, 0.0f)), m_dash_timer(0.0f), m_dash_cooldown_timer(0.0f), 
         m_shoot_cooldown_timer(0.0f)
     {}
+
+    bool Player::attach(Chaser *chaser)
+    {
+        if (m_dash_timer > 0.0f)
+            return false;
+
+        m_attached.push_back(chaser);
+        return true;
+    }
 
     void Player::update(const float elapsed)
     {
@@ -73,6 +83,13 @@ namespace ITD
                 mover->vel = m_facing * dash_speed;
                 m_dash_timer = dash_time;
                 m_dash_cooldown_timer = dash_cooldown;
+
+                for (auto chaser : m_attached)
+                {
+                    chaser->detach();
+                }
+
+                m_attached.clear();
             }
         }
         else if (m_dash_timer <= 0.0f)
@@ -100,6 +117,14 @@ namespace ITD
         else
         {
             m_shoot_cooldown_timer -= elapsed;
+        }
+    }
+
+    void Player::on_removed()
+    {
+        for (auto chaser : m_attached)
+        {
+            chaser->detach();
         }
     }
 

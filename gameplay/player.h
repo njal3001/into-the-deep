@@ -3,6 +3,8 @@
 
 namespace ITD
 {
+    class Chaser;
+
     class Player : public Component
     {
     private:
@@ -22,10 +24,16 @@ namespace ITD
         float m_dash_cooldown_timer;
         float m_shoot_cooldown_timer;
 
+        std::vector<Chaser*> m_attached;
+
     public:
         Player();
 
+        bool attach(Chaser *chaser);
+
         void update(const float elapsed) override;
+        void on_removed() override;
+
         void render(Renderer *renderer) override;
 
         static Entity* create(Scene *scene, const glm::vec2& pos);

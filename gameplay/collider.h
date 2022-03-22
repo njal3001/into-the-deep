@@ -34,6 +34,7 @@ namespace ITD
         float rotation;
         bool dynamic;
         uint32_t mask;
+        bool active;
 
     private:
         Quadf m_quad;

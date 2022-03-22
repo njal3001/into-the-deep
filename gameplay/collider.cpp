@@ -6,7 +6,7 @@
 namespace ITD
 {
     Collider::Collider(const Rectf &bounds, const float rotation)
-        : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None),
+        : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None), active(true),
         m_in_bucket(false), m_timestamp(-1)
     {}
 

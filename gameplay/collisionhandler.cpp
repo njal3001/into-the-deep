@@ -124,7 +124,11 @@ namespace ITD
         while (mnode)
         {
             Collider *col = mnode->data->collider;
-            update_buckets(col);
+            if (col->active)
+            {
+                update_buckets(col);
+            }
+
             mnode = mnode->next;
         }
     }
@@ -161,78 +165,81 @@ namespace ITD
                 auto mover = mnode->data;
                 auto col = mover->collider;
 
-                const Recti& buc_box = col->m_bucket_box;
-                glm::ivec2 bl = buc_box.bl;
-                glm::ivec2 tr = buc_box.tr;
-
-                const size_t hash = std::hash<Collider*>{}(col);
-                for (int y = bl.y; y <= tr.y; y++)
+                if (col->active)
                 {
-                    for (int x = bl.x; x <= tr.x; x++)
+                    const Recti& buc_box = col->m_bucket_box;
+                    glm::ivec2 bl = buc_box.bl;
+                    glm::ivec2 tr = buc_box.tr;
+
+                    const size_t hash = std::hash<Collider*>{}(col);
+                    for (int y = bl.y; y <= tr.y; y++)
                     {
-                        if (!valid_bucket_index(x, y)) continue;
-
-                        std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
-
-                        for (Collider *ocol : *bucket)
+                        for (int x = bl.x; x <= tr.x; x++)
                         {
-                            if (col != ocol && (mover->collides_with & ocol->mask))
+                            if (!valid_bucket_index(x, y)) continue;
+
+                            std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
+
+                            for (Collider *ocol : *bucket)
                             {
-                                // Make sure that same collision does not trigger multiple times
-                                const size_t ohash = std::hash<Collider*>{}(ocol);
-                                const size_t comb_hash = Calc::hash_combine(hash, ohash);
-                                const bool has_collided = collided_map.find(comb_hash) 
-                                    != collided_map.end();
-
-                                if (!has_collided)
+                                if (ocol->active && col != ocol && (mover->collides_with & ocol->mask))
                                 {
-                                    const glm::vec2 push = col->push_out(*ocol);
-                                    if (push != glm::vec2())
+                                    // Make sure that same collision does not trigger multiple times
+                                    const size_t ohash = std::hash<Collider*>{}(ocol);
+                                    const size_t comb_hash = Calc::hash_combine(hash, ohash);
+                                    const bool has_collided = collided_map.find(comb_hash) 
+                                        != collided_map.end();
+
+                                    if (!has_collided)
                                     {
-                                        collided_map[comb_hash] = true;
-                                        glm::vec2 push_norm = Calc::normalize(push);
-
-                                        auto omover = ocol->get<Mover>();
-                                        if (omover)
+                                        const glm::vec2 push = col->push_out(*ocol);
+                                        if (push != glm::vec2())
                                         {
-                                            const glm::vec2 vel_diff = mover->vel - omover->vel;
-                                            const float p = glm::dot(push_norm, vel_diff);
+                                            collided_map[comb_hash] = true;
+                                            glm::vec2 push_norm = Calc::normalize(push);
 
-                                            //  Collision response
-                                            const bool needs_push1 = !mover->on_hit || 
-                                                !mover->on_hit(mover, ocol, push_norm);
-
-                                            const bool needs_push2 = 
-                                                !(omover->collides_with & col->mask) ||
-                                                        !omover->on_hit || 
-                                                        !omover->on_hit(omover, col, -push_norm);
-
-                                            const float push_div = (float)(needs_push1 + 
-                                                    needs_push2);
-
-                                            if (needs_push1)
+                                            auto omover = ocol->get<Mover>();
+                                            if (omover)
                                             {
-                                                col->entity()->pos += push / push_div;
-                                                mover->vel -= push_norm * p * collision_elasticity;
-                                                col->invalidate_cache();
+                                                const glm::vec2 vel_diff = mover->vel - omover->vel;
+                                                const float p = glm::dot(push_norm, vel_diff);
+
+                                                //  Collision response
+                                                const bool needs_push1 = !mover->on_hit || 
+                                                    !mover->on_hit(mover, ocol, push_norm);
+
+                                                const bool needs_push2 = 
+                                                    !(omover->collides_with & col->mask) ||
+                                                            !omover->on_hit || 
+                                                            !omover->on_hit(omover, col, -push_norm);
+
+                                                const float push_div = (float)(needs_push1 + 
+                                                        needs_push2);
+
+                                                if (needs_push1)
+                                                {
+                                                    col->entity()->pos += push / push_div;
+                                                    mover->vel -= push_norm * p * collision_elasticity;
+                                                    col->invalidate_cache();
+                                                }
+
+                                                if (needs_push2)
+                                                {
+                                                    ocol->entity()->pos -= push / push_div;
+                                                    omover->vel += push_norm * p * collision_elasticity;
+                                                    ocol->invalidate_cache();
+                                                }
                                             }
-
-                                            if (needs_push2)
+                                            else
                                             {
-                                                ocol->entity()->pos -= push / push_div;
-                                                omover->vel += push_norm * p * collision_elasticity;
-                                                ocol->invalidate_cache();
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (!mover->on_hit || 
-                                                    !mover->on_hit(mover, ocol, push_norm))
-                                            {
-                                                col->entity()->pos += push;
-                                                const float p = glm::dot(push_norm, mover->vel);
-                                                mover->vel -= push_norm * p * collision_elasticity;
-                                                col->invalidate_cache();
+                                                if (!mover->on_hit || 
+                                                        !mover->on_hit(mover, ocol, push_norm))
+                                                {
+                                                    col->entity()->pos += push;
+                                                    const float p = glm::dot(push_norm, mover->vel);
+                                                    mover->vel -= push_norm * p * collision_elasticity;
+                                                    col->invalidate_cache();
+                                                }
                                             }
                                         }
                                     }
