@@ -2,7 +2,7 @@
 #include "player.h"
 #include "hurtable.h"
 
-namespace Uboat
+namespace ITD
 {
     void PlayerHUD::render(Renderer *renderer)
     {

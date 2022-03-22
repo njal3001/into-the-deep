@@ -7,7 +7,7 @@
 #include "rocket.h"
 #include "hurtable.h"
 
-namespace Uboat
+namespace ITD
 {
     Player::Player()
         : m_facing(glm::vec2(1.0f, 0.0f)), m_dash_timer(0.0f), m_dash_cooldown_timer(0.0f), 

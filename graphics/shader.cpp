@@ -1,7 +1,7 @@
 #include "shader.h"
 #include <assert.h>
 
-namespace Uboat
+namespace ITD
 {
     Shader::Shader(const std::string& vert_str, const std::string& frag_str)
         : m_id(0)

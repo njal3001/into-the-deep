@@ -4,7 +4,7 @@
 #include <glm/gtx/norm.hpp>
 #include <stdio.h>
 
-namespace Uboat
+namespace ITD
 {
     namespace Calc
     {

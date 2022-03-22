@@ -5,7 +5,7 @@
 #include "collisionhandler.h"
 #include "pool.h"
 
-namespace Uboat
+namespace ITD
 {
     #define MAX_COMPONENT_TYPES 256
 

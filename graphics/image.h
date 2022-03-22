@@ -2,7 +2,7 @@
 #include <string>
 #include "color.h"
 
-namespace Uboat
+namespace ITD
 {
     class Image
     {

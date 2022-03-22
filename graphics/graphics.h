@@ -1,7 +1,7 @@
 #pragma once
 #include "color.h"
 
-namespace Uboat
+namespace ITD
 {
     namespace Graphics
     {

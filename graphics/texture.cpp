@@ -1,7 +1,7 @@
 #include "texture.h"
 #include <assert.h>
 
-namespace Uboat
+namespace ITD
 {
     Texture::Texture(const size_t width, const size_t height, const unsigned char* data)
         : Texture()

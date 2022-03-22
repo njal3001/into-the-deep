@@ -1,6 +1,6 @@
 #include "hurtable.h"
 
-namespace Uboat
+namespace ITD
 {
 
     Hurtable::Hurtable()

@@ -3,7 +3,7 @@
 #include <functional>
 #include "collider.h"
 
-namespace Uboat
+namespace ITD
 {
     class Mover : public Component
     {

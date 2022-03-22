@@ -5,7 +5,7 @@
 #include <glm/mat4x4.hpp>
 #include <vector>
 
-namespace Uboat
+namespace ITD
 {
     struct Uniform
     {

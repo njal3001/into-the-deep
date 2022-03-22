@@ -3,7 +3,7 @@
 #include "mover.h"
 #include <algorithm>
 
-namespace Uboat
+namespace ITD
 {
     Collider::Collider(const Rectf &bounds, const float rotation)
         : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None),

@@ -3,7 +3,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
 
-namespace Uboat
+namespace ITD
 {
     template<class T> struct Rect;
     template<class T> struct Quad;

@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include "image.h"
 
-namespace Uboat
+namespace ITD
 {
     class Texture
     {

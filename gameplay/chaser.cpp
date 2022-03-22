@@ -5,7 +5,7 @@
 #include "../maths/calc.h"
 #include "hurtable.h"
 
-namespace Uboat
+namespace ITD
 {
     Chaser::Chaser()
     {}

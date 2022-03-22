@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 #include <glm/vec2.hpp>
 
-namespace Uboat
+namespace ITD
 {
     #define KEYBOARD_KEY_MAX 282
     #define MOUSE_BUTTON_MAX 6

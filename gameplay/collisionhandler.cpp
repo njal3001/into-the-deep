@@ -6,7 +6,7 @@
 #include <memory>
 #include "../maths/calc.h"
 
-namespace Uboat
+namespace ITD
 {
     CollisionHandler::CollisionHandler()
         : m_scene(nullptr)

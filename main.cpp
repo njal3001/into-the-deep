@@ -20,7 +20,7 @@ constexpr float screen_height = 360.f;
 
 int main()
 {
-    using namespace Uboat;
+    using namespace ITD;
 
     Platform::init();
     Renderer renderer;

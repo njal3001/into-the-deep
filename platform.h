@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-namespace Uboat
+namespace ITD
 {
     namespace Platform
     {

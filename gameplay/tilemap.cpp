@@ -6,7 +6,7 @@
 #include "chaser.h"
 #include "playerhud.h"
 
-namespace Uboat
+namespace ITD
 {
     using namespace rapidxml;
 

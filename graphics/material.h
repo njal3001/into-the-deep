@@ -2,7 +2,7 @@
 #include "shader.h"
 #include "texture.h"
 
-namespace Uboat
+namespace ITD
 {
     class Material
     {

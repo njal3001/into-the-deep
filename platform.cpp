@@ -2,7 +2,7 @@
 #include "graphics/graphics.h"
 #include "input.h"
 
-namespace Uboat
+namespace ITD
 {
     namespace
     {
@@ -18,7 +18,7 @@ namespace Uboat
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 
         g_window = SDL_CreateWindow(
-            "Uboat Game!",
+            "Into The Deep",
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
             960,

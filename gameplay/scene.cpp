@@ -2,7 +2,7 @@
 #include <algorithm>
 #include "tilemap.h"
 
-namespace Uboat
+namespace ITD
 {
     Scene::Scene(Tilemap *map)
         : m_tilemap(map), m_freeze_timer(0.0f)

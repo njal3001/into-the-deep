@@ -8,7 +8,7 @@
 #include "texture.h"
 #include "material.h"
 
-namespace Uboat
+namespace ITD
 {
 
 #define RENDERER_MAX_SPRITES 10000

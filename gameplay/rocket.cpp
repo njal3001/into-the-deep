@@ -5,7 +5,7 @@
 #include "tilemap.h"
 #include "hurtable.h"
 
-namespace Uboat
+namespace ITD
 {
     Rocket::Rocket()
         : m_life_timer(life_time), m_max_speed(0.0f), m_target(nullptr), tracker(nullptr)

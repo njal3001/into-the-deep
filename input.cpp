@@ -2,7 +2,7 @@
 #include "platform.h"
 #include <SDL2/SDL_joystick.h>
 
-namespace Uboat
+namespace ITD
 {
     void Input::Keyboard::clear()
     {

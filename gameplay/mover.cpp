@@ -1,6 +1,6 @@
 #include "mover.h"
 
-namespace Uboat
+namespace ITD
 {
     Mover::Mover()
         : collider(nullptr), vel(glm::vec2()), collides_with(Mask::Solid), on_hit(nullptr)

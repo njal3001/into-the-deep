@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include "../maths/shapes.h"
 
-namespace Uboat
+namespace ITD
 {
     class Scene;
     class Collider;

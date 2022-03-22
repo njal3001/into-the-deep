@@ -1,7 +1,7 @@
 #include "material.h"
 #include <string.h>
 
-namespace Uboat
+namespace ITD
 {
     Material::Material()
         : m_shader(nullptr)

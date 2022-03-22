@@ -2,7 +2,7 @@
 #include "ecs.h"
 #include <functional>
 
-namespace Uboat
+namespace ITD
 {
     class Hurtable : public Component
     {

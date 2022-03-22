@@ -1,7 +1,7 @@
 #include "file.h"
 #include <SDL2/SDL.h>
 
-namespace Uboat
+namespace ITD
 {
     File::File(const std::string& path)
         : path(path), size(0), data(nullptr)

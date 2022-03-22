@@ -2,7 +2,7 @@
 #include "../third_party/stb_image.h"
 #include "image.h"
 
-namespace Uboat
+namespace ITD
 {
 
     Image::Image(const std::string& filename)

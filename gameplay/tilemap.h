@@ -3,7 +3,7 @@
 #include "ecs.h"
 #include "rapidxml/rapidxml.hpp"
 
-namespace Uboat
+namespace ITD
 {
     class Tilemap
     {

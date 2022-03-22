@@ -2,7 +2,7 @@
 #include "ecs.h"
 #include "collider.h"
 
-namespace Uboat
+namespace ITD
 {
     Entity* Factory::wall(Scene *scene, const glm::vec2& pos)
     {

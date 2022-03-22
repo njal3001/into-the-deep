@@ -1,7 +1,7 @@
 #include "ecs.h"
 #include <string.h>
 
-namespace Uboat
+namespace ITD
 {
     Component::Component()
         : visible(true), m_type(0), m_alive(true), m_entity(nullptr), 

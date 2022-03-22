@@ -2,7 +2,7 @@
 #include "ecs.h"
 #include "../maths/shapes.h"
 
-namespace Uboat
+namespace ITD
 {
     struct Mask
     {
