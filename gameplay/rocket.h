@@ -13,6 +13,9 @@ namespace ITD
         static constexpr float tracker_height = 32.0f;
         static constexpr float rotation_multiplier = 0.2f;
         static constexpr float accel = 80.0f;
+        static constexpr float explosion_duration = 0.3f;
+        static constexpr float explosion_width = 10.0f;
+        static constexpr float explosion_height = 10.0f;
 
         float m_life_timer;
         float m_max_speed;
@@ -31,6 +34,6 @@ namespace ITD
         static Entity* create(Scene *scene, const glm::vec2 &pos, const glm::vec2& vel);
 
     private:
-        void on_hit(Collider *other, const glm::vec2 &dir);
+        void explode();
     };
 }

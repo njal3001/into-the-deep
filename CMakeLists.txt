@@ -34,6 +34,7 @@ add_executable(itd
     gameplay/chaser.cpp
     gameplay/hurtable.cpp
     gameplay/rocket.cpp
+    gameplay/explosion.cpp
     gameplay/playerhud.cpp
     )
 

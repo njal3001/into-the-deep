@@ -4,6 +4,7 @@
 #include "../maths/calc.h"
 #include "tilemap.h"
 #include "hurtable.h"
+#include "explosion.h"
 
 namespace ITD
 {
@@ -25,8 +26,9 @@ namespace ITD
         m_life_timer -= elapsed;
         if (m_life_timer <= 0.0f)
         {
-            m_entity->destroy();
-            tracker->destroy();
+            explode();
+            // m_entity->destroy();
+            // tracker->destroy();
         }
         else
         {
@@ -71,15 +73,11 @@ namespace ITD
         }
     }
 
-    void Rocket::on_hit(Collider *other, const glm::vec2 &dir)
+    void Rocket::explode()
     {
-        Hurtable *hurtable = other->get<Hurtable>();
-        if (hurtable)
-        {
-            hurtable->hurt(-dir);
-            scene()->freeze(0.05f);
-        }
-
+        Collider *col = get<Collider>();
+        Explosion::create(scene(), m_entity->pos, explosion_duration, glm::vec2(explosion_width, explosion_height), col->rotation);
+        tracker->destroy();
         m_entity->destroy();
     }
 
@@ -111,7 +109,7 @@ namespace ITD
         mov->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
         {
             Rocket *rocket = mover->get<Rocket>();
-            rocket->on_hit(other, dir);
+            rocket->explode();
 
             return true;
         };

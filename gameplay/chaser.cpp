@@ -114,10 +114,10 @@ namespace ITD
 
         Hurtable *h = new Hurtable();
         h->health = 2;
-        h->on_hurt = [](Hurtable *self, const glm::vec2 &dir)
+        h->on_hurt = [](Hurtable *self, const glm::vec2 &force)
         {
             Mover *mov = self->get<Mover>();
-            mov->vel = dir * hurt_knockback; 
+            mov->vel = force * hurt_knockback; 
         };
         e->add(h);
 
