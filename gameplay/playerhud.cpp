@@ -6,10 +6,10 @@ namespace ITD
 {
     void PlayerHUD::render(Renderer *renderer)
     {
-        const Node<Player> *pnode = scene()->first<Player>();
-        if (pnode)
+        auto pfirst = scene()->first<Player>();
+        if (pfirst != scene()->end<Player>())
         {
-            const Player *player = pnode->data;
+            const Player *player = (Player*)*pfirst;
             const Hurtable *hurtable = player->get<Hurtable>();
 
             const glm::vec2 size = glm::vec2(width, height);

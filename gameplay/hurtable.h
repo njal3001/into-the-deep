@@ -17,7 +17,7 @@ namespace ITD
     public:
         Hurtable();
 
-        void hurt(const glm::vec2 &dir);
+        bool hurt(const glm::vec2 &dir);
         void update(const float elapsed) override;
     };
 }

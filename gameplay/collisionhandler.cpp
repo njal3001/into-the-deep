@@ -120,16 +120,13 @@ namespace ITD
 
     void CollisionHandler::update_all_buckets()
     {
-        auto mnode = m_scene->first<Mover>();
-        while (mnode)
+        for (auto iter = m_scene->first<Mover>(); iter != m_scene->end<Mover>(); iter++)
         {
-            Collider *col = mnode->data->collider;
+            Collider *col = ((Mover*)(*iter))->collider;
             if (col->active)
             {
                 update_buckets(col);
             }
-
-            mnode = mnode->next;
         }
     }
 
@@ -159,10 +156,9 @@ namespace ITD
 
         for (size_t i = 0; i < collision_iterations; i++)
         {
-            auto mnode = m_scene->first<Mover>();
-            while (mnode)
+            for (auto iter = m_scene->first<Mover>(); iter != m_scene->end<Mover>(); iter++)
             {
-                auto mover = mnode->data;
+                auto mover = (Mover*)(*iter);
                 auto col = mover->collider;
 
                 if (col->active)
@@ -248,8 +244,6 @@ namespace ITD
                         }
                     }
                 }
-
-                mnode = mnode->next;
             }
         }
     }

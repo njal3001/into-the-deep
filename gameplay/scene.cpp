@@ -13,26 +13,16 @@ namespace ITD
 
     Scene::~Scene()
     {
+        for (auto iter = m_to_add.begin(); iter != m_to_add.end(); iter++)
         {
-            auto addnode = m_to_add.head;
-            while (addnode)
-            {
-                auto next = addnode->next;
-                auto ent = addnode->data;
-                delete ent;
-                addnode = next;
-            }
+            delete *iter;
+            iter = m_to_add.erase(iter);
         }
 
+        for (auto iter = m_entities.begin(); iter != m_entities.end(); iter++)
         {
-            auto enode = m_entities.head;
-            while (enode)
-            {
-                auto next = enode->next;
-                auto ent = enode->data;
-                delete ent;
-                enode = next;
-            }
+            delete *iter;
+            iter = m_to_add.erase(iter);
         }
     }
 
@@ -41,20 +31,21 @@ namespace ITD
         Entity* entity = new Entity(pos);
         entity->m_scene = this;
 
-        m_to_add.insert(&entity->m_node);
+        m_to_add.insert(m_to_add.end(), entity);
 
         return entity;
     }
 
     void Scene::track_component(Component* component)
     {
-        m_components[component->type()].insert(&component->m_node);
+        m_components[component->type()].push_back(component);
+        component->m_iterator = --m_components[component->type()].end();
     }
 
     void Scene::untrack_component(Component* component)
     {
         assert(component->scene() == this);
-        m_components[component->type()].remove(&component->m_node);
+        m_components[component->type()].erase(component->m_iterator);
     }
 
     void Scene::update(float elapsed)
@@ -67,28 +58,18 @@ namespace ITD
 
         update_lists();
 
-        auto enode = m_entities.head;
-        while (enode)
+        for (auto ent : m_entities)
         {
-            auto ent = enode->data;
             ent->update_lists();
-            enode = enode->next;
         }
 
         for (size_t i = 0; i < Component::Types::count(); i++)
         {
             if (s_prop_masks[i] & Property::Updatable)
             {
-                auto cnode = m_components[i].head;
-                while (cnode)
+                for (auto comp : m_components[i])
                 {
-                    auto comp = cnode->data;
-                    if (comp->alive())
-                    {
-                        comp->update(elapsed);
-                    }
-
-                    cnode = cnode->next;
+                    comp->update(elapsed);
                 }
             }
         }
@@ -98,33 +79,21 @@ namespace ITD
 
     void Scene::update_lists()
     {
+        for (auto iter = m_entities.begin(); iter != m_entities.end(); iter++)
         {
-            auto enode = m_entities.head;
-            while (enode)
+            if (!(*iter)->m_alive)
             {
-                auto next = enode->next;
-                auto ent = enode->data;
-                if (!ent->m_alive)
-                {
-                    m_entities.remove(enode);
-                    ent->removed();
-                    delete ent;
-                }
-
-                enode = next;
+                (*iter)->removed();
+                delete *iter;
+                iter = m_entities.erase(iter);
             }
         }
 
+        for (auto iter = m_to_add.begin(); iter != m_to_add.end(); iter++)
         {
-            auto addnode = m_to_add.head;
-            while (addnode)
-            {
-                auto next = addnode->next;
-                m_to_add.remove(addnode);
-                m_entities.insert(addnode);
-
-                addnode = next;
-            }
+            m_entities.push_back(*iter);
+            (*iter)->m_iterator = --m_entities.end();
+            iter = m_entities.erase(iter);
         }
     }
 
@@ -136,16 +105,12 @@ namespace ITD
         {
             if (s_prop_masks[i] & Property::Renderable)
             {
-                auto cnode = m_components[i].head;
-                while (cnode)
+                for (auto comp : m_components[i])
                 {
-                    auto comp = cnode->data;
-                    if (comp->alive() && comp->visible && comp->entity()->visible)
+                    if (comp->visible && comp->entity()->visible)
                     {
                         comp->render(renderer);
                     }
-
-                    cnode = cnode->next;
                 }
             }
         }
@@ -157,16 +122,12 @@ namespace ITD
         {
             if (s_prop_masks[i] & Property::HUD)
             {
-                auto cnode = m_components[i].head;
-                while (cnode)
+                for (auto comp : m_components[i])
                 {
-                    auto comp = cnode->data;
-                    if (comp->alive() && comp->visible && comp->entity()->visible)
+                    if (comp->visible && comp->entity()->visible)
                     {
                         comp->render(renderer);
                     }
-
-                    cnode = cnode->next;
                 }
             }
         }

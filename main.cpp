@@ -62,10 +62,10 @@ int main()
 
         // Player camera
         glm::mat4 camera = glm::mat4(1.0f);
-        auto pnode = scene.first<Player>();
-        if (pnode)
+        auto pfirst = scene.first<Player>();
+        if (pfirst != scene.end<Player>())
         {
-            Player *player = pnode->data;
+            Player *player = (Player*)*pfirst;
             glm::vec3 offset = screen_center - glm::vec3(player->entity()->pos, 1.0f);
             offset.x = std::clamp(offset.x, screen_width - map_pwidth, 0.0f);
             offset.y = std::clamp(offset.y, screen_height - map_pheight, 0.0f);

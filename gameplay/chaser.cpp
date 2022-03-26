@@ -61,10 +61,10 @@ namespace ITD
             glm::vec2 dir;
             float moving = 1.0f;
 
-            Node<Player> *pnode = scene()->first<Player>();
-            if (pnode)
+            auto pfirst = scene()->first<Player>();
+            if (pfirst != scene()->end<Player>())
             {
-                Player* player = pnode->data;
+                Player* player = (Player*)*pfirst;
                 dir = Calc::normalize(player->entity()->pos - entity()->pos);
             }
             else

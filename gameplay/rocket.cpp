@@ -27,15 +27,13 @@ namespace ITD
         if (m_life_timer <= 0.0f)
         {
             explode();
-            // m_entity->destroy();
-            // tracker->destroy();
         }
         else
         {
             Collider *collider = get<Collider>();
-            if (!m_target)
+            Collider *tracker_collider = tracker->get<Collider>();
+            if (!m_target && tracker_collider)
             {
-                Collider *tracker_collider = tracker->get<Collider>();
                 const glm::vec2 tracker_dir = glm::rotate(Calc::right, collider->rotation);
                 tracker->pos = m_entity->pos + tracker_dir * (tracker_width - collider_width) / 2.0f;
                 tracker_collider->rotation = collider->rotation;

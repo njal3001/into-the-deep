@@ -4,11 +4,8 @@
 namespace ITD
 {
     Component::Component()
-        : visible(true), m_type(0), m_alive(true), m_entity(nullptr), 
-        m_next(nullptr), m_prev(nullptr)
-    {
-        m_node.data = this;
-    }
+        : visible(true), m_type(0), m_alive(true), m_entity(nullptr)
+    {}
 
     Component::~Component()
     {}
@@ -31,16 +28,6 @@ namespace ITD
     Scene* Component::scene() const
     {
         return (m_entity ? m_entity->scene() : nullptr);
-    }
-
-    Component* Component::next() const
-    {
-        return m_next;
-    }
-
-    Component* Component::prev() const
-    {
-        return m_prev;
     }
 
     void Component::destroy()

@@ -7,7 +7,7 @@ namespace ITD
         : m_invincible_timer(0.0f), invincible_time(0.5f)
     {}
 
-    void Hurtable::hurt(const glm::vec2 &dir)
+    bool Hurtable::hurt(const glm::vec2 &dir)
     {
         if (m_invincible_timer <= 0.0f)
         {
@@ -24,7 +24,11 @@ namespace ITD
             }
 
             m_invincible_timer = invincible_time;
+
+            return true;
         }
+
+        return false;
     }
 
     void Hurtable::update(const float elapsed)

@@ -1,9 +1,9 @@
 #pragma once
 #include <assert.h>
 #include <vector>
+#include <list>
 #include "../graphics/renderer.h"
 #include "collisionhandler.h"
-#include "pool.h"
 
 namespace ITD
 {
@@ -33,9 +33,7 @@ namespace ITD
         uint8_t m_type;
         bool m_alive;
 
-        Node<Component> m_node;
-        Component *m_next;
-        Component *m_prev;
+        std::list<Component*>::iterator m_iterator;
 
         class Types
         {
@@ -68,9 +66,6 @@ namespace ITD
         Entity* entity() const;
         Scene* scene() const;
 
-        Component* next() const;
-        Component* prev() const;
-
         template <class T>
         T* get() const;
 
@@ -99,9 +94,7 @@ namespace ITD
 
         bool m_alive;
 
-        Entity *m_next;
-        Entity *m_prev;
-        Node<Entity> m_node;
+        std::list<Entity*>::iterator m_iterator;
 
     public:
         Entity(const glm::vec2& pos);
@@ -130,9 +123,10 @@ namespace ITD
     class Scene
     {
     private:
-        Pool<Entity> m_entities;
-        Pool<Entity> m_to_add;
-        Pool<Component> m_components[MAX_COMPONENT_TYPES];
+        std::list<Entity*> m_entities;
+        std::list<Entity*> m_to_add;
+        std::list<Component*> m_components[MAX_COMPONENT_TYPES];
+
         Tilemap *m_tilemap;
         CollisionHandler m_collision_handler;
         float m_freeze_timer;
@@ -157,7 +151,10 @@ namespace ITD
         void render_hud(Renderer *renderer);
 
         template<class T>
-        Node<T>* first() const;
+        typename std::list<Component*>::iterator first();
+
+        template<class T>
+        typename std::list<Component*>::iterator end();
 
         void freeze(const float amount);
 
@@ -209,9 +206,16 @@ namespace ITD
     }
 
     template<class T>
-    Node<T>* Scene::first() const
+    typename std::list<Component*>::iterator Scene::first()
     {
         const uint8_t type = Component::Types::id<T>();
-        return (Node<T>*)m_components[type].head;
+        return m_components[type].begin();
+    }
+
+    template<class T>
+    typename std::list<Component*>::iterator Scene::end()
+    {
+        const uint8_t type = Component::Types::id<T>();
+        return m_components[type].end();
     }
 }

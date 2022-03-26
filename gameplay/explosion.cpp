@@ -23,8 +23,10 @@ namespace ITD
         Hurtable *hurtable = other->get<Hurtable>();
         if (hurtable)
         {
-            hurtable->hurt(-dir);
-            scene()->freeze(0.05f);
+            if (hurtable->hurt(-dir))
+            {
+                scene()->freeze(0.05f);
+            }
         }
     }
 
@@ -51,7 +53,6 @@ namespace ITD
         mov->collider = col;
         mov->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
         {
-            printf("Hit\n");
             Explosion *exp = mover->get<Explosion>();
             exp->on_hit(other, dir);
 
