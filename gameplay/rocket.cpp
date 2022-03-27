@@ -106,6 +106,7 @@ namespace ITD
 
             return true;
         };
+
         ent->add(col);
 
         Mover *mov = new Mover();

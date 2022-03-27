@@ -219,7 +219,7 @@ namespace ITD
                                             }
                                         }
 
-                                        if ((ocol->collides_with & col->mask) && col->on_collide)
+                                        if ((col->collides_with & ocol->mask) && col->on_collide)
                                         {
                                             col->on_collide(col, ocol, push_norm);
                                         }
