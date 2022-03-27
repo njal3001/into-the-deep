@@ -17,7 +17,7 @@ namespace ITD
         Collider *col = get<Collider>();
         Mover *mov = get<Mover>();
         const glm::vec2 dir = Calc::normalize(mov->vel);
-        col->rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f));
+        col->set_rotation(glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f)));
         m_max_speed = glm::length(mov->vel);
     }
 
@@ -34,9 +34,9 @@ namespace ITD
             Collider *tracker_collider = tracker->get<Collider>();
             if (!m_target && tracker_collider)
             {
-                const glm::vec2 tracker_dir = glm::rotate(Calc::right, collider->rotation);
-                tracker->pos = m_entity->pos + tracker_dir * (tracker_width - collider_width) / 2.0f;
-                tracker_collider->rotation = collider->rotation;
+                const glm::vec2 tracker_dir = glm::rotate(Calc::right, collider->get_rotation());
+                tracker->set_pos(m_entity->get_pos() + tracker_dir * (tracker_width - collider_width) / 2.0f);
+                tracker_collider->set_rotation(collider->get_rotation());
 
                 std::vector<Collider*> in_range;
                 tracker_collider->check_all(Mask::Enemy, &in_range);
@@ -57,10 +57,10 @@ namespace ITD
             glm::vec2 facing;
             if (m_target)
             {
-                const glm::vec2 dir = Calc::normalize(m_target->pos - entity()->pos);
+                const glm::vec2 dir = Calc::normalize(m_target->get_pos() - entity()->get_pos());
                 const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
-                collider->rotation = Calc::shortest_rotation_approach(collider->rotation, target_rotation, rotation_multiplier * elapsed);
-                facing = glm::rotate(Calc::right, collider->rotation);
+                collider->set_rotation(Calc::shortest_rotation_approach(collider->get_rotation(), target_rotation, rotation_multiplier * elapsed));
+                facing = glm::rotate(Calc::right, collider->get_rotation());
             }
             else
             {
@@ -74,7 +74,7 @@ namespace ITD
     void Rocket::explode()
     {
         Collider *col = get<Collider>();
-        Explosion::create(scene(), m_entity->pos, explosion_duration, glm::vec2(explosion_width, explosion_height), col->rotation);
+        Explosion::create(scene(), m_entity->get_pos(), explosion_duration, glm::vec2(explosion_width, explosion_height), col->get_rotation());
         tracker->destroy();
         m_entity->destroy();
     }
@@ -98,33 +98,27 @@ namespace ITD
         ent->add(rocket);
 
         Collider *col = new Collider(Rectf(glm::vec2(), glm::vec2(collider_width, collider_height)));
-        ent->add(col);
-
-        Mover *mov = new Mover();
-        mov->collides_with |= Mask::Enemy;
-        mov->collider = col;
-        mov->vel = vel;
-        mov->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
+        col->collides_with = Mask::Solid | Mask::Enemy;
+        col->on_collide = [](Collider *collider, Collider *other, const glm::vec2 &dir)
         {
-            Rocket *rocket = mover->get<Rocket>();
+            Rocket *rocket = collider->get<Rocket>();
             rocket->explode();
 
             return true;
         };
+        ent->add(col);
 
+        Mover *mov = new Mover();
+        mov->vel = vel;
         ent->add(mov);
 
         Entity *tracker = scene->add_entity(pos);
-        const glm::vec2 tracker_bl = col->bounds.center() - glm::vec2(tracker_width, tracker_height) / 2.0f;
+        const glm::vec2 tracker_bl = col->get_bounds().center() - glm::vec2(tracker_width, tracker_height) / 2.0f;
         const glm::vec2 tracker_tr = tracker_bl + glm::vec2(tracker_width, tracker_height);
 
         Collider *tracker_collider = new Collider(Rectf(tracker_bl, tracker_tr));
 
         tracker->add(tracker_collider);
-        Mover *tracker_mover = new Mover();
-        tracker_mover->collider = tracker_collider;
-        tracker->add(tracker_mover);
-
         rocket->tracker = tracker;
 
         return ent;

@@ -9,7 +9,6 @@ namespace ITD
         SDL_Window *g_window = nullptr;
         SDL_Joystick *g_joystick = nullptr;
         uint64_t g_ticks = 0;
-        uint8_t g_frame = 0;
         const char *g_app_path;
     }
 
@@ -75,8 +74,6 @@ namespace ITD
 
         Input::update();
 
-        g_frame++;
-
         return cont;
     }
 
@@ -108,10 +105,5 @@ namespace ITD
         auto counter = SDL_GetPerformanceCounter();
         auto freq = (double)SDL_GetPerformanceFrequency();
         return (uint64_t)(counter * (ticks_per_sec / freq));
-    }
-
-    uint8_t Platform::frame()
-    {
-        return g_frame;
     }
 }

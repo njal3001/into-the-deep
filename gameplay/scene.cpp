@@ -13,13 +13,13 @@ namespace ITD
 
     Scene::~Scene()
     {
-        for (auto iter = m_to_add.begin(); iter != m_to_add.end(); iter++)
+        for (auto iter = m_to_add.begin(); iter != m_to_add.end();)
         {
             delete *iter;
             iter = m_to_add.erase(iter);
         }
 
-        for (auto iter = m_entities.begin(); iter != m_entities.end(); iter++)
+        for (auto iter = m_entities.begin(); iter != m_entities.end();)
         {
             delete *iter;
             iter = m_to_add.erase(iter);
@@ -79,7 +79,7 @@ namespace ITD
 
     void Scene::update_lists()
     {
-        for (auto iter = m_entities.begin(); iter != m_entities.end(); iter++)
+        for (auto iter = m_entities.begin(); iter != m_entities.end();)
         {
             if (!(*iter)->m_alive)
             {
@@ -87,9 +87,13 @@ namespace ITD
                 delete *iter;
                 iter = m_entities.erase(iter);
             }
+            else
+            {
+                iter++;
+            }
         }
 
-        for (auto iter = m_to_add.begin(); iter != m_to_add.end(); iter++)
+        for (auto iter = m_to_add.begin(); iter != m_to_add.end();)
         {
             m_entities.push_back(*iter);
             (*iter)->m_iterator = --m_entities.end();

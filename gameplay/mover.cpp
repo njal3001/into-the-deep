@@ -3,12 +3,11 @@
 namespace ITD
 {
     Mover::Mover()
-        : collider(nullptr), vel(glm::vec2()), collides_with(Mask::Solid), on_hit(nullptr)
+        : vel(glm::vec2())
     {}
 
     void Mover::update(const float elapsed)
     {
-        m_entity->pos += vel * elapsed;
-        collider->invalidate_cache();
+        m_entity->translate(vel * elapsed);
     }
 }

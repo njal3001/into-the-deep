@@ -1,12 +1,39 @@
 #include "ecs.h"
 #include <algorithm>
 #include <vector>
+#include "collider.h"
 
 namespace ITD
 {
     Entity::Entity(const glm::vec2& pos)
-        : pos(pos), visible(true), m_scene(nullptr), m_alive(true)
+        : m_pos(pos), visible(true), m_scene(nullptr), m_alive(true)
     {}
+
+    void Entity::set_pos(const glm::vec2 &pos)
+    {
+        m_pos = pos;
+
+        Collider *collider = get<Collider>();
+        if (collider)
+        {
+            collider->on_position_changed();
+        }
+    }
+
+    glm::vec2 Entity::get_pos() const
+    {
+        return m_pos;
+    }
+
+    void Entity::translate(const glm::vec2 &amount)
+    {
+        m_pos += amount;
+        Collider *collider = get<Collider>();
+        if (collider)
+        {
+            collider->on_position_changed();
+        }
+    }
 
     Entity::~Entity()
     {
@@ -49,26 +76,24 @@ namespace ITD
 
     void Entity::update_lists()
     {
+        for (auto it = m_components.begin(); it != m_components.end();)
         {
-            auto it = m_components.begin();
-
-            while (it != m_components.end())
+            Component* c = *it;
+            if (!c->m_alive)
             {
-                Component* c = *it;
-                if (!c->m_alive)
-                {
-                    it = m_components.erase(it);
+                it = m_components.erase(it);
 
-                    m_scene->untrack_component(c);
-                    delete c;
-                }
-                else
-                {
-                    it++;
-                }
+                m_scene->untrack_component(c);
+                delete c;
+            }
+            else
+            {
+                it++;
             }
         }
 
+
+        // TODO: Don't need two loops for this
         for (auto c : m_to_add)
         {
             c->m_entity = this;

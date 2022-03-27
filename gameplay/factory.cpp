@@ -8,7 +8,7 @@ namespace ITD
     {
         Entity* e = scene->add_entity(pos);
         Collider* c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), 
-                    glm::vec2(8.0f, 8.0f)));
+                    glm::vec2(8.0f, 8.0f)), 0.0f, false);
 
         c->mask = Mask::Solid;
         e->add(c);

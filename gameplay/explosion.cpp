@@ -43,23 +43,17 @@ namespace ITD
         Explosion *explosion = new Explosion(duration);
         ent->add(explosion);
 
-        Collider *col = new Collider(Rectf(-size / 2.0f, size / 2.0f));
-        col->rotation = rotation;
-        ent->add(col);
-
-        // TODO: On hit should rather be in the collider component
-        Mover *mov = new Mover();
-        mov->collides_with |= Mask::Enemy;
-        mov->collider = col;
-        mov->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
+        Collider *col = new Collider(Rectf(-size / 2.0f, size / 2.0f), rotation, false);
+        col->collides_with = Mask::Enemy;
+        col->on_collide = [](Collider *collider, Collider *other, const glm::vec2 &dir)
         {
-            Explosion *exp = mover->get<Explosion>();
+            Explosion *exp = collider->get<Explosion>();
             exp->on_hit(other, dir);
 
             return true;
         };
 
-        ent->add(mov);
+        ent->add(col);
 
         return ent;
     }

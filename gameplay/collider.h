@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "ecs.h"
 #include "../maths/shapes.h"
 
@@ -15,14 +16,9 @@ namespace ITD
     class Collider : public Component
     {
         friend class CollisionHandler;
+        friend class Entity;
 
-    public:
-        struct Axes
-        {
-            glm::vec2 ax1;
-            glm::vec2 ax2;
-        };
-
+    private:
         struct Projection
         {
             float start;
@@ -30,32 +26,40 @@ namespace ITD
         };
 
     public:
-        Rectf bounds;
-        float rotation;
-        bool dynamic;
         uint32_t mask;
+        uint32_t collides_with;
         bool active;
+        std::function<bool (Collider *collider, Collider *other, const glm::vec2 &dir)> on_collide;
 
     private:
+        Rectf m_bounds;
+        float m_rotation;
+        bool m_dynamic;
+        bool m_invalid_cache;
+
         Quadf m_quad;
-        Axes m_axes;
+        glm::vec2 m_axes[2];
         Rectf m_bbox;
+
         Recti m_bucket_box;
         bool m_in_bucket;
-
-        int m_timestamp;
+        std::list<Collider*>::iterator m_dyn_iter;
 
     public:
-        Collider(const Rectf &bounds, const float rotation = 0.0f);
+        Collider(const Rectf &bounds, const float rotation = 0.0f, const bool dynamic = true);
 
-        const Quadf &quad();
-        const Axes &axes();
-        const Rectf &bbox();
+        void set_bounds(const Rectf &bounds);
+        Rectf get_bounds() const;
 
-        // Assumes that the collider is refreshed
-        Projection project(const glm::vec2 &axis) const;
+        void set_rotation(const float rotation);
+        void rotate(const float amount);
+        float get_rotation() const;
 
-        void invalidate_cache();
+        void set_dynamic(const bool dynamic);
+        bool is_dynamic() const;
+
+        Quadf quad();
+        Rectf bbox();
 
         bool overlaps(Collider &other);
         glm::vec2 push_out(Collider &other);
@@ -71,6 +75,10 @@ namespace ITD
         void on_removed() override;
 
     private:
+        // Assumes that the collider is refreshed
+        Projection project(const glm::vec2 &axis) const;
+
+        void on_position_changed();
         void refresh();
         void recalculate();
     };

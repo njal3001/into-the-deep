@@ -84,10 +84,11 @@ namespace ITD
         friend class Scene;
 
     public:
-        glm::vec2 pos;
         bool visible;
 
     private:
+        glm::vec2 m_pos;
+
         Scene* m_scene;
         std::vector<Component*> m_components;
         std::vector<Component*> m_to_add;
@@ -99,6 +100,10 @@ namespace ITD
     public:
         Entity(const glm::vec2& pos);
         ~Entity();
+
+        void set_pos(const glm::vec2 &pos);
+        glm::vec2 get_pos() const;
+        void translate(const glm::vec2 &amount);
 
         bool alive() const;
         Scene* scene() const;

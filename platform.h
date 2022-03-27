@@ -19,6 +19,5 @@ namespace ITD
         std::string app_path();
 
         uint64_t ticks();
-        uint8_t frame();
     }
 }

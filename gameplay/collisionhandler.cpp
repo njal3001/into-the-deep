@@ -24,6 +24,18 @@ namespace ITD
         m_buckets.resize(m_grid_width * m_grid_height);
     }
 
+    void CollisionHandler::register_dynamic(Collider *collider)
+    {
+        m_dynamic_colliders.push_back(collider);
+        collider->m_dyn_iter = --m_dynamic_colliders.end();
+    }
+
+    void CollisionHandler::deregister_dynamic(Collider *collider)
+    {
+        m_dynamic_colliders.erase(collider->m_dyn_iter);
+        collider->m_dyn_iter = m_dynamic_colliders.end();
+    }
+
     void CollisionHandler::update_buckets(Collider *collider)
     {
         const Rectf& bbox = collider->bbox();
@@ -120,9 +132,8 @@ namespace ITD
 
     void CollisionHandler::update_all_buckets()
     {
-        for (auto iter = m_scene->first<Mover>(); iter != m_scene->end<Mover>(); iter++)
+        for (auto col : m_dynamic_colliders)
         {
-            Collider *col = ((Mover*)(*iter))->collider;
             if (col->active)
             {
                 update_buckets(col);
@@ -151,92 +162,71 @@ namespace ITD
 
     void CollisionHandler::update()
     {
-        std::unordered_map<size_t, bool> collided_map;
         update_all_buckets();
 
         for (size_t i = 0; i < collision_iterations; i++)
         {
-            for (auto iter = m_scene->first<Mover>(); iter != m_scene->end<Mover>(); iter++)
+            for (auto col : m_dynamic_colliders)
             {
-                auto mover = (Mover*)(*iter);
-                auto col = mover->collider;
-
                 if (col->active)
                 {
-                    const Recti& buc_box = col->m_bucket_box;
-                    glm::ivec2 bl = buc_box.bl;
-                    glm::ivec2 tr = buc_box.tr;
+                    const Recti &buc_box = col->m_bucket_box;
+                    const glm::ivec2 &bl = buc_box.bl;
+                    const glm::ivec2 &tr = buc_box.tr;
 
-                    const size_t hash = std::hash<Collider*>{}(col);
                     for (int y = bl.y; y <= tr.y; y++)
                     {
                         for (int x = bl.x; x <= tr.x; x++)
                         {
                             if (!valid_bucket_index(x, y)) continue;
 
-                            std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
+                            const std::vector<Collider*> &bucket = m_buckets[y * m_grid_width + x];
 
-                            for (Collider *ocol : *bucket)
+                            for (Collider *ocol : bucket)
                             {
-                                if (ocol->active && col != ocol && (mover->collides_with & ocol->mask))
+                                if (ocol->active && col != ocol && ((col->collides_with & ocol->mask) || (ocol->collides_with & col->mask)))
                                 {
-                                    // Make sure that same collision does not trigger multiple times
-                                    const size_t ohash = std::hash<Collider*>{}(ocol);
-                                    const size_t comb_hash = Calc::hash_combine(hash, ohash);
-                                    const bool has_collided = collided_map.find(comb_hash) 
-                                        != collided_map.end();
-
-                                    if (!has_collided)
+                                    const glm::vec2 push = col->push_out(*ocol);
+                                    if (push != glm::vec2())
                                     {
-                                        const glm::vec2 push = col->push_out(*ocol);
-                                        if (push != glm::vec2())
-                                        {
-                                            collided_map[comb_hash] = true;
-                                            glm::vec2 push_norm = Calc::normalize(push);
+                                        glm::vec2 push_norm = Calc::normalize(push);
 
-                                            auto omover = ocol->get<Mover>();
-                                            if (omover)
+                                        if (ocol->is_dynamic())
+                                        {
+                                            col->entity()->translate(push / 2.0f);
+                                            ocol->entity()->translate(-push / 2.0f);
+
+                                            Mover *mov = col->get<Mover>();
+                                            Mover *omov = ocol->get<Mover>();
+                                            if (mov && omov)
                                             {
-                                                const glm::vec2 vel_diff = mover->vel - omover->vel;
+                                                const glm::vec2 vel_diff = mov->vel - omov->vel;
                                                 const float p = glm::dot(push_norm, vel_diff);
 
-                                                //  Collision response
-                                                const bool needs_push1 = !mover->on_hit || 
-                                                    !mover->on_hit(mover, ocol, push_norm);
-
-                                                const bool needs_push2 = 
-                                                    !(omover->collides_with & col->mask) ||
-                                                            !omover->on_hit || 
-                                                            !omover->on_hit(omover, col, -push_norm);
-
-                                                const float push_div = (float)(needs_push1 + 
-                                                        needs_push2);
-
-                                                if (needs_push1)
-                                                {
-                                                    col->entity()->pos += push / push_div;
-                                                    mover->vel -= push_norm * p * collision_elasticity;
-                                                    col->invalidate_cache();
-                                                }
-
-                                                if (needs_push2)
-                                                {
-                                                    ocol->entity()->pos -= push / push_div;
-                                                    omover->vel += push_norm * p * collision_elasticity;
-                                                    ocol->invalidate_cache();
-                                                }
+                                                mov->vel -= push_norm * p * collision_elasticity;
+                                                omov->vel += push_norm * p * collision_elasticity;
                                             }
-                                            else
+                                        }
+                                        else
+                                        {
+                                            col->entity()->translate(push);
+
+                                            Mover *mov = col->get<Mover>();
+                                            if (mov)
                                             {
-                                                if (!mover->on_hit || 
-                                                        !mover->on_hit(mover, ocol, push_norm))
-                                                {
-                                                    col->entity()->pos += push;
-                                                    const float p = glm::dot(push_norm, mover->vel);
-                                                    mover->vel -= push_norm * p * collision_elasticity;
-                                                    col->invalidate_cache();
-                                                }
+                                                const float p = glm::dot(push_norm, mov->vel);
+                                                mov->vel -= push_norm * p * collision_elasticity;
                                             }
+                                        }
+
+                                        if ((ocol->collides_with & col->mask) && col->on_collide)
+                                        {
+                                            col->on_collide(col, ocol, push_norm);
+                                        }
+
+                                        if ((ocol->collides_with & col->mask) && ocol->on_collide)
+                                        {
+                                            ocol->on_collide(ocol, col, -push_norm);
                                         }
                                     }
                                 }
@@ -252,7 +242,7 @@ namespace ITD
     {
         if (!collider->m_in_bucket) return nullptr;
 
-        const Recti& buc_box = collider->m_bucket_box;
+        const Recti &buc_box = collider->m_bucket_box;
         glm::ivec2 bl = buc_box.bl;
         glm::ivec2 tr = buc_box.tr;
 
@@ -262,8 +252,8 @@ namespace ITD
             {
                 if (!valid_bucket_index(x, y)) continue;
 
-                std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
-                for (Collider *other : *bucket)
+                std::vector<Collider*> &bucket = m_buckets[y * m_grid_width + x];
+                for (Collider *other : bucket)
                 {
                     if (collider != other && (mask & other->mask))
                     {
@@ -284,7 +274,7 @@ namespace ITD
     {
         if (!collider->m_in_bucket) return;
 
-        const Recti& buc_box = collider->m_bucket_box;
+        const Recti &buc_box = collider->m_bucket_box;
         glm::ivec2 bl = buc_box.bl;
         glm::ivec2 tr = buc_box.tr;
 
@@ -294,8 +284,8 @@ namespace ITD
             {
                 if (!valid_bucket_index(x, y)) continue;
 
-                std::vector<Collider*> *bucket = &m_buckets[y * m_grid_width + x];
-                for (Collider *other : *bucket)
+                const std::vector<Collider*> &bucket = m_buckets[y * m_grid_width + x];
+                for (Collider *other : bucket)
                 {
                     if (collider != other && (mask & other->mask))
                     {

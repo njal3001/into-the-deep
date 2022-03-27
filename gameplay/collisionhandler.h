@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
+#include <list>
 #include "../maths/shapes.h"
 
 namespace ITD
@@ -11,18 +12,23 @@ namespace ITD
     class CollisionHandler
     {
     private:
+        static constexpr size_t collision_iterations = 1;
+        static constexpr float collision_elasticity = 0.01f;
+
         Scene *m_scene;
         std::vector<std::vector<Collider*>> m_buckets;
         size_t m_grid_width;
         size_t m_grid_height;
 
-        static constexpr size_t collision_iterations = 1;
-        static constexpr float collision_elasticity = 0.01f;
+        std::list<Collider*> m_dynamic_colliders;
 
     public:
         CollisionHandler();
 
         void init(Scene *scene);
+
+        void register_dynamic(Collider *collider);
+        void deregister_dynamic(Collider *collider);
 
         void update_buckets(Collider *collider);
         void add_bucket(Collider *collider, const size_t bx, const size_t by);

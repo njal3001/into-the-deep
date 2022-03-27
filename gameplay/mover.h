@@ -7,14 +7,11 @@ namespace ITD
 {
     class Mover : public Component
     {
-    private:
-        static constexpr float collision_elasticity = 0.01f;
-
     public:
-        Collider* collider;
         glm::vec2 vel;
-        uint32_t collides_with;
-        std::function<bool (Mover *mover, Collider *other, const glm::vec2 &dir)> on_hit;
+        //Collider* collider;
+        //uint32_t collides_with;
+        //std::function<bool (Mover *mover, Collider *other, const glm::vec2 &dir)> on_hit;
 
     public:
         Mover();

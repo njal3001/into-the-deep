@@ -5,58 +5,112 @@
 
 namespace ITD
 {
-    Collider::Collider(const Rectf &bounds, const float rotation)
-        : bounds(bounds), rotation(rotation), dynamic(true), mask(Mask::None), active(true),
-        m_in_bucket(false), m_timestamp(-1)
+    Collider::Collider(const Rectf &bounds, const float rotation, const bool dynamic)
+        : m_bounds(bounds), m_rotation(rotation), m_dynamic(dynamic), mask(Mask::None), active(true),
+        m_in_bucket(false), m_invalid_cache(true)
     {}
 
     void Collider::awake()
     {
-        Mover *mover = get<Mover>();
-        if (!mover)
+        recalculate();
+        scene()->collision_handler()->update_buckets(this);
+        m_invalid_cache = false;
+
+        if (m_dynamic)
         {
-            dynamic = false;
-            recalculate();
-            scene()->collision_handler()->update_buckets(this);
+            scene()->collision_handler()->register_dynamic(this);
         }
     }
 
     void Collider::on_removed()
     {
+        if (m_dynamic)
+        {
+            scene()->collision_handler()->deregister_dynamic(this);
+        }
+
         scene()->collision_handler()->remove(this);
     }
 
     void Collider::refresh()
     {
-        const int ticks = Platform::frame();
-        if (ticks != m_timestamp && dynamic)
+        if (m_invalid_cache)
         {
-            m_timestamp = ticks;
             recalculate();
+            m_invalid_cache = false;
+
+            if (!m_dynamic)
+            {
+                scene()->collision_handler()->update_buckets(this);
+            }
         }
     }
 
-    const Quadf &Collider::quad()
+    void Collider::set_bounds(const Rectf &bounds)
+    {
+        m_bounds = bounds;
+        m_invalid_cache = true;
+    }
+
+    Rectf Collider::get_bounds() const
+    {
+        return m_bounds;
+    }
+
+    void Collider::set_rotation(const float rotation)
+    {
+        m_rotation = rotation;
+        m_invalid_cache = true;
+    }
+
+    void Collider::rotate(const float amount)
+    {
+        m_rotation += amount;
+        m_invalid_cache = true;
+    }
+
+    float Collider::get_rotation() const
+    {
+        return m_rotation;
+    }
+
+    void Collider::set_dynamic(const bool dynamic)
+    {
+        if (dynamic != m_dynamic)
+        {
+            m_dynamic = dynamic;
+
+            if (dynamic)
+            {
+                scene()->collision_handler()->register_dynamic(this);
+            }
+            else
+            {
+                scene()->collision_handler()->deregister_dynamic(this);
+            }
+        }
+    }
+
+    bool Collider::is_dynamic() const
+    {
+        return m_dynamic;
+    }
+
+    Quadf Collider::quad()
     {
         refresh();
         return m_quad;
     }
 
-    const Collider::Axes &Collider::axes()
-    {
-        refresh();
-        return m_axes;
-    }
-
-    const Rectf &Collider::bbox()
+    Rectf Collider::bbox()
     {
         refresh();
         return m_bbox;
     }
 
-    void Collider::invalidate_cache()
+    void Collider::on_position_changed()
     {
-        m_timestamp = -1;
+        m_invalid_cache = true;
     }
 
     Collider::Projection Collider::project(const glm::vec2 &axis) const
@@ -82,20 +136,25 @@ namespace ITD
 
     glm::vec2 Collider::push_out(Collider &other)
     {
-        const Axes* all_axes[2] = { &axes(), &other.axes() };
+        refresh();
+        other.refresh();
+
+        const glm::vec2* all_axes[2] = { m_axes, other.m_axes };
 
         // No need to check both colliders axes if the rotation is the same
-        const size_t naxes = 2 - (rotation == other.rotation);
+        const size_t naxes = 2 - (m_rotation == other.m_rotation);
 
         float min_push = FLT_MAX;
         glm::vec2 push_dir;
 
         for (size_t i = 0; i < naxes; i++)
         {
-            const Axes *axes = all_axes[i];
+            const glm::vec2 *axes = all_axes[i];
 
-            for (const auto &axis : { axes->ax1, axes->ax2 })
+            for (size_t j = 0; j < 2; j++)
             {
+                const glm::vec2 axis = axes[j];
+
                 const Projection prj1 = project(axis);
                 const Projection prj2 = other.project(axis);
 
@@ -123,19 +182,24 @@ namespace ITD
 
     float Collider::distance(Collider &other)
     {
-        const Axes* all_axes[2] = { &axes(), &other.axes() };
+        refresh();
+        other.refresh();
+
+        const glm::vec2* all_axes[2] = { m_axes, other.m_axes };
 
         // No need to check both colliders axes if the rotation is the same
-        const size_t naxes = 2 - (rotation == other.rotation);
+        const size_t naxes = 2 - (m_rotation == other.m_rotation);
 
         float max_dist = 0.0f;
 
         for (size_t i = 0; i < naxes; i++)
         {
-            const Axes *axes = all_axes[i];
+            const glm::vec2 *axes = all_axes[i];
 
-            for (const auto &axis : { axes->ax1, axes->ax2 })
+            for (size_t j = 0; j < 2; j++)
             {
+                const glm::vec2 axis = axes[j];
+
                 const Projection prj1 = project(axis);
                 const Projection prj2 = other.project(axis);
 
@@ -159,11 +223,11 @@ namespace ITD
 
     void Collider::recalculate()
     {
-        m_quad = Quadf(bounds, rotation);
-        m_quad.offset(m_entity->pos);
+        m_quad = Quadf(m_bounds, m_rotation);
+        m_quad.offset(m_entity->get_pos());
 
-        m_axes.ax1 = glm::normalize(m_quad.d - m_quad.a);
-        m_axes.ax2 = glm::normalize(m_quad.b - m_quad.a);
+        m_axes[0] = glm::normalize(m_quad.d - m_quad.a);
+        m_axes[1] = glm::normalize(m_quad.b - m_quad.a);
 
         float max_x = m_quad.a.x;
         max_x = std::max(m_quad.b.x, max_x);

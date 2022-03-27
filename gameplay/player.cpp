@@ -49,8 +49,8 @@ namespace ITD
         {
             const glm::vec2 right = glm::vec2(1.0f, 0.0f);
             const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
-            col->rotation = Calc::shortest_rotation_approach(col->rotation, target_rotation, rotation_multiplier * elapsed);
-            m_facing = glm::rotate(right, col->rotation);
+            col->set_rotation(Calc::shortest_rotation_approach(col->get_rotation(), target_rotation, rotation_multiplier * elapsed));
+            m_facing = glm::rotate(right, col->get_rotation());
         }
         else
         {
@@ -108,7 +108,7 @@ namespace ITD
 
             if (shoot)
             {
-                Rocket::create(scene(), m_entity->pos, m_facing * shoot_speed);
+                Rocket::create(scene(), m_entity->get_pos(), m_facing * shoot_speed);
                 m_shoot_cooldown_timer = shoot_cooldown;
 
                 mover->vel -= m_facing * shoot_knockback;
@@ -143,11 +143,10 @@ namespace ITD
 
         Collider *c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(12.0f, 8.0f)));
         c->mask = Mask::Player;
+        c->collides_with = Mask::Solid | Mask::Enemy;
         e->add(c);
 
         Mover *m = new Mover();
-        m->collides_with |= Mask::Enemy;
-        m->collider = c;
         e->add(m);
 
         Hurtable *h = new Hurtable();

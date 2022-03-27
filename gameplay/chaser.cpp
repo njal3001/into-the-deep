@@ -44,8 +44,7 @@ namespace ITD
         Collider *collider = get<Collider>();
         if (m_attached_to)
         {
-            m_entity->pos = m_attached_to->entity()->pos;
-            collider->invalidate_cache();
+            m_entity->set_pos(m_attached_to->entity()->get_pos());
 
             m_attack_timer -= elapsed;
             if (m_attack_timer <= 0.0f)
@@ -65,7 +64,7 @@ namespace ITD
             if (pfirst != scene()->end<Player>())
             {
                 Player* player = (Player*)*pfirst;
-                dir = Calc::normalize(player->entity()->pos - entity()->pos);
+                dir = Calc::normalize(player->entity()->get_pos() - entity()->get_pos());
             }
             else
             {
@@ -75,9 +74,9 @@ namespace ITD
 
             const glm::vec2 right = glm::vec2(1.0f, 0.0f);
             const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
-            collider->rotation = Calc::shortest_rotation_approach(collider->rotation, target_rotation, rotation_multiplier * elapsed);
+            collider->set_rotation(Calc::shortest_rotation_approach(collider->get_rotation(), target_rotation, rotation_multiplier * elapsed));
 
-            const glm::vec2 facing = glm::rotate(right, collider->rotation);
+            const glm::vec2 facing = glm::rotate(right, collider->get_rotation());
             mover->vel = Calc::approach(mover->vel, facing * max_speed * moving, accel * elapsed);
         }
 
@@ -99,17 +98,16 @@ namespace ITD
 
         Collider *c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(8.0f, 8.0f)));
         c->mask = Mask::Enemy;
-        e->add(c);
-
-        Mover *m = new Mover();
-        m->collider = c;
-        m->collides_with |= Mask::Player | Mask::Enemy;
-        m->on_hit = [](Mover *mover, Collider *other, const glm::vec2 &dir)
+        c->collides_with = Mask::Solid | Mask::Player | Mask::Enemy;
+        c->on_collide = [](Collider *collider, Collider *other, const glm::vec2 &dir)
         {
-            Chaser *chaser = mover->get<Chaser>();
+            Chaser *chaser = collider->get<Chaser>();
             return chaser->on_collide(other, dir);
         };
 
+        e->add(c);
+
+        Mover *m = new Mover();
         e->add(m);
 
         Hurtable *h = new Hurtable();
