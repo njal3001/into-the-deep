@@ -29,6 +29,7 @@ namespace ITD
         uint32_t mask;
         uint32_t collides_with;
         bool active;
+        bool trigger_only;
         std::function<bool (Collider *collider, Collider *other, const glm::vec2 &dir)> on_collide;
 
     private:

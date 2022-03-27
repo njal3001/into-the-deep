@@ -93,7 +93,6 @@ namespace ITD
         }
 
 
-        // TODO: Don't need two loops for this
         for (auto c : m_to_add)
         {
             c->m_entity = this;
@@ -101,9 +100,7 @@ namespace ITD
             m_scene->track_component(c);
         }
 
-        // Need to wake components after clearing because new components
-        // can be added in awake function
-
+        // Waking up components after all have been added
         std::vector<Component*> added;
         added.insert(added.begin(), m_to_add.begin(), m_to_add.end());
 

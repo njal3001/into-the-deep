@@ -7,7 +7,7 @@ namespace ITD
 {
     Collider::Collider(const Rectf &bounds, const float rotation, const bool dynamic)
         : m_bounds(bounds), m_rotation(rotation), m_dynamic(dynamic), mask(Mask::None), active(true),
-        m_in_bucket(false), m_invalid_cache(true)
+        trigger_only(false), m_in_bucket(false), m_invalid_cache(true)
     {}
 
     void Collider::awake()

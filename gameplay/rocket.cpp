@@ -99,6 +99,7 @@ namespace ITD
 
         Collider *col = new Collider(Rectf(glm::vec2(), glm::vec2(collider_width, collider_height)));
         col->collides_with = Mask::Solid | Mask::Enemy;
+        col->trigger_only = true;
         col->on_collide = [](Collider *collider, Collider *other, const glm::vec2 &dir)
         {
             Rocket *rocket = collider->get<Rocket>();

@@ -196,26 +196,32 @@ namespace ITD
                                             col->entity()->translate(push / 2.0f);
                                             ocol->entity()->translate(-push / 2.0f);
 
-                                            Mover *mov = col->get<Mover>();
-                                            Mover *omov = ocol->get<Mover>();
-                                            if (mov && omov)
+                                            if (!(col->trigger_only || ocol->trigger_only))
                                             {
-                                                const glm::vec2 vel_diff = mov->vel - omov->vel;
-                                                const float p = glm::dot(push_norm, vel_diff);
+                                                Mover *mov = col->get<Mover>();
+                                                Mover *omov = ocol->get<Mover>();
+                                                if (mov && omov)
+                                                {
+                                                    const glm::vec2 vel_diff = mov->vel - omov->vel;
+                                                    const float p = glm::dot(push_norm, vel_diff);
 
-                                                mov->vel -= push_norm * p * collision_elasticity;
-                                                omov->vel += push_norm * p * collision_elasticity;
+                                                    mov->vel -= push_norm * p * collision_elasticity;
+                                                    omov->vel += push_norm * p * collision_elasticity;
+                                                }
                                             }
                                         }
                                         else
                                         {
                                             col->entity()->translate(push);
 
-                                            Mover *mov = col->get<Mover>();
-                                            if (mov)
+                                            if (!(col->trigger_only || ocol->trigger_only))
                                             {
-                                                const float p = glm::dot(push_norm, mov->vel);
-                                                mov->vel -= push_norm * p * collision_elasticity;
+                                                Mover *mov = col->get<Mover>();
+                                                if (mov)
+                                                {
+                                                    const float p = glm::dot(push_norm, mov->vel);
+                                                    mov->vel -= push_norm * p * collision_elasticity;
+                                                }
                                             }
                                         }
 
