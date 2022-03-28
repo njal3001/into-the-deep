@@ -10,32 +10,32 @@ find_package(glm REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS} ${RAPIDXML_INCLUDE_DIRS})
 
 add_executable(itd
-    main.cpp
-    platform.cpp
-    input.cpp
-    file.cpp
-    graphics/graphics.cpp
-    graphics/renderer.cpp
-    graphics/shader.cpp
-    graphics/color.cpp
-    graphics/image.cpp
-    graphics/texture.cpp
-    graphics/material.cpp
-    maths/calc.cpp
-    gameplay/entity.cpp
-    gameplay/component.cpp
-    gameplay/scene.cpp
-    gameplay/tilemap.cpp
-    gameplay/collider.cpp
-    gameplay/player.cpp
-    gameplay/factory.cpp
-    gameplay/collisionhandler.cpp
-    gameplay/mover.cpp
-    gameplay/chaser.cpp
-    gameplay/hurtable.cpp
-    gameplay/rocket.cpp
-    gameplay/explosion.cpp
-    gameplay/playerhud.cpp
+    src/main.cpp
+    src/platform.cpp
+    src/input.cpp
+    src/file.cpp
+    src/graphics/graphics.cpp
+    src/graphics/renderer.cpp
+    src/graphics/shader.cpp
+    src/graphics/color.cpp
+    src/graphics/image.cpp
+    src/graphics/texture.cpp
+    src/graphics/material.cpp
+    src/maths/calc.cpp
+    src/gameplay/entity.cpp
+    src/gameplay/component.cpp
+    src/gameplay/scene.cpp
+    src/gameplay/tilemap.cpp
+    src/gameplay/collider.cpp
+    src/gameplay/player.cpp
+    src/gameplay/factory.cpp
+    src/gameplay/collisionhandler.cpp
+    src/gameplay/mover.cpp
+    src/gameplay/chaser.cpp
+    src/gameplay/hurtable.cpp
+    src/gameplay/rocket.cpp
+    src/gameplay/explosion.cpp
+    src/gameplay/playerhud.cpp
     )
 
 target_link_libraries(itd ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
