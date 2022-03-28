@@ -4,83 +4,55 @@
 #include "mover.h"
 #include "../maths/calc.h"
 #include "hurtable.h"
+#include "explosion.h"
+#include "collider.h"
 
 namespace ITD
 {
-    Chaser::Chaser()
-        : m_attached_to(nullptr), m_detach_recovery_timer(0.0f)
-    {}
-
     bool Chaser::on_collide(Collider *other, const glm::vec2 &dir)
     {
-        if (other->mask & Mask::Player && m_detach_recovery_timer <= 0.0f)
+        if (other->mask & Mask::Player)
         {
-            Player *player = other->get<Player>();
-            if (player->attach(this))
-            {
-                m_attached_to = player;
-
-                Mover *mover = get<Mover>();
-                Collider *collider = get<Collider>();
-                mover->vel = glm::vec2();
-                collider->active = false;
-                m_attack_timer = attack_time;
-            }
+            explode();
+            return true;
         }
 
         return false;
     }
 
-    void Chaser::detach()
+    void Chaser::explode()
     {
-        m_attached_to = nullptr;
-        Collider *collider = get<Collider>();
-        collider->active = true;
-        m_detach_recovery_timer = detach_recovery_time;
+        Collider *col = get<Collider>();
+        Explosion::create(scene(), m_entity->get_pos() + col->get_bounds().center(), explosion_duration, 
+                glm::vec2(explosion_width, explosion_height), col->get_rotation(), Mask::Enemy | Mask::Player);
+        m_entity->destroy();
     }
 
     void Chaser::update(const float elapsed)
     {
         Collider *collider = get<Collider>();
-        if (m_attached_to)
-        {
-            m_entity->set_pos(m_attached_to->entity()->get_pos());
+        Mover *mover = get<Mover>();
+        glm::vec2 dir;
+        float moving = 1.0f;
 
-            m_attack_timer -= elapsed;
-            if (m_attack_timer <= 0.0f)
-            {
-                Hurtable *hurtable = m_attached_to->get<Hurtable>();
-                hurtable->hurt(glm::vec2());
-                m_attack_timer = attack_time;
-            }
+        auto pfirst = scene()->first<Player>();
+        if (pfirst != scene()->end<Player>())
+        {
+            Player* player = (Player*)*pfirst;
+            dir = Calc::normalize(player->entity()->get_pos() - entity()->get_pos());
         }
-        else if (m_detach_recovery_timer <= 0.0f)
+        else
         {
-            Mover *mover = get<Mover>();
-            glm::vec2 dir;
-            float moving = 1.0f;
-
-            auto pfirst = scene()->first<Player>();
-            if (pfirst != scene()->end<Player>())
-            {
-                Player* player = (Player*)*pfirst;
-                dir = Calc::normalize(player->entity()->get_pos() - entity()->get_pos());
-            }
-            else
-            {
-                dir = mover->vel;
-                moving = 0.0f;
-            }
-
-            const glm::vec2 right = glm::vec2(1.0f, 0.0f);
-            const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
-            collider->set_rotation(Calc::shortest_rotation_approach(collider->get_rotation(), target_rotation, rotation_multiplier * elapsed));
-
-            const glm::vec2 facing = glm::rotate(right, collider->get_rotation());
-            mover->vel = Calc::approach(mover->vel, facing * max_speed * moving, accel * elapsed);
+            dir = mover->vel;
+            moving = 0.0f;
         }
 
-        m_detach_recovery_timer -= elapsed;
+        const glm::vec2 right = glm::vec2(1.0f, 0.0f);
+        const float target_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
+        collider->set_rotation(Calc::shortest_rotation_approach(collider->get_rotation(), target_rotation, rotation_multiplier * elapsed));
+
+        const glm::vec2 facing = glm::rotate(right, collider->get_rotation());
+        mover->vel = Calc::approach(mover->vel, facing * max_speed * moving, accel * elapsed);
     }
 
     void Chaser::render(Renderer *renderer)
@@ -111,11 +83,11 @@ namespace ITD
         e->add(m);
 
         Hurtable *h = new Hurtable();
-        h->health = 2;
+        h->health = 1;
         h->on_hurt = [](Hurtable *self, const glm::vec2 &force)
         {
-            Mover *mov = self->get<Mover>();
-            mov->vel = force * hurt_knockback; 
+            Chaser *chaser = self->get<Chaser>();
+            chaser->explode();
         };
         e->add(h);
 

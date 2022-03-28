@@ -193,11 +193,11 @@ namespace ITD
 
                                         if (ocol->is_dynamic())
                                         {
-                                            col->entity()->translate(push / 2.0f);
-                                            ocol->entity()->translate(-push / 2.0f);
-
                                             if (!(col->trigger_only || ocol->trigger_only))
                                             {
+                                                col->entity()->translate(push / 2.0f);
+                                                ocol->entity()->translate(-push / 2.0f);
+
                                                 Mover *mov = col->get<Mover>();
                                                 Mover *omov = ocol->get<Mover>();
                                                 if (mov && omov)
@@ -212,10 +212,10 @@ namespace ITD
                                         }
                                         else
                                         {
-                                            col->entity()->translate(push);
-
                                             if (!(col->trigger_only || ocol->trigger_only))
                                             {
+                                                col->entity()->translate(push);
+
                                                 Mover *mov = col->get<Mover>();
                                                 if (mov)
                                                 {

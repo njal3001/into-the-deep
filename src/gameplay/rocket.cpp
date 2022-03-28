@@ -5,6 +5,7 @@
 #include "tilemap.h"
 #include "hurtable.h"
 #include "explosion.h"
+#include "collider.h"
 
 namespace ITD
 {
@@ -74,7 +75,8 @@ namespace ITD
     void Rocket::explode()
     {
         Collider *col = get<Collider>();
-        Explosion::create(scene(), m_entity->get_pos(), explosion_duration, glm::vec2(explosion_width, explosion_height), col->get_rotation());
+        Explosion::create(scene(), m_entity->get_pos() + col->get_bounds().center(), explosion_duration, 
+                glm::vec2(explosion_width, explosion_height), col->get_rotation(), Mask::Enemy);
         tracker->destroy();
         m_entity->destroy();
     }

@@ -37,14 +37,16 @@ namespace ITD
         renderer->quad(quad.a, quad.b, quad.c, quad.d, Color(255, 255, 0));
     }
 
-    Entity *Explosion::create(Scene *scene, const glm::vec2 &pos, const float duration, const glm::vec2 &size, const float rotation)
+    Entity *Explosion::create(Scene *scene, const glm::vec2 &pos, const float duration, 
+            const glm::vec2 &size, const float rotation, const uint32_t hurt_mask)
     {
         Entity *ent = scene->add_entity(pos);
         Explosion *explosion = new Explosion(duration);
         ent->add(explosion);
 
         Collider *col = new Collider(Rectf(-size / 2.0f, size / 2.0f), rotation, false);
-        col->collides_with = Mask::Enemy;
+        col->collides_with = hurt_mask;
+        col->trigger_only = true;
         col->on_collide = [](Collider *collider, Collider *other, const glm::vec2 &dir)
         {
             Explosion *exp = collider->get<Explosion>();

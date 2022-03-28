@@ -23,9 +23,7 @@ int main()
 {
     using namespace ITD;
 
-    Platform::init();
-    Renderer renderer;
-
+    // Register all components
     Scene::register_component<Collider>();
     Scene::register_component<Mover>(Property::Updatable);
     Scene::register_component<Player>(Property::Updatable | Property::Renderable);
@@ -34,6 +32,9 @@ int main()
     Scene::register_component<Hurtable>(Property::Updatable);
     Scene::register_component<PlayerHUD>(Property::HUD);
     Scene::register_component<Explosion>(Property::Updatable | Property::Renderable);
+
+    Platform::init();
+    Renderer renderer;
 
     Tilemap map("tilemap");
     Scene scene(&map);
