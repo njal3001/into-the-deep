@@ -6,6 +6,7 @@
 #include <glm/gtx/vector_angle.hpp>
 #include "rocket.h"
 #include "hurtable.h"
+#include "animator.h"
 
 namespace ITD
 {
@@ -101,6 +102,9 @@ namespace ITD
         {
             m_shoot_cooldown_timer -= elapsed;
         }
+
+        auto anim = get<Animator>();
+        anim->rotation = col->get_rotation();
     }
 
     void Player::render(Renderer *renderer)
@@ -113,21 +117,25 @@ namespace ITD
 
     Entity* Player::create(Scene *scene, const glm::vec2& pos)
     {
-        Entity *e = scene->add_entity(pos);
-        e->add(new Player());
+        Entity *ent = scene->add_entity(pos);
+        ent->add(new Player());
 
-        Collider *c = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(col_width, col_height)));
-        c->mask = Mask::Player;
-        c->collides_with = Mask::Solid | Mask::Enemy;
-        e->add(c);
+        Collider *col = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(col_width, col_height)));
+        col->mask = Mask::Player;
+        col->collides_with = Mask::Solid | Mask::Enemy;
+        ent->add(col);
 
-        Mover *m = new Mover();
-        e->add(m);
+        Mover *mov = new Mover();
+        ent->add(mov);
 
-        Hurtable *h = new Hurtable();
-        h->health = 5;
-        e->add(h);
+        Hurtable *hur = new Hurtable();
+        hur->health = 5;
+        ent->add(hur);
 
-        return e;
+        Animator *ani = new Animator("player-Sheet", 
+                Recti(glm::ivec2(0, 5), glm::ivec2(16, 16)), 4, 0.100f, glm::vec2(0.0f, 0.0f));
+        ent->add(ani);
+
+        return ent;
     }
 }

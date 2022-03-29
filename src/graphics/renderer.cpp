@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <math.h>
 #include <memory>
+#include "../maths/calc.h"
 
 namespace ITD
 {
@@ -184,7 +185,7 @@ namespace ITD
         m_vertex_count += 4;
     }
 
-    void Renderer::set_texture(Texture *texture)
+    void Renderer::set_texture(const Texture *texture)
     {
         if (m_batch_front.count > 0 && m_batch_front.texture != texture)
         {
@@ -314,17 +315,50 @@ namespace ITD
         }
     }
 
-    void Renderer::tex(Texture *texture, const glm::vec2& pos, const Color color)
+    void Renderer::tex(const Texture *texture, const glm::vec2& pos, const Color color)
     {
         assert(m_vertex_map && m_index_map);
 
         set_texture(texture);
 
-        unsigned int w = texture->width();
-        unsigned int h = texture->height();
+        float w = texture->width();
+        float h = texture->height();
 
         push_quad(pos.x, pos.y, pos.x, pos.y + h, pos.x + w, pos.y + h, pos.x + w, pos.y,
                 0, 1, 0, 0, 1, 0, 1, 1, color, color, color, color, 255, 0, 0);
+    }
+
+    void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos, const Color color)
+    {
+        assert(m_vertex_map && m_index_map);
+
+        // TODO: Check if texture is set?
+        set_texture(subtexture.get_texture());
+
+        // TODO: Const ref return?
+        Recti bounds = subtexture.get_bounds();
+
+        const float w = bounds.width();
+        const float h = bounds.height();
+
+        const std::array<glm::vec2, 4> &coords = subtexture.get_tex_coords();
+
+        push_quad(pos.x, pos.y, pos.x, pos.y + h, pos.x + w, pos.y + h, pos.x + w, pos.y,
+                coords[0].x, 1.0f - coords[0].y, coords[1].x, 1.0f - coords[1].y, 
+                coords[2].x, 1.0f - coords[2].y, coords[3].x, 1.0f - coords[3].y, 
+                color, color, color, color, 255, 0, 0);
+    }
+
+    void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos, const float rotation, const Color color)
+    {
+        const Recti bounds = subtexture.get_bounds();
+        const float w = bounds.width();
+        const float h = bounds.height();
+
+        const glm::mat4 mat = Calc::rotate(rotation, pos + glm::vec2(w, h) / 2.0f);
+        push_matrix(mat);
+        tex(subtexture, pos, color);
+        pop_matrix();
     }
 
     void Renderer::end()

@@ -224,7 +224,7 @@ namespace ITD
     void Collider::recalculate()
     {
         m_quad = Quadf(m_bounds, m_rotation);
-        m_quad.offset(m_entity->get_pos());
+        m_quad += m_entity->get_pos();
 
         m_axes[0] = glm::normalize(m_quad.d - m_quad.a);
         m_axes[1] = glm::normalize(m_quad.b - m_quad.a);

@@ -17,7 +17,7 @@ namespace ITD
         static constexpr float shoot_knockback = 35.0f;
         static constexpr float rotation_multiplier = 1.0f;
         static constexpr float col_width = 12.0f;
-        static constexpr float col_height = 8.0f;
+        static constexpr float col_height = 7.0f;
 
         glm::vec2 m_facing;
         float m_dash_timer;

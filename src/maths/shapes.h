@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
+#include "calc.h"
 
 namespace ITD
 {
@@ -22,7 +23,7 @@ namespace ITD
             : bl(glm::tvec2<T>()), tr(glm::tvec2<T>())
         {}
 
-        Rect(const glm::tvec2<T>& bl, const glm::tvec2<T>& tr)
+        Rect(const glm::tvec2<T> &bl, const glm::tvec2<T> &tr)
             : bl(bl), tr(tr)
         {}
 
@@ -38,14 +39,36 @@ namespace ITD
 
         glm::tvec2<T> center() const
         {
-            return bl + (tr - bl) / 2.0f;
+            return bl + (tr - bl) / (T)2;
         }
 
-        bool contains(glm::tvec2<T> point) const
+        bool contains(const glm::tvec2<T> &point) const
         {
             return 
                 bl.x <= point.x && tr.x >= point.x &&
                 bl.y <= point.y && tr.y >= point.y;
+        }
+
+        T width() const
+        {
+            return tr.x - bl.x;
+        }
+
+        T height() const
+        {
+            return tr.y - bl.y;
+        }
+
+        Rect operator +(const glm::tvec2<T> &rhs) const
+        {
+            return Rect(bl + rhs, tr + rhs);
+        }
+
+        Rect &operator +=(const glm::tvec2<T> &rhs)
+        {
+            bl += rhs;
+            tr += rhs;
+            return *this;
         }
     };
 
@@ -75,23 +98,26 @@ namespace ITD
         {
             if (amount  == 0) return;
 
-            const glm::tvec3<T> pivot3 = glm::tvec3<T>(pivot, 0);
-            const glm::tmat4x4<T> rotate = glm::translate(
-                    glm::rotate(glm::translate(glm::tmat4x4<T>(1), pivot3),
-                        amount, glm::tvec3<T>(0, 0, 1)), -pivot3);
+            const glm::mat4 mat = Calc::rotate(amount, pivot);
 
-            a = glm::tvec2<T>(rotate * glm::tvec4<T>(a, 0, 1));
-            b = glm::tvec2<T>(rotate * glm::tvec4<T>(b, 0, 1));
-            c = glm::tvec2<T>(rotate * glm::tvec4<T>(c, 0, 1));
-            d = glm::tvec2<T>(rotate * glm::tvec4<T>(d, 0, 1));
+            a = glm::tvec2<T>(mat * glm::tvec4<T>(a, 0, 1));
+            b = glm::tvec2<T>(mat * glm::tvec4<T>(b, 0, 1));
+            c = glm::tvec2<T>(mat * glm::tvec4<T>(c, 0, 1));
+            d = glm::tvec2<T>(mat * glm::tvec4<T>(d, 0, 1));
         }
 
-        void offset(const glm::tvec2<T>& off)
+        Quad operator +(const glm::tvec2<T> &rhs) const
         {
-            a += off;
-            b += off;
-            c += off;
-            d += off;
+            return Quad(a + rhs, b + rhs, c + rhs, d + rhs);
+        }
+
+        Quad &operator +=(const glm::tvec2<T> &rhs)
+        {
+            a += rhs;
+            b += rhs;
+            c += rhs;
+            d += rhs;
+            return *this;
         }
     };
 }

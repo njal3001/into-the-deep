@@ -7,6 +7,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "material.h"
+#include "subtexture.h"
 
 namespace ITD
 {
@@ -32,7 +33,7 @@ namespace ITD
         struct Batch
         {
             size_t count;
-            Texture *texture;
+            const Texture *texture;
             Material *material;
         };
 
@@ -61,7 +62,7 @@ namespace ITD
         Renderer(const Renderer& other) = delete;
         Renderer& operator=(const Renderer& other) = delete;
 
-        void set_texture(Texture *texture);
+        void set_texture(const Texture *texture);
 
         void push_material(Material *material);
         Material* pop_material();
@@ -85,7 +86,9 @@ namespace ITD
         void circ(const glm::vec2& center, const float radius, const unsigned int steps,
                 const Color color);
 
-        void tex(Texture* texture, const glm::vec2& pos, const Color color);
+        void tex(const Texture *texture, const glm::vec2 &pos, const Color color);
+        void tex(const Subtexture &subtexture, const glm::vec2 &pos, const Color color);
+        void tex(const Subtexture &subtexture, const glm::vec2 &pos, const float rotation, const Color color);
 
     private:
         void make_vertex(float px, float py, float tx, float ty, Color color,

@@ -21,6 +21,7 @@ add_executable(itd
     src/graphics/image.cpp
     src/graphics/texture.cpp
     src/graphics/material.cpp
+    src/graphics/subtexture.cpp
     src/maths/calc.cpp
     src/gameplay/entity.cpp
     src/gameplay/component.cpp
@@ -36,6 +37,7 @@ add_executable(itd
     src/gameplay/rocket.cpp
     src/gameplay/explosion.cpp
     src/gameplay/playerhud.cpp
+    src/gameplay/animator.cpp
     )
 
 target_link_libraries(itd ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})
