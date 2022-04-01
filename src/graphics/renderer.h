@@ -88,7 +88,6 @@ namespace ITD
 
         void tex(const Texture *texture, const glm::vec2 &pos, const Color color);
         void tex(const Subtexture &subtexture, const glm::vec2 &pos, const Color color);
-        void tex(const Subtexture &subtexture, const glm::vec2 &pos, const float rotation, const Color color);
 
     private:
         void make_vertex(float px, float py, float tx, float ty, Color color,

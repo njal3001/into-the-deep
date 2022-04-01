@@ -16,8 +16,8 @@ namespace ITD
         static constexpr float shoot_speed = 150.0f;
         static constexpr float shoot_knockback = 35.0f;
         static constexpr float rotation_multiplier = 1.0f;
-        static constexpr float col_width = 12.0f;
-        static constexpr float col_height = 7.0f;
+        static constexpr float col_width = 13.0f;
+        static constexpr float col_height = 6.0f;
 
         glm::vec2 m_facing;
         float m_dash_timer;
@@ -28,7 +28,6 @@ namespace ITD
         Player();
 
         void update(const float elapsed) override;
-        void render(Renderer *renderer) override;
 
         static Entity* create(Scene *scene, const glm::vec2& pos);
     };

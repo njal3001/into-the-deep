@@ -6,6 +6,7 @@
 #include "hurtable.h"
 #include "explosion.h"
 #include "collider.h"
+#include "animator.h"
 
 namespace ITD
 {
@@ -69,6 +70,9 @@ namespace ITD
             }
 
             mov->vel = Calc::approach(mov->vel, facing * m_max_speed, accel * elapsed);
+
+            Animator *anim = get<Animator>();
+            anim->rotation = collider->get_rotation();
         }
     }
 
@@ -79,18 +83,6 @@ namespace ITD
                 glm::vec2(explosion_width, explosion_height), col->get_rotation(), Mask::Enemy);
         tracker->destroy();
         m_entity->destroy();
-    }
-
-    void Rocket::render(Renderer *renderer)
-    {
-        Collider *col = get<Collider>();
-        // Collider *tracker_collider = tracker->get<Collider>();
-        // const Quadf& target_quad = tracker_collider->quad();
-        // renderer->quad(target_quad.a, target_quad.b, target_quad.c, target_quad.d, Color::black);
-
-
-        const Quadf& quad = col->quad();
-        renderer->quad(quad.a, quad.b, quad.c, quad.d, Color::white);
     }
 
     Entity* Rocket::create(Scene *scene, const glm::vec2 &pos, const glm::vec2& vel)
@@ -124,6 +116,10 @@ namespace ITD
 
         tracker->add(tracker_collider);
         rocket->tracker = tracker;
+
+        Animator *anim = new Animator("torpedo", Recti(glm::ivec2(),  
+                    glm::ivec2(8, 4)), 1, 0.0f, glm::vec2(), glm::vec2(4.0f, 2.0f));
+        ent->add(anim);
 
         return ent;
     }

@@ -107,14 +107,6 @@ namespace ITD
         anim->rotation = col->get_rotation();
     }
 
-    void Player::render(Renderer *renderer)
-    {
-        Collider *col = get<Collider>();
-
-        const Quadf& quad = col->quad();
-        renderer->quad(quad.a, quad.b, quad.c, quad.d, Color::black);
-    }
-
     Entity* Player::create(Scene *scene, const glm::vec2& pos)
     {
         Entity *ent = scene->add_entity(pos);
@@ -132,8 +124,9 @@ namespace ITD
         hur->health = 5;
         ent->add(hur);
 
-        Animator *ani = new Animator("player-Sheet", 
-                Recti(glm::ivec2(0, 5), glm::ivec2(16, 16)), 4, 0.100f, glm::vec2(0.0f, 0.0f));
+        Animator *ani = new Animator("player", 
+                Recti(glm::ivec2(0, 0), glm::ivec2(15, 8)), 1, 0.0f, 
+                glm::vec2(-1.0f, -1.0f), glm::vec2(7.5f, 4.0f));
         ent->add(ani);
 
         return ent;

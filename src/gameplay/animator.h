@@ -8,6 +8,7 @@ namespace ITD
     public:
         float frame_length;
         glm::vec2 offset;
+        glm::vec2 pivot;
         float rotation;
 
     private:
@@ -21,7 +22,8 @@ namespace ITD
 
     public:
         Animator(const std::string &sprite_sheet, const Recti &frame_bounds, 
-                const size_t nframes, const float frame_length, const glm::vec2 &offset);
+                const size_t nframes, const float frame_length, 
+                const glm::vec2 &offset, const glm::vec2 &pivot);
 
         void update(const float elapsed) override;
         void render(Renderer *renderer) override;

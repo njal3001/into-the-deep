@@ -349,18 +349,6 @@ namespace ITD
                 color, color, color, color, 255, 0, 0);
     }
 
-    void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos, const float rotation, const Color color)
-    {
-        const Recti bounds = subtexture.get_bounds();
-        const float w = bounds.width();
-        const float h = bounds.height();
-
-        const glm::mat4 mat = Calc::rotate(rotation, pos + glm::vec2(w, h) / 2.0f);
-        push_matrix(mat);
-        tex(subtexture, pos, color);
-        pop_matrix();
-    }
-
     void Renderer::end()
     {
         glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
