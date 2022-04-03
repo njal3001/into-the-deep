@@ -22,6 +22,8 @@ namespace ITD
 
     void Animator::update(const float elapsed)
     {
+        if (m_nframes == 0) return;
+
         m_frame_timer += elapsed;
         if (m_frame_timer >= frame_length)
         {
@@ -35,9 +37,9 @@ namespace ITD
 
     void Animator::render(Renderer *renderer)
     {
-        const glm::vec2 pos = m_entity->get_pos() + offset;
+        glm::vec2 pos = m_entity->get_pos() + offset;
+        glm::mat4 mat = Calc::rotate(rotation, m_entity->get_pos() + pivot);
 
-        const glm::mat4 mat = Calc::rotate(rotation, pos + pivot);
         renderer->push_matrix(mat);
         renderer->tex(m_subtexture, pos, Color::white);
         renderer->pop_matrix();

@@ -51,12 +51,12 @@ namespace ITD
 
         T width() const
         {
-            return tr.x - bl.x;
+            return tr.x - bl.x + 1;
         }
 
         T height() const
         {
-            return tr.y - bl.y;
+            return tr.y - bl.y + 1;
         }
 
         Rect operator +(const glm::tvec2<T> &rhs) const

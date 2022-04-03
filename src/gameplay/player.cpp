@@ -107,12 +107,21 @@ namespace ITD
         anim->rotation = col->get_rotation();
     }
 
+    void Player::render(Renderer *renderer)
+    {
+        Collider *col = get<Collider>();
+        Quadf quad = col->quad();
+        renderer->quad(quad.a, quad.b, quad.c, quad.d, Color::red);
+    }
+
     Entity* Player::create(Scene *scene, const glm::vec2& pos)
     {
         Entity *ent = scene->add_entity(pos);
         ent->add(new Player());
 
-        Collider *col = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(col_width, col_height)));
+        // TODO: The collider should not be this big, but this ends
+        // up being correct because of some bug propably
+        Collider *col = new Collider(Rectf(glm::vec2(0.0f, 0.0f), glm::vec2(14.0f, 9.0f)));
         col->mask = Mask::Player;
         col->collides_with = Mask::Solid | Mask::Enemy;
         ent->add(col);
@@ -125,8 +134,8 @@ namespace ITD
         ent->add(hur);
 
         Animator *ani = new Animator("player", 
-                Recti(glm::ivec2(0, 0), glm::ivec2(15, 8)), 1, 0.0f, 
-                glm::vec2(-1.0f, -1.0f), glm::vec2(7.5f, 4.0f));
+                Recti(glm::ivec2(0, 0), glm::ivec2(16, 10)), 1, 0.0f, 
+                glm::vec2(-2.0f, -1.0f), glm::vec2(7.0f, 4.5f));
         ent->add(ani);
 
         return ent;
