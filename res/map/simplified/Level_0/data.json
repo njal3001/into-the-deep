@@ -1,0 +1,60 @@
+{
+	"x": 0,
+	"y": 0,
+	"width": 544,
+	"height": 360,
+	"iid": "4ee06060-8dc0-11ec-934a-2967f719e776",
+	"layers": [
+		"Tileset.png"
+	],
+	"entities": {
+		"Player": [
+			{
+				"id": "Player",
+				"iid": "2a4095b0-8dc0-11ec-b2db-97a48e97a76f",
+				"layer": "Entities",
+				"x": 152,
+				"y": 328,
+				"width": 8,
+				"height": 8,
+				"color": 9755059,
+				"customFields" : {}
+			}
+		],
+		"Chaser": [
+			{
+				"id": "Chaser",
+				"iid": "4550af70-8dc0-11ec-b2db-3f540b93b1ed",
+				"layer": "Entities",
+				"x": 80,
+				"y": 64,
+				"width": 8,
+				"height": 8,
+				"color": 15144507,
+				"customFields" : {}
+			},
+			{
+				"id": "Chaser",
+				"iid": "460e8130-8dc0-11ec-b2db-5b98387c68fd",
+				"layer": "Entities",
+				"x": 152,
+				"y": 64,
+				"width": 8,
+				"height": 8,
+				"color": 15144507,
+				"customFields" : {}
+			},
+			{
+				"id": "Chaser",
+				"iid": "46903450-8dc0-11ec-b2db-0383d3ec505d",
+				"layer": "Entities",
+				"x": 192,
+				"y": 136,
+				"width": 8,
+				"height": 8,
+				"color": 15144507,
+				"customFields" : {}
+			}
+		]
+	}
+}

@@ -56,7 +56,8 @@ namespace ITD
 
     void Graphics::clear(const Color color)
     {
-        glClearColor(color.r, color.g, color.b, color.a);
+        glClearColor(color.r / 255.0f, 
+                color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 

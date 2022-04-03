@@ -38,7 +38,7 @@ int main()
     Platform::init();
     Renderer renderer;
 
-    Tilemap map("tilemap");
+    Tilemap map("Level_0");
     Scene scene(&map);
 
     glm::mat4 matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
@@ -48,6 +48,8 @@ int main()
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f; // In seconds
+
+    Color bg_color(0x29366f);
 
     while (Platform::update())
     {
@@ -61,7 +63,7 @@ int main()
         scene.update(elapsed);
 
         // Render
-        Graphics::clear(Color::blue);
+        Graphics::clear(bg_color);
 
         // Player camera
         glm::mat4 camera = glm::mat4(1.0f);

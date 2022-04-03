@@ -12,8 +12,11 @@ namespace ITD
         size_t m_height;
 
     public:
-        Image(const std::string& filename);
+        Image(const std::string &filename);
+        Image();
         ~Image();
+
+        void load(const std::string &filename);
 
         Image(const Image& other) = delete;
         Image& operator=(const Image& other) = delete;
