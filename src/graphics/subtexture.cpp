@@ -56,13 +56,9 @@ namespace ITD
         const float sx = 1.0f / tex_w;
         const float sy = 1.0f / tex_h;
 
-        // Half pixel correction
-        const float dx = 0.5f / tex_w;
-        const float dy = 0.5f / tex_h;
-
-        m_tex_coords[0] = glm::vec2(m_bounds.bl.x * sx + dx, m_bounds.bl.y * sy + dy);
-        m_tex_coords[1] = glm::vec2(m_bounds.bl.x * sx + dx, m_bounds.tr.y * sy - dy);
-        m_tex_coords[2] = glm::vec2(m_bounds.tr.x * sx - dx, m_bounds.tr.y * sy - dy);
-        m_tex_coords[3] = glm::vec2(m_bounds.tr.x * sx - dx, m_bounds.bl.y * sy + dy);
+        m_tex_coords[0] = glm::vec2(m_bounds.bl.x * sx, m_bounds.bl.y * sy);
+        m_tex_coords[1] = glm::vec2(m_bounds.bl.x * sx, (m_bounds.tr.y + 1.0f) * sy);
+        m_tex_coords[2] = glm::vec2((m_bounds.tr.x + 1.0f) * sx, (m_bounds.tr.y + 1.0f) * sy);
+        m_tex_coords[3] = glm::vec2((m_bounds.tr.x + 1.0f) * sx, m_bounds.bl.y * sy);
     }
 }

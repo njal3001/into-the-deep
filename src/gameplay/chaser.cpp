@@ -89,8 +89,8 @@ namespace ITD
             Chaser *chaser = self->get<Chaser>();
             chaser->explode();
         };
-        e->add(h);
 
+        e->add(h);
 
         return e;
     }

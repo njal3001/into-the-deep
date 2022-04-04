@@ -321,10 +321,10 @@ namespace ITD
 
         set_texture(texture);
 
-        float w = texture->width();
-        float h = texture->height();
+        float mx = pos.x + texture->width() - 1.0f;
+        float my = pos.y + texture->height() - 1.0f;
 
-        push_quad(pos.x, pos.y, pos.x, pos.y + h, pos.x + w, pos.y + h, pos.x + w, pos.y,
+        push_quad(pos.x, pos.y, pos.x, my, mx, my, mx, pos.y,
                 0, 1, 0, 0, 1, 0, 1, 1, color, color, color, color, 255, 0, 0);
     }
 
@@ -338,12 +338,12 @@ namespace ITD
         // TODO: Const ref return?
         Recti bounds = subtexture.get_bounds();
 
-        const float w = bounds.width();
-        const float h = bounds.height();
+        const float mx = pos.x + bounds.width() - 1.0f;
+        const float my = pos.y + bounds.height() - 1.0f;
 
         const std::array<glm::vec2, 4> &coords = subtexture.get_tex_coords();
 
-        push_quad(pos.x, pos.y, pos.x, pos.y + h, pos.x + w, pos.y + h, pos.x + w, pos.y,
+        push_quad(pos.x, pos.y, pos.x, my, mx, my, mx, pos.y,
                 coords[0].x, 1.0f - coords[0].y, coords[1].x, 1.0f - coords[1].y, 
                 coords[2].x, 1.0f - coords[2].y, coords[3].x, 1.0f - coords[3].y, 
                 color, color, color, color, 255, 0, 0);
