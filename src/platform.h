@@ -2,22 +2,23 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-namespace ITD
-{
-    namespace Platform
-    {
-        constexpr uint64_t ticks_per_sec = 100000;
+namespace ITD {
 
-        bool init();
-        bool update();
-        void present();
-        void shutdown();
+namespace Platform {
 
-        SDL_Window* get_window();
-        SDL_Joystick* get_joystick();
+    constexpr uint64_t ticks_per_sec = 100000;
 
-        std::string app_path();
+    bool init();
+    bool update();
+    void present();
+    void shutdown();
 
-        uint64_t ticks();
-    }
-}
+    SDL_Window *get_window();
+    SDL_Joystick *get_joystick();
+
+    std::string app_path();
+
+    uint64_t ticks();
+}  // namespace Platform
+
+}  // namespace ITD

@@ -1,5 +1,15 @@
-#include <glm/gtc/matrix_transform.hpp>
 #include <algorithm>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "gameplay/animator.h"
+#include "gameplay/chaser.h"
+#include "gameplay/collider.h"
+#include "gameplay/explosion.h"
+#include "gameplay/hurtable.h"
+#include "gameplay/mover.h"
+#include "gameplay/player.h"
+#include "gameplay/playerhud.h"
+#include "gameplay/rocket.h"
 #include "gameplay/tilemap.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
@@ -7,15 +17,6 @@
 #include "input.h"
 #include "maths/shapes.h"
 #include "platform.h"
-#include "gameplay/collider.h"
-#include "gameplay/player.h"
-#include "gameplay/mover.h"
-#include "gameplay/chaser.h"
-#include "gameplay/rocket.h"
-#include "gameplay/hurtable.h"
-#include "gameplay/playerhud.h"
-#include "gameplay/explosion.h"
-#include "gameplay/animator.h"
 
 constexpr float screen_width = 540.0f;
 constexpr float screen_height = 360.f;
@@ -27,13 +28,18 @@ int main()
     // Register all components
     Scene::register_component<Collider>();
     Scene::register_component<Mover>(Property::Updatable);
-    Scene::register_component<Player>(Property::Updatable | Property::Renderable);
-    Scene::register_component<Chaser>(Property::Updatable | Property::Renderable);
-    Scene::register_component<Rocket>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Player>(Property::Updatable |
+                                      Property::Renderable);
+    Scene::register_component<Chaser>(Property::Updatable |
+                                      Property::Renderable);
+    Scene::register_component<Rocket>(Property::Updatable |
+                                      Property::Renderable);
     Scene::register_component<Hurtable>(Property::Updatable);
     Scene::register_component<PlayerHUD>(Property::HUD);
-    Scene::register_component<Explosion>(Property::Updatable | Property::Renderable);
-    Scene::register_component<Animator>(Property::Updatable | Property::Renderable);
+    Scene::register_component<Explosion>(Property::Updatable |
+                                         Property::Renderable);
+    Scene::register_component<Animator>(Property::Updatable |
+                                        Property::Renderable);
 
     Platform::init();
     Renderer renderer;
@@ -42,12 +48,13 @@ int main()
     Scene scene(&map);
 
     glm::mat4 matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
-    glm::vec3 screen_center = glm::vec3(screen_width, screen_height, 0.0f) / 2.0f;
+    glm::vec3 screen_center =
+        glm::vec3(screen_width, screen_height, 0.0f) / 2.0f;
     const float map_pwidth = map.width() * 8.0f;
     const float map_pheight = map.height() * 8.0f;
 
     uint64_t prev_ticks = Platform::ticks();
-    float elapsed = 0.0f; // In seconds
+    float elapsed = 0.0f;  // In seconds
 
     Color bg_color(0x29366f);
 
@@ -70,8 +77,9 @@ int main()
         auto pfirst = scene.first<Player>();
         if (pfirst != scene.end<Player>())
         {
-            Player *player = (Player*)*pfirst;
-            glm::vec3 offset = screen_center - glm::vec3(player->entity()->get_pos(), 1.0f);
+            Player *player = (Player *)*pfirst;
+            glm::vec3 offset =
+                screen_center - glm::vec3(player->entity()->get_pos(), 1.0f);
             offset.x = std::clamp(offset.x, screen_width - map_pwidth, 0.0f);
             offset.y = std::clamp(offset.y, screen_height - map_pheight, 0.0f);
             camera = glm::translate(camera, offset);

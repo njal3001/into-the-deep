@@ -1,86 +1,88 @@
 #pragma once
 #include <functional>
-#include "ecs.h"
 #include "../maths/shapes.h"
+#include "ecs.h"
 
-namespace ITD
+namespace ITD {
+
+struct Mask {
+    static constexpr uint32_t None = 0;
+    static constexpr uint32_t Solid = 1;
+    static constexpr uint32_t Player = 1 << 1;
+    static constexpr uint32_t Enemy = 1 << 2;
+};
+
+class Collider : public Component
 {
-    struct Mask
-    {
-        static constexpr uint32_t None = 0;
-        static constexpr uint32_t Solid = 1;
-        static constexpr uint32_t Player = 1 << 1;
-        static constexpr uint32_t Enemy = 1 << 2;
+    friend class CollisionHandler;
+    friend class Entity;
+
+private:
+    struct Projection {
+        float start;
+        float end;
     };
 
-    class Collider : public Component
-    {
-        friend class CollisionHandler;
-        friend class Entity;
+public:
+    uint32_t mask;
+    uint32_t collides_with;
+    bool active;
+    bool trigger_only;
+    std::function<bool(Collider *collider, Collider *other,
+                       const glm::vec2 &dir)>
+        on_collide;
 
-    private:
-        struct Projection
-        {
-            float start;
-            float end;
-        };
+private:
+    Rectf m_bounds;
+    float m_rotation;
+    bool m_dynamic;
+    bool m_invalid_cache;
 
-    public:
-        uint32_t mask;
-        uint32_t collides_with;
-        bool active;
-        bool trigger_only;
-        std::function<bool (Collider *collider, Collider *other, const glm::vec2 &dir)> on_collide;
+    Quadf m_quad;
+    glm::vec2 m_axes[2];
+    Rectf m_bbox;
 
-    private:
-        Rectf m_bounds;
-        float m_rotation;
-        bool m_dynamic;
-        bool m_invalid_cache;
+    Recti m_bucket_box;
+    bool m_in_bucket;
+    std::list<Collider *>::iterator m_dyn_iter;
 
-        Quadf m_quad;
-        glm::vec2 m_axes[2];
-        Rectf m_bbox;
+public:
+    Collider(const Rectf &bounds, const float rotation = 0.0f,
+             const bool dynamic = true);
 
-        Recti m_bucket_box;
-        bool m_in_bucket;
-        std::list<Collider*>::iterator m_dyn_iter;
+    void set_bounds(const Rectf &bounds);
+    Rectf get_bounds() const;
 
-    public:
-        Collider(const Rectf &bounds, const float rotation = 0.0f, const bool dynamic = true);
+    void set_rotation(const float rotation);
+    void rotate(const float amount);
+    float get_rotation() const;
 
-        void set_bounds(const Rectf &bounds);
-        Rectf get_bounds() const;
+    void set_dynamic(const bool dynamic);
+    bool is_dynamic() const;
 
-        void set_rotation(const float rotation);
-        void rotate(const float amount);
-        float get_rotation() const;
+    Quadf quad();
+    Rectf bbox();
 
-        void set_dynamic(const bool dynamic);
-        bool is_dynamic() const;
+    bool overlaps(Collider &other);
+    glm::vec2 push_out(Collider &other);
+    float distance(Collider &other);
 
-        Quadf quad();
-        Rectf bbox();
+    Collider *check(const uint32_t mask);
+    void check_all(const uint32_t mask, std::vector<Collider *> *out);
 
-        bool overlaps(Collider &other);
-        glm::vec2 push_out(Collider &other);
-        float distance(Collider &other);
+    void render(Renderer *renderer) override;
 
-        Collider *check(const uint32_t mask);
-        void check_all(const uint32_t mask, std::vector<Collider*> *out);
+protected:
+    void awake() override;
+    void on_removed() override;
 
-        void render(Renderer *renderer) override;
+private:
+    // Assumes that the collider is refreshed
+    Projection project(const glm::vec2 &axis) const;
 
-    protected:
-        void awake() override;
-        void on_removed() override;
+    void on_position_changed();
+    void refresh();
+    void recalculate();
+};
 
-    private:
-        // Assumes that the collider is refreshed
-        Projection project(const glm::vec2 &axis) const;
-
-        void on_position_changed();
-        void refresh();
-        void recalculate();
-    };
-}
+}  // namespace ITD

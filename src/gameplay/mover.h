@@ -1,16 +1,17 @@
 #pragma once
 #include "ecs.h"
 
-namespace ITD
+namespace ITD {
+
+class Mover : public Component
 {
-    class Mover : public Component
-    {
-    public:
-        glm::vec2 vel;
+public:
+    glm::vec2 vel;
 
-    public:
-        Mover();
+public:
+    Mover();
 
-        void update(const float elapsed) override;
-    };
-}
+    void update(const float elapsed) override;
+};
+
+}  // namespace ITD

@@ -1,23 +1,24 @@
 #pragma once
-#include "ecs.h"
 #include <functional>
+#include "ecs.h"
 
-namespace ITD
+namespace ITD {
+
+class Hurtable : public Component
 {
-    class Hurtable : public Component
-    {
-    private:
-        float m_invincible_timer;
+private:
+    float m_invincible_timer;
 
-    public:
-        int health;
-        float invincible_time;
-        std::function<void (Hurtable *self, const glm::vec2 &force)> on_hurt;
-        
-    public:
-        Hurtable();
+public:
+    int health;
+    float invincible_time;
+    std::function<void(Hurtable *self, const glm::vec2 &force)> on_hurt;
 
-        bool hurt(const glm::vec2 &dir);
-        void update(const float elapsed) override;
-    };
-}
+public:
+    Hurtable();
+
+    bool hurt(const glm::vec2 &dir);
+    void update(const float elapsed) override;
+};
+
+}  // namespace ITD

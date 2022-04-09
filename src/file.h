@@ -1,14 +1,14 @@
 #include <string>
 
-namespace ITD
-{
-    struct File
-    {
-        std::string path;
-        size_t size;
-        char *data;
+namespace ITD {
 
-        File(const std::string& path);
-        ~File();
-    };
+struct File {
+    std::string path;
+    size_t size;
+    char *data;
+
+    File(const std::string &path);
+    ~File();
 };
+
+};  // namespace ITD

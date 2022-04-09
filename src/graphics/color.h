@@ -1,26 +1,26 @@
 #pragma once
 #include <stdint.h>
 
-namespace ITD
-{
-    struct Color
-    {
-        uint8_t r, g, b, a;
+namespace ITD {
 
-        Color();
+struct Color {
+    uint8_t r, g, b, a;
 
-        Color(int rgb);
-        Color(int rgb, float alpha);
+    Color();
 
-        Color(uint8_t r, uint8_t g, uint8_t b);
-        Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+    Color(int rgb);
+    Color(int rgb, float alpha);
 
-        uint32_t rgb();
+    Color(uint8_t r, uint8_t g, uint8_t b);
+    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
-        static const Color white;
-        static const Color black;
-        static const Color red;
-        static const Color green;
-        static const Color blue;
-    };
-}
+    uint32_t rgb();
+
+    static const Color white;
+    static const Color black;
+    static const Color red;
+    static const Color green;
+    static const Color blue;
+};
+
+}  // namespace ITD
