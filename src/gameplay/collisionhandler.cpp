@@ -218,12 +218,15 @@ void CollisionHandler::update()
                                                 const float p = glm::dot(
                                                     push_norm, vel_diff);
 
-                                                mov->vel -=
-                                                    push_norm * p *
-                                                    collision_elasticity;
-                                                omov->vel +=
-                                                    push_norm * p *
-                                                    collision_elasticity;
+                                                if (p < 0.0f)
+                                                {
+                                                    mov->vel -=
+                                                        push_norm * p *
+                                                        collision_elasticity;
+                                                    omov->vel +=
+                                                        push_norm * p *
+                                                        collision_elasticity;
+                                                }
                                             }
                                         }
                                     }
@@ -239,9 +242,11 @@ void CollisionHandler::update()
                                             {
                                                 const float p = glm::dot(
                                                     push_norm, mov->vel);
-                                                mov->vel -=
-                                                    push_norm * p *
-                                                    collision_elasticity;
+
+                                                if (p < 0.0f)
+                                                {
+                                                    mov->vel -= push_norm * p;
+                                                }
                                             }
                                         }
                                     }

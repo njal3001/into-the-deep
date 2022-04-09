@@ -34,7 +34,7 @@ add_executable(itd
     src/gameplay/mover.cpp
     src/gameplay/chaser.cpp
     src/gameplay/hurtable.cpp
-    src/gameplay/rocket.cpp
+    src/gameplay/torpedo.cpp
     src/gameplay/explosion.cpp
     src/gameplay/playerhud.cpp
     src/gameplay/animator.cpp

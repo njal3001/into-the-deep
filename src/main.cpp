@@ -9,7 +9,7 @@
 #include "gameplay/mover.h"
 #include "gameplay/player.h"
 #include "gameplay/playerhud.h"
-#include "gameplay/rocket.h"
+#include "gameplay/torpedo.h"
 #include "gameplay/tilemap.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
@@ -32,7 +32,7 @@ int main()
                                       Property::Renderable);
     Scene::register_component<Chaser>(Property::Updatable |
                                       Property::Renderable);
-    Scene::register_component<Rocket>(Property::Updatable |
+    Scene::register_component<Torpedo>(Property::Updatable |
                                       Property::Renderable);
     Scene::register_component<Hurtable>(Property::Updatable);
     Scene::register_component<PlayerHUD>(Property::HUD);

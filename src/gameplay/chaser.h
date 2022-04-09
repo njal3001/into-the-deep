@@ -10,7 +10,7 @@ private:
     static constexpr float accel = 110.0f;
     static constexpr float hurt_knockback = 30.0f;
     static constexpr float rotation_multiplier = 0.5f;
-    static constexpr float explosion_duration = 0.5f;
+    static constexpr float explosion_duration = 0.2f;
     static constexpr float explosion_width = 12.0f;
     static constexpr float explosion_height = 12.0f;
 

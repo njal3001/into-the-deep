@@ -6,7 +6,7 @@
 #include "collider.h"
 #include "hurtable.h"
 #include "mover.h"
-#include "rocket.h"
+#include "torpedo.h"
 
 namespace ITD {
 
@@ -15,6 +15,9 @@ Player::Player()
     , m_dash_timer(0.0f)
     , m_dash_cooldown_timer(0.0f)
     , m_shoot_cooldown_timer(0.0f)
+    , m_torpedo_ammo(max_torpedo_ammo)
+    , m_reload_timer(0.0f)
+    , m_shoot_delay_timer(0.0f)
 {
 }
 
@@ -90,8 +93,20 @@ void Player::update(const float elapsed)
         m_dash_cooldown_timer -= elapsed;
     }
 
+    // Reloading
+    if (m_torpedo_ammo == 0)
+    {
+        m_reload_timer += elapsed;
+        if (m_reload_timer >= reload_time)
+        {
+            m_reload_timer = 0.0f;
+            m_torpedo_ammo = max_torpedo_ammo;
+        }
+    }
+
     // Check for shooting input
-    if (m_dash_timer <= 0.0f && m_shoot_cooldown_timer <= 0.0f)
+    if (m_dash_timer <= 0.0f && m_shoot_delay_timer <= 0.0f &&
+        m_torpedo_ammo > 0)
     {
         bool shoot = Input::keyboard()->pressed[SDL_SCANCODE_C];
         if (controller->active())
@@ -101,20 +116,31 @@ void Player::update(const float elapsed)
 
         if (shoot)
         {
-            Rocket::create(scene(), m_entity->get_pos(),
-                           m_facing * shoot_speed);
-            m_shoot_cooldown_timer = shoot_cooldown;
+            auto vel_norm = Calc::normalize(mover->vel);
+            float cos = glm::dot(vel_norm, m_facing);
+
+            Torpedo::create(scene(), m_entity->get_pos(), m_facing,
+                            std::max(0.0f, cos) * mover->vel.length() +
+                                torpedo_start_speed);
+
+            m_shoot_delay_timer = shoot_delay;
+            m_torpedo_ammo--;
 
             mover->vel -= m_facing * shoot_knockback;
         }
     }
     else
     {
-        m_shoot_cooldown_timer -= elapsed;
+        m_shoot_delay_timer -= elapsed;
     }
 
     auto anim = get<Animator>();
     anim->rotation = col->get_rotation();
+}
+
+int Player::torpedo_ammo() const
+{
+    return m_torpedo_ammo;
 }
 
 void Player::render(Renderer *renderer)

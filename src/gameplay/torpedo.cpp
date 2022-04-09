@@ -1,4 +1,4 @@
-#include "rocket.h"
+#include "torpedo.h"
 #include <glm/gtx/vector_angle.hpp>
 #include "../maths/calc.h"
 #include "animator.h"
@@ -10,25 +10,21 @@
 
 namespace ITD {
 
-Rocket::Rocket()
+Torpedo::Torpedo()
     : m_life_timer(life_time)
-    , m_max_speed(0.0f)
     , m_target(nullptr)
     , tracker(nullptr)
 {
 }
 
-void Rocket::awake()
+void Torpedo::awake()
 {
     Collider *col = get<Collider>();
-    Mover *mov = get<Mover>();
-    const glm::vec2 dir = Calc::normalize(mov->vel);
     col->set_rotation(
         glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f)));
-    m_max_speed = glm::length(mov->vel);
 }
 
-void Rocket::update(const float elapsed)
+void Torpedo::update(const float elapsed)
 {
     m_life_timer -= elapsed;
     if (m_life_timer <= 0.0f)
@@ -78,18 +74,18 @@ void Rocket::update(const float elapsed)
         }
         else
         {
-            facing = Calc::normalize(mov->vel);
+            facing = dir;
         }
 
         mov->vel =
-            Calc::approach(mov->vel, facing * m_max_speed, accel * elapsed);
+            Calc::approach(mov->vel, facing * max_speed, accel * elapsed);
 
         Animator *anim = get<Animator>();
         anim->rotation = collider->get_rotation();
     }
 }
 
-void Rocket::explode()
+void Torpedo::explode()
 {
     Collider *col = get<Collider>();
     Explosion::create(scene(), m_entity->get_pos() + col->get_bounds().center(),
@@ -100,11 +96,13 @@ void Rocket::explode()
     m_entity->destroy();
 }
 
-Entity *Rocket::create(Scene *scene, const glm::vec2 &pos, const glm::vec2 &vel)
+Entity *Torpedo::create(Scene *scene, const glm::vec2 &pos,
+                        const glm::vec2 &dir, const float start_speed)
 {
     Entity *ent = scene->add_entity(pos);
-    Rocket *rocket = new Rocket();
-    ent->add(rocket);
+    Torpedo *torpedo = new Torpedo();
+    torpedo->dir = dir;
+    ent->add(torpedo);
 
     Collider *col = new Collider(
         Rectf(glm::vec2(), glm::vec2(collider_width, collider_height)));
@@ -112,8 +110,8 @@ Entity *Rocket::create(Scene *scene, const glm::vec2 &pos, const glm::vec2 &vel)
     col->trigger_only = true;
     col->on_collide = [](Collider *collider, Collider *other,
                          const glm::vec2 &dir) {
-        Rocket *rocket = collider->get<Rocket>();
-        rocket->explode();
+        Torpedo *torpedo = collider->get<Torpedo>();
+        torpedo->explode();
 
         return true;
     };
@@ -121,7 +119,7 @@ Entity *Rocket::create(Scene *scene, const glm::vec2 &pos, const glm::vec2 &vel)
     ent->add(col);
 
     Mover *mov = new Mover();
-    mov->vel = vel;
+    mov->vel = dir * start_speed;
     ent->add(mov);
 
     Entity *tracker = scene->add_entity(pos);
@@ -134,7 +132,7 @@ Entity *Rocket::create(Scene *scene, const glm::vec2 &pos, const glm::vec2 &vel)
     Collider *tracker_collider = new Collider(Rectf(tracker_bl, tracker_tr));
 
     tracker->add(tracker_collider);
-    rocket->tracker = tracker;
+    torpedo->tracker = tracker;
 
     Animator *anim =
         new Animator("torpedo", Recti(glm::ivec2(), glm::ivec2(8, 4)), 1, 0.0f,

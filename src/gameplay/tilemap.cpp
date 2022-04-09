@@ -97,6 +97,7 @@ void Tilemap::fill_scene(Scene *scene)
             if (key == "Player")
             {
                 Player::create(scene, pos);
+                PlayerHUD::create(scene);
             }
             else if (key == "Chaser")
             {

@@ -20,6 +20,13 @@ void PlayerHUD::render(Renderer *renderer)
                 glm::vec2(offset_x + margin * i, 360.0f - offset_y);
             renderer->rect(pos, pos + size, Color::green);
         }
+
+        for (int i = 0; i < player->torpedo_ammo(); i++)
+        {
+            const glm::vec2 pos =
+                glm::vec2(offset_x + margin * i, 360.0f - offset_y - 10.0f);
+            renderer->rect(pos, pos + size, Color::red);
+        }
     }
 }
 
