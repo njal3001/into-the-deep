@@ -5,6 +5,7 @@
 #include "ecs.h"
 #include "mover.h"
 #include "tilemap.h"
+#include "../platform.h"
 
 namespace ITD {
 
@@ -335,6 +336,34 @@ void CollisionHandler::check_all(Collider *collider, const uint32_t mask,
                 }
             }
         }
+    }
+}
+
+void CollisionHandler::render_dynamic_buckets(Renderer *renderer)
+{
+    for (auto d : m_dynamic_colliders)
+    {
+        const Recti &buc_box = d->m_bucket_box;
+        const glm::ivec2 &bl = buc_box.bl;
+        const glm::ivec2 &tr = buc_box.tr;
+
+        for (int y = bl.y; y <= tr.y; y++)
+        {
+            for (int x = bl.x; x <= tr.x; x++)
+            {
+                glm::vec2 pos = glm::vec2(x, y) * 16.0f;
+                renderer->rect(pos, pos + glm::vec2(1.0f, 1.0f) * 16.0f, Color::green);
+            }
+        }
+    }
+}
+
+void CollisionHandler::render_collider_outlines(Renderer *renderer)
+{
+    for (auto cnode = m_scene->first<Collider>(); cnode != m_scene->end<Collider>(); cnode++)
+    {
+        Collider *col = (Collider*)*cnode;
+        col->render_outline(renderer, Color::red);
     }
 }
 

@@ -75,10 +75,14 @@ public:
     void tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
              const glm::vec2 &pos2, const Color color);
 
+    void rect(const Rectf &r, const Color color);
     void rect(const glm::vec2 &bl, const glm::vec2 &tr, const Color color);
+    void rect_line(const Rectf &r, const float t, const Color color);
 
+    void quad(const Quadf &q, const Color color);
     void quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
               const glm::vec2 &d, const Color color);
+    void quad_line(const Quadf &q, const float t, const Color color);
 
     void circ(const glm::vec2 &center, const float radius,
               const unsigned int steps, const Color color);

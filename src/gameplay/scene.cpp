@@ -7,6 +7,7 @@ namespace ITD {
 Scene::Scene(Tilemap *map)
     : m_tilemap(map)
     , m_freeze_timer(0.0f)
+    , m_debug(false)
 {
     map->fill_scene(this);
     m_collision_handler.init(this);
@@ -106,6 +107,11 @@ void Scene::render(Renderer *renderer)
 {
     m_tilemap->render(renderer);
 
+    if (m_debug)
+    {
+        m_collision_handler.render_dynamic_buckets(renderer);
+    }
+
     for (size_t i = 0; i < Component::Types::count(); i++)
     {
         if (s_prop_masks[i] & Property::Renderable)
@@ -118,6 +124,11 @@ void Scene::render(Renderer *renderer)
                 }
             }
         }
+    }
+
+    if (m_debug)
+    {
+        m_collision_handler.render_collider_outlines(renderer);
     }
 }
 
@@ -151,6 +162,11 @@ const Tilemap *Scene::map() const
 CollisionHandler *Scene::collision_handler()
 {
     return &m_collision_handler;
+}
+
+void Scene::toggle_debug_mode()
+{
+    m_debug = !m_debug;
 }
 
 }  // namespace ITD

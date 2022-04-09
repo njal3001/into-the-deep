@@ -34,8 +34,7 @@ void Explosion::on_hit(Collider *other, const glm::vec2 &dir)
 void Explosion::render(Renderer *renderer)
 {
     Collider *col = get<Collider>();
-    const Quadf &quad = col->quad();
-    renderer->quad(quad.a, quad.b, quad.c, quad.d, Color(255, 255, 0));
+    renderer->quad(col->quad(), Color(255, 255, 0));
 }
 
 Entity *Explosion::create(Scene *scene, const glm::vec2 &pos,

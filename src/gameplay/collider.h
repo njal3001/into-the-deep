@@ -70,7 +70,7 @@ public:
     Collider *check(const uint32_t mask);
     void check_all(const uint32_t mask, std::vector<Collider *> *out);
 
-    void render(Renderer *renderer) override;
+    void render_outline(Renderer *renderer, const Color color);
 
 protected:
     void awake() override;

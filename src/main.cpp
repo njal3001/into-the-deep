@@ -74,15 +74,21 @@ int main()
 
         // Player camera
         glm::mat4 camera = glm::mat4(1.0f);
-        auto pfirst = scene.first<Player>();
-        if (pfirst != scene.end<Player>())
+        // auto pfirst = scene.first<Player>();
+        // if (pfirst != scene.end<Player>())
+        // {
+        //     Player *player = (Player *)*pfirst;
+        //     glm::vec3 offset =
+        //         screen_center - glm::vec3(player->entity()->get_pos(), 1.0f);
+        //     offset.x = std::clamp(offset.x, screen_width - map_pwidth, 0.0f);
+        //     offset.y = std::clamp(offset.y, screen_height - map_pheight, 0.0f);
+        //     camera = glm::translate(camera, offset);
+        // }
+
+
+        if (Input::keyboard()->pressed[SDL_SCANCODE_F12])
         {
-            Player *player = (Player *)*pfirst;
-            glm::vec3 offset =
-                screen_center - glm::vec3(player->entity()->get_pos(), 1.0f);
-            offset.x = std::clamp(offset.x, screen_width - map_pwidth, 0.0f);
-            offset.y = std::clamp(offset.y, screen_height - map_pheight, 0.0f);
-            camera = glm::translate(camera, offset);
+            scene.toggle_debug_mode();
         }
 
         renderer.begin();

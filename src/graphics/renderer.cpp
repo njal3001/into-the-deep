@@ -283,12 +283,37 @@ void Renderer::tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
                   0, color, color, color, 0, 0, 255);
 }
 
+void Renderer::rect(const Rectf &r, const Color color)
+{
+    rect(r.bl, r.tr, color);
+}
+
 void Renderer::rect(const glm::vec2 &bl, const glm::vec2 &tr, const Color color)
 {
     assert(m_vertex_map && m_index_map);
 
     push_quad(bl.x, bl.y, bl.x, tr.y, tr.x, tr.y, tr.x, bl.y, 0, 0, 0, 0, 0, 0,
               0, 0, color, color, color, color, 0, 0, 255);
+}
+
+void Renderer::rect_line(const Rectf &r, const float t, const Color color)
+{
+    // Bottom
+    rect(r.bl, glm::vec2(r.tr.x, r.bl.y + t), color);
+
+    // Top
+    rect(glm::vec2(r.bl.x, r.tr.y - t), r.tr, color);
+
+    // Left
+    rect(r.bl, glm::vec2(r.bl.x + t, r.tr.y), color);
+
+    // Right
+    rect(glm::vec2(r.tr.x - t, r.bl.y), r.tr, color);
+}
+
+void Renderer::quad(const Quadf &q, const Color color)
+{
+    quad(q.a, q.b, q.c, q.d, color);
 }
 
 void Renderer::quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
@@ -300,10 +325,25 @@ void Renderer::quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
               color, color, color, color, 0, 0, 255);
 }
 
+void Renderer::quad_line(const Quadf &q, const float t, const Color color)
+{
+    glm::vec2 center = q.center();
+
+    std::vector<glm::vec2> all = { q.a, q.b, q.c, q.d };
+    for (int i = 0; i < 4; i++)
+    {
+        glm::vec2 p1 = all[i];
+        glm::vec2 p2 = all[(i + 1) % 4];
+
+        glm::vec2 norm = Calc::normalize(center - (p1 + p2) / 2.0f);
+        quad(p1, p1 + t * norm, p2 + t * norm, p2, color);
+    }
+}
+
 void Renderer::circ(const glm::vec2 &center, const float radius,
                     const unsigned int steps, const Color color)
 {
-    float step_rad = (2 * M_PI) / (float)steps;
+    float step_rad = Calc::TAU / (float)steps;
 
     float rad = 0.0f;
     for (size_t i = 0; i < steps; i++)

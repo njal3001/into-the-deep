@@ -11,6 +11,7 @@ Collider::Collider(const Rectf &bounds, const float rotation,
     , m_rotation(rotation)
     , m_dynamic(dynamic)
     , mask(Mask::None)
+    , collides_with(Mask::None)
     , active(true)
     , trigger_only(false)
     , m_in_bucket(false)
@@ -259,9 +260,9 @@ void Collider::recalculate()
     m_bbox.tr = glm::vec2(max_x, max_y);
 }
 
-void Collider::render(Renderer *renderer)
+void Collider::render_outline(Renderer *renderer, const Color color)
 {
-    renderer->quad(m_quad.a, m_quad.b, m_quad.c, m_quad.d, Color::red);
+    renderer->quad_line(quad(), 1.0f, color);
 }
 
 }  // namespace ITD

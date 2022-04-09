@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <list>
 #include <vector>
+#include "../graphics/renderer.h"
 #include "../maths/shapes.h"
 
 namespace ITD {
@@ -39,6 +40,9 @@ public:
     Collider *check(Collider *collider, const uint32_t mask);
     void check_all(Collider *collider, const uint32_t mask,
                    std::vector<Collider *> *out);
+
+    void render_dynamic_buckets(Renderer *renderer);
+    void render_collider_outlines(Renderer *renderer);
 
 private:
     glm::ivec2 bucket_index(const glm::vec2 &pos);

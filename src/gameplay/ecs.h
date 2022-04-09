@@ -134,6 +134,7 @@ private:
     Tilemap *m_tilemap;
     CollisionHandler m_collision_handler;
     float m_freeze_timer;
+    bool m_debug;
 
     static inline uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = {Property::None};
 
@@ -164,6 +165,8 @@ public:
 
     const Tilemap *map() const;
     CollisionHandler *collision_handler();
+
+    void toggle_debug_mode();
 
 private:
     void update_lists();

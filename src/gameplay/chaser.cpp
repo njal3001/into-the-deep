@@ -50,14 +50,13 @@ void Chaser::update(const float elapsed)
         moving = 0.0f;
     }
 
-    const glm::vec2 right = glm::vec2(1.0f, 0.0f);
     const float target_rotation =
-        glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
+        glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
     collider->set_rotation(Calc::shortest_rotation_approach(
         collider->get_rotation(), target_rotation,
         rotation_multiplier * elapsed));
 
-    const glm::vec2 facing = glm::rotate(right, collider->get_rotation());
+    const glm::vec2 facing = glm::rotate(Calc::right, collider->get_rotation());
     mover->vel = Calc::approach(mover->vel, facing * max_speed * moving,
                                 accel * elapsed);
 }

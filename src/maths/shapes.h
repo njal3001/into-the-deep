@@ -121,6 +121,11 @@ struct Quad {
         d = glm::tvec2<T>(mat * glm::tvec4<T>(d, 0, 1));
     }
 
+    glm::vec2 center() const
+    {
+        return (a + b + c + d) / (T)4;
+    }
+
     Quad operator+(const glm::tvec2<T> &rhs) const
     {
         return Quad(a + rhs, b + rhs, c + rhs, d + rhs);
