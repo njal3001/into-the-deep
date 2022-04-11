@@ -42,25 +42,18 @@ void Player::update(float elapsed)
     dir = Calc::normalize(dir);
     float moving = 1.0f;
 
+    auto mover = get<Mover>();
+
     auto col = get<Collider>();
     if (dir.x != 0 || dir.y != 0)
     {
-        float target_rotation =
-            glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
-
-        col->set_rotation(Calc::shortest_rotation_approach(
-            col->get_rotation(), target_rotation,
-            Calc::TAU * rotation_multiplier * elapsed));
+        mover->rotate_towards(dir,
+                              Calc::TAU * rotation_multiplier * elapsed);
     }
     else
     {
         moving = 0.0f;
     }
-
-
-    glm::vec2 facing = glm::rotate(Calc::right, col->get_rotation());
-
-    auto mover = get<Mover>();
 
     if (m_dash_timer > 0.0f)
     {
@@ -68,11 +61,12 @@ void Player::update(float elapsed)
     }
     else
     {
-        float a = glm::length2(mover->vel) > max_speed * max_speed
+        mover->approach_target = true;
+        mover->accel = glm::length2(mover->vel) > max_speed * max_speed
                       ? dash_deaccel
                       : accel;
-        mover->vel = Calc::approach(mover->vel, facing * moving * max_speed,
-                                    a * elapsed);
+
+        mover->target_speed = moving * max_speed;
     }
 
     // Update input timers
@@ -108,7 +102,8 @@ void Player::update(float elapsed)
     {
         if (m_dash_buffer_timer > 0.0f)
         {
-            mover->vel = facing * dash_speed;
+            mover->vel = mover->facing * dash_speed;
+            mover->approach_target = false;
             m_dash_timer = dash_time;
             m_dash_cooldown_timer = dash_cooldown;
         }
@@ -136,22 +131,24 @@ void Player::update(float elapsed)
         if (m_shoot_buffer_timer > 0.0f)
         {
             auto vel_norm = Calc::normalize(mover->vel);
-            float cos = glm::dot(vel_norm, facing);
+            float cos = glm::dot(vel_norm, mover->facing);
 
-            Torpedo::create(scene(), m_entity->get_pos(), facing,
+            Torpedo::create(scene(), m_entity->get_pos(), mover->facing,
                             std::max(0.0f, cos) * mover->vel.length() +
                                 torpedo_start_speed);
 
             m_shoot_delay_timer = shoot_delay;
             m_torpedo_ammo--;
 
-            mover->vel -= facing * shoot_knockback;
+            mover->vel -= mover->facing * shoot_knockback;
         }
     }
     else
     {
         m_shoot_delay_timer -= elapsed;
     }
+
+    col->face_towards(mover->facing);
 
     auto anim = get<Animator>();
     anim->rotation = col->get_rotation();
@@ -160,13 +157,6 @@ void Player::update(float elapsed)
 int Player::torpedo_ammo() const
 {
     return m_torpedo_ammo;
-}
-
-void Player::render(Renderer *renderer)
-{
-    Collider *col = get<Collider>();
-    Quadf quad = col->quad();
-    // renderer->quad(quad.a, quad.b, quad.c, quad.d, Color::red);
 }
 
 Entity *Player::create(Scene *scene, const glm::vec2 &pos)

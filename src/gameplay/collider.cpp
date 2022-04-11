@@ -1,5 +1,6 @@
 #include "collider.h"
 #include <algorithm>
+#include <glm/gtx/vector_angle.hpp>
 #include "../platform.h"
 #include "mover.h"
 
@@ -80,6 +81,11 @@ void Collider::rotate(float amount)
 float Collider::get_rotation() const
 {
     return m_rotation;
+}
+
+void Collider::face_towards(const glm::vec2 &dir)
+{
+    m_rotation = glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
 }
 
 void Collider::set_dynamic(bool dynamic)

@@ -57,6 +57,8 @@ public:
     void rotate(float amount);
     float get_rotation() const;
 
+    void face_towards(const glm::vec2 &dir);
+
     void set_dynamic(bool dynamic);
     bool is_dynamic() const;
 

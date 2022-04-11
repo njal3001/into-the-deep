@@ -20,8 +20,7 @@ float Calc::shortest_rotation_approach(float val, float target, float amount)
     min = std::abs(min) < std::abs(c) ? min : c;
     float shortest_target_rotation = val + min;
 
-    return fmod(approach(val, shortest_target_rotation, (float)amount),
-                TAU);
+    return fmod(approach(val, shortest_target_rotation, amount), TAU);
 }
 
 }  // namespace ITD

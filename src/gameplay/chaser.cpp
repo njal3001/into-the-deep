@@ -34,32 +34,24 @@ void Chaser::update(float elapsed)
 {
     Collider *collider = get<Collider>();
     Mover *mover = get<Mover>();
-    glm::vec2 dir;
     float moving = 1.0f;
 
     auto pfirst = scene()->first<Player>();
     if (pfirst != scene()->end<Player>())
     {
+        // Rotate towards player
         Player *player = (Player *)*pfirst;
-        dir =
-            Calc::normalize(player->entity()->get_pos() - entity()->get_pos());
+        glm::vec2 dir = Calc::normalize(player->entity()->get_pos() - entity()->get_pos());
+        mover->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
     }
     else
     {
-        dir = mover->vel;
         moving = 0.0f;
     }
 
-    float target_rotation =
-        glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
+    mover->target_speed = max_speed * moving;
 
-    collider->set_rotation(Calc::shortest_rotation_approach(
-        collider->get_rotation(), target_rotation,
-        Calc::TAU * rotation_multiplier * elapsed));
-
-    glm::vec2 facing = glm::rotate(Calc::right, collider->get_rotation());
-    mover->vel = Calc::approach(mover->vel, facing * max_speed * moving,
-                                accel * elapsed);
+    collider->face_towards(mover->facing);
 }
 
 void Chaser::render(Renderer *renderer)
@@ -87,6 +79,7 @@ Entity *Chaser::create(Scene *scene, const glm::vec2 &pos)
     e->add(c);
 
     Mover *m = new Mover();
+    m->accel = accel;
     e->add(m);
 
     Hurtable *h = new Hurtable();

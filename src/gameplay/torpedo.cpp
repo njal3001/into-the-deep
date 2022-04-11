@@ -17,13 +17,6 @@ Torpedo::Torpedo()
 {
 }
 
-void Torpedo::awake()
-{
-    Collider *col = get<Collider>();
-    col->set_rotation(
-        glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f)));
-}
-
 void Torpedo::update(float elapsed)
 {
     m_life_timer -= elapsed;
@@ -70,22 +63,10 @@ void Torpedo::update(float elapsed)
             glm::vec2 dir =
                 Calc::normalize(m_target->get_pos() - entity()->get_pos());
 
-            float target_rotation =
-                glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
-
-            collider->set_rotation(Calc::shortest_rotation_approach(
-                collider->get_rotation(), target_rotation,
-                Calc::TAU * rotation_multiplier * elapsed));
-
-            facing = glm::rotate(Calc::right, collider->get_rotation());
-        }
-        else
-        {
-            facing = dir;
+            mov->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
         }
 
-        mov->vel =
-            Calc::approach(mov->vel, facing * max_speed, accel * elapsed);
+        collider->face_towards(mov->facing);
 
         Animator *anim = get<Animator>();
         anim->rotation = collider->get_rotation();
@@ -108,7 +89,6 @@ Entity *Torpedo::create(Scene *scene, const glm::vec2 &pos,
 {
     Entity *ent = scene->add_entity(pos);
     Torpedo *torpedo = new Torpedo();
-    torpedo->dir = dir;
     ent->add(torpedo);
 
     Collider *col = new Collider(
@@ -126,7 +106,10 @@ Entity *Torpedo::create(Scene *scene, const glm::vec2 &pos,
     ent->add(col);
 
     Mover *mov = new Mover();
+    mov->facing = dir;
     mov->vel = dir * start_speed;
+    mov->accel = accel;
+    mov->target_speed = max_speed;
     ent->add(mov);
 
     Entity *tracker = scene->add_entity(pos);
