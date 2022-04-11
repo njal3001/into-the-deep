@@ -37,6 +37,7 @@ void Torpedo::update(float elapsed)
         Collider *tracker_collider = tracker->get<Collider>();
         if (!m_target && tracker_collider)
         {
+            // Update tracker position and rotation
             glm::vec2 tracker_dir =
                 glm::rotate(Calc::right, collider->get_rotation());
 
@@ -46,6 +47,7 @@ void Torpedo::update(float elapsed)
 
             tracker_collider->set_rotation(collider->get_rotation());
 
+            // Try to find tracking target
             std::vector<Collider *> in_range;
             tracker_collider->check_all(Mask::Enemy, &in_range);
 

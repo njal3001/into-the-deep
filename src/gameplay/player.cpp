@@ -11,13 +11,14 @@
 namespace ITD {
 
 Player::Player()
-    : m_facing(glm::vec2(1.0f, 0.0f))
-    , m_dash_timer(0.0f)
+    : m_dash_timer(0.0f)
     , m_dash_cooldown_timer(0.0f)
     , m_shoot_cooldown_timer(0.0f)
     , m_torpedo_ammo(max_torpedo_ammo)
     , m_reload_timer(0.0f)
     , m_shoot_delay_timer(0.0f)
+    , m_shoot_buffer_timer(0.0f)
+    , m_dash_buffer_timer(0.0f)
 {
 }
 
@@ -50,13 +51,14 @@ void Player::update(float elapsed)
         col->set_rotation(Calc::shortest_rotation_approach(
             col->get_rotation(), target_rotation,
             Calc::TAU * rotation_multiplier * elapsed));
-
-        m_facing = glm::rotate(Calc::right, col->get_rotation());
     }
     else
     {
         moving = 0.0f;
     }
+
+
+    glm::vec2 facing = glm::rotate(Calc::right, col->get_rotation());
 
     auto mover = get<Mover>();
 
@@ -69,22 +71,44 @@ void Player::update(float elapsed)
         float a = glm::length2(mover->vel) > max_speed * max_speed
                       ? dash_deaccel
                       : accel;
-        mover->vel = Calc::approach(mover->vel, m_facing * moving * max_speed,
+        mover->vel = Calc::approach(mover->vel, facing * moving * max_speed,
                                     a * elapsed);
     }
 
-    // Check for dash input
-    if (m_dash_cooldown_timer <= 0.0f)
+    // Update input timers
     {
-        bool dash_started = Input::keyboard()->pressed[SDL_SCANCODE_X];
+        m_dash_buffer_timer = std::max(0.0f, m_dash_buffer_timer - elapsed);
+        m_shoot_buffer_timer = std::max(0.0f, m_shoot_buffer_timer - elapsed);
+
+        bool shoot_input = Input::keyboard()->pressed[SDL_SCANCODE_C];
         if (controller->active())
         {
-            dash_started |= controller->pressed[0];
+            shoot_input |= controller->pressed[3];
         }
 
-        if (dash_started)
+        if (shoot_input)
         {
-            mover->vel = m_facing * dash_speed;
+            m_shoot_buffer_timer = input_buffer_time;
+        }
+
+        bool dash_input = Input::keyboard()->pressed[SDL_SCANCODE_X];
+        if (controller->active())
+        {
+            dash_input |= controller->pressed[0];
+        }
+
+        if (dash_input)
+        {
+            m_dash_buffer_timer = input_buffer_time;
+        }
+    }
+
+    // Dashing
+    if (m_dash_cooldown_timer <= 0.0f)
+    {
+        if (m_dash_buffer_timer > 0.0f)
+        {
+            mover->vel = facing * dash_speed;
             m_dash_timer = dash_time;
             m_dash_cooldown_timer = dash_cooldown;
         }
@@ -105,29 +129,23 @@ void Player::update(float elapsed)
         }
     }
 
-    // Check for shooting input
+    // Shooting
     if (m_dash_timer <= 0.0f && m_shoot_delay_timer <= 0.0f &&
         m_torpedo_ammo > 0)
     {
-        bool shoot = Input::keyboard()->pressed[SDL_SCANCODE_C];
-        if (controller->active())
-        {
-            shoot |= controller->pressed[3];
-        }
-
-        if (shoot)
+        if (m_shoot_buffer_timer > 0.0f)
         {
             auto vel_norm = Calc::normalize(mover->vel);
-            float cos = glm::dot(vel_norm, m_facing);
+            float cos = glm::dot(vel_norm, facing);
 
-            Torpedo::create(scene(), m_entity->get_pos(), m_facing,
+            Torpedo::create(scene(), m_entity->get_pos(), facing,
                             std::max(0.0f, cos) * mover->vel.length() +
                                 torpedo_start_speed);
 
             m_shoot_delay_timer = shoot_delay;
             m_torpedo_ammo--;
 
-            mover->vel -= m_facing * shoot_knockback;
+            mover->vel -= facing * shoot_knockback;
         }
     }
     else
