@@ -17,29 +17,14 @@ Player::Player()
     , m_torpedo_ammo(max_torpedo_ammo)
     , m_reload_timer(0.0f)
     , m_shoot_delay_timer(0.0f)
-    , m_shoot_buffer_timer(0.0f)
-    , m_dash_buffer_timer(0.0f)
 {
 }
 
 void Player::update(float elapsed)
 {
-    glm::vec2 dir;
+    m_player_input.update(elapsed);
+    glm::vec2 dir = m_player_input.dir();
 
-    dir.x = Input::keyboard()->down[SDL_SCANCODE_RIGHT] -
-            Input::keyboard()->down[SDL_SCANCODE_LEFT];
-
-    dir.y = Input::keyboard()->down[SDL_SCANCODE_UP] -
-            Input::keyboard()->down[SDL_SCANCODE_DOWN];
-
-    const Input::Controller *controller = Input::controller();
-    if (controller->active() && dir == glm::vec2())
-    {
-        dir.x = controller->axes[0];
-        dir.y = -controller->axes[1];
-    }
-
-    dir = Calc::normalize(dir);
     float moving = 1.0f;
 
     auto mover = get<Mover>();
@@ -47,8 +32,7 @@ void Player::update(float elapsed)
     auto col = get<Collider>();
     if (dir.x != 0 || dir.y != 0)
     {
-        mover->rotate_towards(dir,
-                              Calc::TAU * rotation_multiplier * elapsed);
+        mover->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
     }
     else
     {
@@ -63,44 +47,16 @@ void Player::update(float elapsed)
     {
         mover->approach_target = true;
         mover->accel = glm::length2(mover->vel) > max_speed * max_speed
-                      ? dash_deaccel
-                      : accel;
+                           ? dash_deaccel
+                           : accel;
 
         mover->target_speed = moving * max_speed;
-    }
-
-    // Update input timers
-    {
-        m_dash_buffer_timer = std::max(0.0f, m_dash_buffer_timer - elapsed);
-        m_shoot_buffer_timer = std::max(0.0f, m_shoot_buffer_timer - elapsed);
-
-        bool shoot_input = Input::keyboard()->pressed[SDL_SCANCODE_C];
-        if (controller->active())
-        {
-            shoot_input |= controller->pressed[3];
-        }
-
-        if (shoot_input)
-        {
-            m_shoot_buffer_timer = input_buffer_time;
-        }
-
-        bool dash_input = Input::keyboard()->pressed[SDL_SCANCODE_X];
-        if (controller->active())
-        {
-            dash_input |= controller->pressed[0];
-        }
-
-        if (dash_input)
-        {
-            m_dash_buffer_timer = input_buffer_time;
-        }
     }
 
     // Dashing
     if (m_dash_cooldown_timer <= 0.0f)
     {
-        if (m_dash_buffer_timer > 0.0f)
+        if (m_player_input.consume_dash())
         {
             mover->vel = mover->facing * dash_speed;
             mover->approach_target = false;
@@ -128,7 +84,7 @@ void Player::update(float elapsed)
     if (m_dash_timer <= 0.0f && m_shoot_delay_timer <= 0.0f &&
         m_torpedo_ammo > 0)
     {
-        if (m_shoot_buffer_timer > 0.0f)
+        if (m_player_input.consume_shoot())
         {
             auto vel_norm = Calc::normalize(mover->vel);
             float cos = glm::dot(vel_norm, mover->facing);

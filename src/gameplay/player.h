@@ -1,5 +1,6 @@
 #pragma once
 #include "ecs.h"
+#include "playerinput.h"
 
 namespace ITD {
 
@@ -18,7 +19,6 @@ private:
     static constexpr float shoot_delay = 0.2f;
     static constexpr float reload_time = 1.5f;
     static constexpr float torpedo_start_speed = 20.0f;
-    static constexpr float input_buffer_time = 0.2f;
 
     float m_dash_timer;
     float m_dash_cooldown_timer;
@@ -26,8 +26,8 @@ private:
     int m_torpedo_ammo;
     float m_shoot_delay_timer;
     float m_reload_timer;
-    float m_shoot_buffer_timer;
-    float m_dash_buffer_timer;
+
+    PlayerInput m_player_input;
 
 public:
     Player();
