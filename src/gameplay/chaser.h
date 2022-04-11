@@ -18,7 +18,7 @@ public:
     bool on_collide(Collider *other, const glm::vec2 &dir);
     void explode();
 
-    void update(const float elapsed) override;
+    void update(float elapsed) override;
     void render(Renderer *renderer) override;
 
     static Entity *create(Scene *scene, const glm::vec2 &pos);

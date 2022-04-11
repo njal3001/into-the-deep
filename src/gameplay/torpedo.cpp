@@ -24,7 +24,7 @@ void Torpedo::awake()
         glm::orientedAngle(glm::vec2(dir.x, -dir.y), glm::vec2(1.0f, 0.0f)));
 }
 
-void Torpedo::update(const float elapsed)
+void Torpedo::update(float elapsed)
 {
     m_life_timer -= elapsed;
     if (m_life_timer <= 0.0f)
@@ -37,11 +37,13 @@ void Torpedo::update(const float elapsed)
         Collider *tracker_collider = tracker->get<Collider>();
         if (!m_target && tracker_collider)
         {
-            const glm::vec2 tracker_dir =
+            glm::vec2 tracker_dir =
                 glm::rotate(Calc::right, collider->get_rotation());
+
             tracker->set_pos(m_entity->get_pos() +
                              tracker_dir * (tracker_width - collider_width) /
                                  2.0f);
+
             tracker_collider->set_rotation(collider->get_rotation());
 
             std::vector<Collider *> in_range;
@@ -50,7 +52,7 @@ void Torpedo::update(const float elapsed)
             float min_dist = FLT_MAX;
             for (auto other : in_range)
             {
-                const float dist = collider->distance(*other);
+                float dist = collider->distance(*other);
                 if (dist < min_dist)
                 {
                     min_dist = dist;
@@ -63,13 +65,16 @@ void Torpedo::update(const float elapsed)
         glm::vec2 facing;
         if (m_target)
         {
-            const glm::vec2 dir =
+            glm::vec2 dir =
                 Calc::normalize(m_target->get_pos() - entity()->get_pos());
-            const float target_rotation =
+
+            float target_rotation =
                 glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
+
             collider->set_rotation(Calc::shortest_rotation_approach(
                 collider->get_rotation(), target_rotation,
-                rotation_multiplier * elapsed));
+                Calc::TAU * rotation_multiplier * elapsed));
+
             facing = glm::rotate(Calc::right, collider->get_rotation());
         }
         else
@@ -123,10 +128,11 @@ Entity *Torpedo::create(Scene *scene, const glm::vec2 &pos,
     ent->add(mov);
 
     Entity *tracker = scene->add_entity(pos);
-    const glm::vec2 tracker_bl =
-        col->get_bounds().center() -
-        glm::vec2(tracker_width, tracker_height) / 2.0f;
-    const glm::vec2 tracker_tr =
+
+    glm::vec2 tracker_bl = col->get_bounds().center() -
+                           glm::vec2(tracker_width, tracker_height) / 2.0f;
+
+    glm::vec2 tracker_tr =
         tracker_bl + glm::vec2(tracker_width, tracker_height);
 
     Collider *tracker_collider = new Collider(Rectf(tracker_bl, tracker_tr));

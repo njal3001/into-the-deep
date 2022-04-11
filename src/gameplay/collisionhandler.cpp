@@ -1,11 +1,11 @@
 #include "collisionhandler.h"
 #include <memory>
 #include "../maths/calc.h"
+#include "../platform.h"
 #include "collider.h"
 #include "ecs.h"
 #include "mover.h"
 #include "tilemap.h"
-#include "../platform.h"
 
 namespace ITD {
 
@@ -40,8 +40,8 @@ void CollisionHandler::deregister_dynamic(Collider *collider)
 
 void CollisionHandler::update_buckets(Collider *collider)
 {
-    const Rectf &bbox = collider->bbox();
-    const Recti buc_box = bucket_box(bbox);
+    Rectf bbox = collider->bbox();
+    Recti buc_box = bucket_box(bbox);
 
     const Recti &prev_buc_box = collider->m_bucket_box;
 
@@ -83,8 +83,7 @@ void CollisionHandler::update_buckets(Collider *collider)
     collider->m_in_bucket = true;
 }
 
-void CollisionHandler::add_bucket(Collider *collider, const size_t bx,
-                                  const size_t by)
+void CollisionHandler::add_bucket(Collider *collider, size_t bx, size_t by)
 {
     if (valid_bucket_index(bx, by))
     {
@@ -92,15 +91,14 @@ void CollisionHandler::add_bucket(Collider *collider, const size_t bx,
     }
 }
 
-void CollisionHandler::remove_bucket(Collider *collider, const size_t bx,
-                                     const size_t by)
+void CollisionHandler::remove_bucket(Collider *collider, size_t bx, size_t by)
 {
     if (!valid_bucket_index(bx, by))
         return;
 
     std::vector<Collider *> *bucket = &m_buckets[by * m_grid_width + bx];
 
-    const size_t bsize = bucket->size();
+    size_t bsize = bucket->size();
     if (bsize > 1)
     {
         // Replace collider to be removed with collider in the back
@@ -149,8 +147,8 @@ void CollisionHandler::update_all_buckets()
 
 Recti CollisionHandler::bucket_box(const Rectf &bbox)
 {
-    const glm::ivec2 bot_index = bucket_index(bbox.bl);
-    const glm::ivec2 top_index = bucket_index(bbox.tr);
+    glm::ivec2 bot_index = bucket_index(bbox.bl);
+    glm::ivec2 top_index = bucket_index(bbox.tr);
 
     return Recti(bot_index, top_index);
 }
@@ -195,7 +193,7 @@ void CollisionHandler::update()
                                 ((col->collides_with & ocol->mask) ||
                                  (ocol->collides_with & col->mask)))
                             {
-                                const glm::vec2 push = col->push_out(*ocol);
+                                glm::vec2 push = col->push_out(*ocol);
                                 if (push != glm::vec2())
                                 {
                                     glm::vec2 push_norm = Calc::normalize(push);
@@ -214,10 +212,10 @@ void CollisionHandler::update()
                                             Mover *omov = ocol->get<Mover>();
                                             if (mov && omov)
                                             {
-                                                const glm::vec2 vel_diff =
+                                                glm::vec2 vel_diff =
                                                     mov->vel - omov->vel;
-                                                const float p = glm::dot(
-                                                    push_norm, vel_diff);
+                                                float p = glm::dot(push_norm,
+                                                                   vel_diff);
 
                                                 if (p < 0.0f)
                                                 {
@@ -241,8 +239,8 @@ void CollisionHandler::update()
                                             Mover *mov = col->get<Mover>();
                                             if (mov)
                                             {
-                                                const float p = glm::dot(
-                                                    push_norm, mov->vel);
+                                                float p = glm::dot(push_norm,
+                                                                   mov->vel);
 
                                                 if (p < 0.0f)
                                                 {
@@ -273,7 +271,7 @@ void CollisionHandler::update()
     }
 }
 
-Collider *CollisionHandler::check(Collider *collider, const uint32_t mask)
+Collider *CollisionHandler::check(Collider *collider, uint32_t mask)
 {
     if (!collider->m_in_bucket)
         return nullptr;
@@ -306,7 +304,7 @@ Collider *CollisionHandler::check(Collider *collider, const uint32_t mask)
     return nullptr;
 }
 
-void CollisionHandler::check_all(Collider *collider, const uint32_t mask,
+void CollisionHandler::check_all(Collider *collider, uint32_t mask,
                                  std::vector<Collider *> *out)
 {
     if (!collider->m_in_bucket)
@@ -352,7 +350,8 @@ void CollisionHandler::render_dynamic_buckets(Renderer *renderer)
             for (int x = bl.x; x <= tr.x; x++)
             {
                 glm::vec2 pos = glm::vec2(x, y) * 16.0f;
-                renderer->rect(pos, pos + glm::vec2(1.0f, 1.0f) * 16.0f, Color::green);
+                renderer->rect(pos, pos + glm::vec2(1.0f, 1.0f) * 16.0f,
+                               Color::green);
             }
         }
     }
@@ -360,9 +359,10 @@ void CollisionHandler::render_dynamic_buckets(Renderer *renderer)
 
 void CollisionHandler::render_collider_outlines(Renderer *renderer)
 {
-    for (auto cnode = m_scene->first<Collider>(); cnode != m_scene->end<Collider>(); cnode++)
+    for (auto cnode = m_scene->first<Collider>();
+         cnode != m_scene->end<Collider>(); cnode++)
     {
-        Collider *col = (Collider*)*cnode;
+        Collider *col = (Collider *)*cnode;
         col->render_outline(renderer, Color::red);
     }
 }

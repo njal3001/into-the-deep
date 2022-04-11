@@ -70,7 +70,7 @@ public:
 
     virtual void destroy();
 
-    virtual void update(const float elapsed);
+    virtual void update(float elapsed);
     virtual void render(Renderer *renderer);
 
 protected:
@@ -143,7 +143,7 @@ public:
     ~Scene();
 
     template <class T>
-    static void register_component(const uint8_t prop_mask = Property::None);
+    static void register_component(uint8_t prop_mask = Property::None);
 
     Entity *add_entity(const glm::vec2 &pos);
     void remove_entity(Entity *entity);
@@ -161,7 +161,7 @@ public:
     template <class T>
     typename std::list<Component *>::iterator end();
 
-    void freeze(const float amount);
+    void freeze(float amount);
 
     const Tilemap *map() const;
     CollisionHandler *collision_handler();
@@ -184,7 +184,7 @@ void Entity::add(T *component)
 {
     assert(m_scene);
 
-    const uint8_t type = Component::Types::id<T>();
+    uint8_t type = Component::Types::id<T>();
     component->m_type = type;
 
     m_to_add.push_back(component);
@@ -193,7 +193,7 @@ void Entity::add(T *component)
 template <class T>
 T *Entity::get() const
 {
-    const uint8_t type = Component::Types::id<T>();
+    uint8_t type = Component::Types::id<T>();
     for (auto c : m_components)
     {
         if (c->m_type == type)
@@ -206,23 +206,23 @@ T *Entity::get() const
 }
 
 template <class T>
-void Scene::register_component(const uint8_t prop_mask)
+void Scene::register_component(uint8_t prop_mask)
 {
-    const uint32_t id = Component::Types::id<T>();
+    uint32_t id = Component::Types::id<T>();
     s_prop_masks[id] = prop_mask;
 }
 
 template <class T>
 typename std::list<Component *>::iterator Scene::first()
 {
-    const uint8_t type = Component::Types::id<T>();
+    uint8_t type = Component::Types::id<T>();
     return m_components[type].begin();
 }
 
 template <class T>
 typename std::list<Component *>::iterator Scene::end()
 {
-    const uint8_t type = Component::Types::id<T>();
+    uint8_t type = Component::Types::id<T>();
     return m_components[type].end();
 }
 

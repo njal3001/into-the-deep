@@ -11,7 +11,7 @@ public:
 public:
     Mover();
 
-    void update(const float elapsed) override;
+    void update(float elapsed) override;
 };
 
 }  // namespace ITD

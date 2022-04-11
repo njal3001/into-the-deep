@@ -30,7 +30,7 @@ void Chaser::explode()
     m_entity->destroy();
 }
 
-void Chaser::update(const float elapsed)
+void Chaser::update(float elapsed)
 {
     Collider *collider = get<Collider>();
     Mover *mover = get<Mover>();
@@ -50,13 +50,14 @@ void Chaser::update(const float elapsed)
         moving = 0.0f;
     }
 
-    const float target_rotation =
+    float target_rotation =
         glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
+
     collider->set_rotation(Calc::shortest_rotation_approach(
         collider->get_rotation(), target_rotation,
-        rotation_multiplier * elapsed));
+        Calc::TAU * rotation_multiplier * elapsed));
 
-    const glm::vec2 facing = glm::rotate(Calc::right, collider->get_rotation());
+    glm::vec2 facing = glm::rotate(Calc::right, collider->get_rotation());
     mover->vel = Calc::approach(mover->vel, facing * max_speed * moving,
                                 accel * elapsed);
 }
@@ -65,8 +66,7 @@ void Chaser::render(Renderer *renderer)
 {
     Collider *col = get<Collider>();
 
-    const Quadf &quad = col->quad();
-    renderer->quad(quad.a, quad.b, quad.c, quad.d, Color::red);
+    renderer->quad(col->quad(), Color::red);
 }
 
 Entity *Chaser::create(Scene *scene, const glm::vec2 &pos)

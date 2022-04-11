@@ -21,7 +21,7 @@ Player::Player()
 {
 }
 
-void Player::update(const float elapsed)
+void Player::update(float elapsed)
 {
     glm::vec2 dir;
 
@@ -44,13 +44,14 @@ void Player::update(const float elapsed)
     auto col = get<Collider>();
     if (dir.x != 0 || dir.y != 0)
     {
-        const glm::vec2 right = glm::vec2(1.0f, 0.0f);
-        const float target_rotation =
-            glm::orientedAngle(glm::vec2(dir.x, -dir.y), right);
+        float target_rotation =
+            glm::orientedAngle(glm::vec2(dir.x, -dir.y), Calc::right);
+
         col->set_rotation(Calc::shortest_rotation_approach(
             col->get_rotation(), target_rotation,
-            rotation_multiplier * elapsed));
-        m_facing = glm::rotate(right, col->get_rotation());
+            Calc::TAU * rotation_multiplier * elapsed));
+
+        m_facing = glm::rotate(Calc::right, col->get_rotation());
     }
     else
     {
@@ -65,9 +66,9 @@ void Player::update(const float elapsed)
     }
     else
     {
-        const float a = glm::length2(mover->vel) > max_speed * max_speed
-                            ? dash_deaccel
-                            : accel;
+        float a = glm::length2(mover->vel) > max_speed * max_speed
+                      ? dash_deaccel
+                      : accel;
         mover->vel = Calc::approach(mover->vel, m_facing * moving * max_speed,
                                     a * elapsed);
     }

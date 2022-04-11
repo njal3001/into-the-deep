@@ -5,8 +5,7 @@
 
 namespace ITD {
 
-Collider::Collider(const Rectf &bounds, const float rotation,
-                   const bool dynamic)
+Collider::Collider(const Rectf &bounds, float rotation, bool dynamic)
     : m_bounds(bounds)
     , m_rotation(rotation)
     , m_dynamic(dynamic)
@@ -66,13 +65,13 @@ Rectf Collider::get_bounds() const
     return m_bounds;
 }
 
-void Collider::set_rotation(const float rotation)
+void Collider::set_rotation(float rotation)
 {
     m_rotation = rotation;
     m_invalid_cache = true;
 }
 
-void Collider::rotate(const float amount)
+void Collider::rotate(float amount)
 {
     m_rotation += amount;
     m_invalid_cache = true;
@@ -83,7 +82,7 @@ float Collider::get_rotation() const
     return m_rotation;
 }
 
-void Collider::set_dynamic(const bool dynamic)
+void Collider::set_dynamic(bool dynamic)
 {
     if (dynamic != m_dynamic)
     {
@@ -124,14 +123,17 @@ void Collider::on_position_changed()
 
 Collider::Projection Collider::project(const glm::vec2 &axis) const
 {
-    const float p0 = glm::dot(m_quad.a, axis);
-    const float p1 = glm::dot(m_quad.b, axis);
-    const float p2 = glm::dot(m_quad.c, axis);
-    const float p3 = glm::dot(m_quad.d, axis);
+    float min = FLT_MAX;
+    float max = -FLT_MAX;
 
-    std::initializer_list<float> all = {p0, p1, p2, p3};
+    for (const auto &point : m_quad.values)
+    {
+        float dot = glm::dot(point, axis);
+        min = std::min(dot, min);
+        max = std::max(dot, max);
+    }
 
-    return {.start = std::min(all), .end = std::max(all)};
+    return {.start = min, .end = max};
 }
 
 bool Collider::overlaps(Collider &other)
@@ -147,7 +149,7 @@ glm::vec2 Collider::push_out(Collider &other)
     const glm::vec2 *all_axes[2] = {m_axes, other.m_axes};
 
     // No need to check both colliders axes if the rotation is the same
-    const size_t naxes = 2 - (m_rotation == other.m_rotation);
+    size_t naxes = 2 - (m_rotation == other.m_rotation);
 
     float min_push = FLT_MAX;
     glm::vec2 push_dir;
@@ -158,10 +160,10 @@ glm::vec2 Collider::push_out(Collider &other)
 
         for (size_t j = 0; j < 2; j++)
         {
-            const glm::vec2 axis = axes[j];
+            glm::vec2 axis = axes[j];
 
-            const Projection prj1 = project(axis);
-            const Projection prj2 = other.project(axis);
+            Projection prj1 = project(axis);
+            Projection prj2 = other.project(axis);
 
             // No push out if not overlapping
             if (std::min(prj1.end, prj2.end) < std::max(prj1.start, prj2.start))
@@ -170,10 +172,9 @@ glm::vec2 Collider::push_out(Collider &other)
             }
 
             // Check if positive or negative direction push is smallest
-            const float push1 = prj2.end - prj1.start;
-            const float push2 = prj2.start - prj1.end;
-            const float push =
-                std::abs(push1) < std::abs(push2) ? push1 : push2;
+            float push1 = prj2.end - prj1.start;
+            float push2 = prj2.start - prj1.end;
+            float push = std::abs(push1) < std::abs(push2) ? push1 : push2;
 
             if (std::abs(push) < std::abs(min_push))
             {
@@ -194,7 +195,7 @@ float Collider::distance(Collider &other)
     const glm::vec2 *all_axes[2] = {m_axes, other.m_axes};
 
     // No need to check both colliders axes if the rotation is the same
-    const size_t naxes = 2 - (m_rotation == other.m_rotation);
+    size_t naxes = 2 - (m_rotation == other.m_rotation);
 
     float max_dist = 0.0f;
 
@@ -204,12 +205,12 @@ float Collider::distance(Collider &other)
 
         for (size_t j = 0; j < 2; j++)
         {
-            const glm::vec2 axis = axes[j];
+            glm::vec2 axis = axes[j];
 
-            const Projection prj1 = project(axis);
-            const Projection prj2 = other.project(axis);
+            Projection prj1 = project(axis);
+            Projection prj2 = other.project(axis);
 
-            const float dist =
+            float dist =
                 std::max(prj1.start, prj2.start) - std::min(prj1.end, prj2.end);
             max_dist = std::max(dist, max_dist);
         }
@@ -218,12 +219,12 @@ float Collider::distance(Collider &other)
     return max_dist;
 }
 
-Collider *Collider::check(const uint32_t mask)
+Collider *Collider::check(uint32_t mask)
 {
     return scene()->collision_handler()->check(this, mask);
 }
 
-void Collider::check_all(const uint32_t mask, std::vector<Collider *> *out)
+void Collider::check_all(uint32_t mask, std::vector<Collider *> *out)
 {
     scene()->collision_handler()->check_all(this, mask, out);
 }
@@ -233,34 +234,27 @@ void Collider::recalculate()
     m_quad = Quadf(m_bounds, m_rotation);
     m_quad += m_entity->get_pos();
 
-    m_axes[0] = glm::normalize(m_quad.d - m_quad.a);
-    m_axes[1] = glm::normalize(m_quad.b - m_quad.a);
+    m_axes[0] = Calc::normalize(m_quad.d - m_quad.a);
+    m_axes[1] = Calc::normalize(m_quad.b - m_quad.a);
 
-    float max_x = m_quad.a.x;
-    max_x = std::max(m_quad.b.x, max_x);
-    max_x = std::max(m_quad.c.x, max_x);
-    max_x = std::max(m_quad.d.x, max_x);
+    float min_x = FLT_MAX;
+    float min_y = FLT_MAX;
+    float max_x = -FLT_MAX;
+    float max_y = -FLT_MAX;
 
-    float min_x = m_quad.a.x;
-    min_x = std::min(m_quad.b.x, min_x);
-    min_x = std::min(m_quad.c.x, min_x);
-    min_x = std::min(m_quad.d.x, min_x);
-
-    float max_y = m_quad.a.y;
-    max_y = std::max(m_quad.b.y, max_y);
-    max_y = std::max(m_quad.c.y, max_y);
-    max_y = std::max(m_quad.d.y, max_y);
-
-    float min_y = m_quad.a.y;
-    min_y = std::min(m_quad.b.y, min_y);
-    min_y = std::min(m_quad.c.y, min_y);
-    min_y = std::min(m_quad.d.y, min_y);
+    for (const auto &point : m_quad.values)
+    {
+        min_x = std::min(point.x, min_x);
+        min_y = std::min(point.y, min_y);
+        max_x = std::max(point.x, max_x);
+        max_y = std::max(point.y, max_y);
+    }
 
     m_bbox.bl = glm::vec2(min_x, min_y);
     m_bbox.tr = glm::vec2(max_x, max_y);
 }
 
-void Collider::render_outline(Renderer *renderer, const Color color)
+void Collider::render_outline(Renderer *renderer, Color color)
 {
     renderer->quad_line(quad(), 1.0f, color);
 }

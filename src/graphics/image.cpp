@@ -37,6 +37,7 @@ void Image::load(const std::string &filename)
     m_height = (size_t)y;
 }
 
+// TODO: Should return value be const?
 const Color *Image::pixels() const
 {
     return m_pixels;

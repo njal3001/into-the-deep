@@ -50,8 +50,8 @@ int main()
     glm::mat4 matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
     glm::vec3 screen_center =
         glm::vec3(screen_width, screen_height, 0.0f) / 2.0f;
-    const float map_pwidth = map.width() * 8.0f;
-    const float map_pheight = map.height() * 8.0f;
+    float map_pwidth = map.width() * 8.0f;
+    float map_pheight = map.height() * 8.0f;
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds
@@ -61,8 +61,8 @@ int main()
     while (Platform::update())
     {
         // Calculate elapsed time
-        const uint64_t current_ticks = Platform::ticks();
-        const uint64_t tick_diff = current_ticks - prev_ticks;
+        uint64_t current_ticks = Platform::ticks();
+        uint64_t tick_diff = current_ticks - prev_ticks;
         elapsed = (tick_diff) / (float)Platform::ticks_per_sec;
         prev_ticks = current_ticks;
 

@@ -18,12 +18,12 @@ Tilemap::Tilemap(const std::string &name)
     , m_width(0)
     , m_height(0)
 {
-    const std::string base_path =
+    std::string base_path =
         Platform::app_path() + "../res/map/simplified/" + m_name + "/";
 
-    const std::string img_path = base_path + "_composite.png";
-    const std::string igrid_path = base_path + "IntGrid-int.png";
-    const std::string data_path = base_path + "data.json";
+    std::string img_path = base_path + "_composite.png";
+    std::string igrid_path = base_path + "IntGrid-int.png";
+    std::string data_path = base_path + "data.json";
 
     Image img(img_path);
     m_texture.load(img);

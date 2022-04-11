@@ -60,7 +60,7 @@ Shader::Shader(const std::string &vert_str, const std::string &frag_str)
     }
 
     // Get uniforms
-    const size_t max_name_length = 256;
+    size_t max_name_length = 256;
     GLint active_uniforms;
     glGetProgramiv(m_id, GL_ACTIVE_UNIFORMS, &active_uniforms);
 

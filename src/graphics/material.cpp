@@ -21,10 +21,8 @@ void Material::set_shader(const Shader *shader)
     if (!shader)
         return;
 
-    const auto &uniforms = shader->uniforms();
-
     size_t values_size = 0;
-    for (auto &uniform : uniforms)
+    for (const auto &uniform : shader->uniforms())
     {
         if (uniform.type == GL_SAMPLER_2D)
         {
@@ -45,11 +43,9 @@ const Shader *Material::shader() const
 }
 
 bool Material::set_texture(const std::string &name, const Texture *texture,
-                           const size_t slot)
+                           size_t slot)
 {
-    const auto &uniforms = m_shader->uniforms();
-
-    for (auto &uniform : uniforms)
+    for (const auto &uniform : m_shader->uniforms())
     {
         if (uniform.type != GL_SAMPLER_2D)
             continue;
@@ -66,15 +62,13 @@ bool Material::set_texture(const std::string &name, const Texture *texture,
 
 bool Material::set_value(const std::string &name, const float *value)
 {
-    const auto &uniforms = m_shader->uniforms();
-
     size_t offset = 0;
-    for (auto &uniform : uniforms)
+    for (auto &uniform : m_shader->uniforms())
     {
         if (uniform.type == GL_SAMPLER_2D)
             continue;
 
-        const size_t length = uniform_length(uniform);
+        size_t length = uniform_length(uniform);
 
         if (name == uniform.name)
         {
@@ -88,7 +82,7 @@ bool Material::set_value(const std::string &name, const float *value)
     return false;
 }
 
-const Texture *Material::get_texture(const size_t slot) const
+const Texture *Material::get_texture(size_t slot) const
 {
     return m_textures[slot];
 }

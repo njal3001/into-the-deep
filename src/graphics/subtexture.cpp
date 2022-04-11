@@ -48,8 +48,8 @@ const std::array<glm::vec2, 4> &Subtexture::get_tex_coords() const
 
 void Subtexture::update_tex_coords()
 {
-    const float tex_w = m_texture->width();
-    const float tex_h = m_texture->height();
+    float tex_w = m_texture->width();
+    float tex_h = m_texture->height();
 
     // Check bounds
     assert(m_bounds.bl.x >= 0 && m_bounds.tr.x <= tex_w && m_bounds.bl.y >= 0 &&

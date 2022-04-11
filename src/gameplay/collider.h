@@ -47,17 +47,17 @@ private:
     std::list<Collider *>::iterator m_dyn_iter;
 
 public:
-    Collider(const Rectf &bounds, const float rotation = 0.0f,
-             const bool dynamic = true);
+    Collider(const Rectf &bounds, float rotation = 0.0f,
+             bool dynamic = true);
 
     void set_bounds(const Rectf &bounds);
     Rectf get_bounds() const;
 
-    void set_rotation(const float rotation);
-    void rotate(const float amount);
+    void set_rotation(float rotation);
+    void rotate(float amount);
     float get_rotation() const;
 
-    void set_dynamic(const bool dynamic);
+    void set_dynamic(bool dynamic);
     bool is_dynamic() const;
 
     Quadf quad();
@@ -67,10 +67,10 @@ public:
     glm::vec2 push_out(Collider &other);
     float distance(Collider &other);
 
-    Collider *check(const uint32_t mask);
-    void check_all(const uint32_t mask, std::vector<Collider *> *out);
+    Collider *check(uint32_t mask);
+    void check_all(uint32_t mask, std::vector<Collider *> *out);
 
-    void render_outline(Renderer *renderer, const Color color);
+    void render_outline(Renderer *renderer, Color color);
 
 protected:
     void awake() override;

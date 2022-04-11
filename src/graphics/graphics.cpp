@@ -57,7 +57,7 @@ bool Graphics::init()
     return true;
 }
 
-void Graphics::clear(const Color color)
+void Graphics::clear(Color color)
 {
     glClearColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f,
                  color.a / 255.0f);

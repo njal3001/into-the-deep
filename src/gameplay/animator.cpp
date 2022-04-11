@@ -6,8 +6,8 @@
 namespace ITD {
 
 Animator::Animator(const std::string &sprite_sheet, const Recti &frame_bounds,
-                   const size_t nframes, const float frame_length,
-                   const glm::vec2 &offset, const glm::vec2 &pivot)
+                   size_t nframes, float frame_length, const glm::vec2 &offset,
+                   const glm::vec2 &pivot)
     : m_sprite_sheet(sprite_sheet)
     , m_frame_bounds(frame_bounds)
     , m_nframes(nframes)
@@ -18,8 +18,7 @@ Animator::Animator(const std::string &sprite_sheet, const Recti &frame_bounds,
     , pivot(pivot)
     , rotation(0.0f)
 {
-    const std::string path =
-        Platform::app_path() + "../res/" + sprite_sheet + ".png";
+    std::string path = Platform::app_path() + "../res/" + sprite_sheet + ".png";
     Image img(path);
     m_texture.load(img);
 
@@ -27,7 +26,7 @@ Animator::Animator(const std::string &sprite_sheet, const Recti &frame_bounds,
     m_subtexture.set_texture(&m_texture);
 }
 
-void Animator::update(const float elapsed)
+void Animator::update(float elapsed)
 {
     if (m_nframes == 0)
         return;

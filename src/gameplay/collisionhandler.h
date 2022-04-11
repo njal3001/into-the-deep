@@ -32,13 +32,13 @@ public:
     void deregister_dynamic(Collider *collider);
 
     void update_buckets(Collider *collider);
-    void add_bucket(Collider *collider, const size_t bx, const size_t by);
-    void remove_bucket(Collider *collider, const size_t bx, const size_t by);
+    void add_bucket(Collider *collider, size_t bx, size_t by);
+    void remove_bucket(Collider *collider, size_t bx, size_t by);
     void remove(Collider *collider);
 
     void update();
-    Collider *check(Collider *collider, const uint32_t mask);
-    void check_all(Collider *collider, const uint32_t mask,
+    Collider *check(Collider *collider, uint32_t mask);
+    void check_all(Collider *collider, uint32_t mask,
                    std::vector<Collider *> *out);
 
     void render_dynamic_buckets(Renderer *renderer);
@@ -48,7 +48,7 @@ private:
     glm::ivec2 bucket_index(const glm::vec2 &pos);
     Recti bucket_box(const Rectf &bbox);
     void update_all_buckets();
-    bool valid_bucket_index(const size_t bx, const size_t by);
+    bool valid_bucket_index(size_t bx, size_t by);
 };
 
 }  // namespace ITD

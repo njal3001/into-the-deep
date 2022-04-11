@@ -78,10 +78,16 @@ struct Rect {
 
 template <class T>
 struct Quad {
-    glm::tvec2<T> a;
-    glm::tvec2<T> b;
-    glm::tvec2<T> c;
-    glm::tvec2<T> d;
+    union {
+        struct {
+            glm::tvec2<T> a;
+            glm::tvec2<T> b;
+            glm::tvec2<T> c;
+            glm::tvec2<T> d;
+        };
+
+        glm::tvec2<T> values[4];
+    };
 
     Quad()
         : a(glm::tvec2<T>())
@@ -139,7 +145,6 @@ struct Quad {
         d += rhs;
         return *this;
     }
-
 };
 
 }  // namespace ITD

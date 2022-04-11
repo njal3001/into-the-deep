@@ -64,7 +64,7 @@ public:
     void push_material(Material *material);
     Material *pop_material();
 
-    void push_matrix(const glm::mat4 &matrix, const bool absolute = false);
+    void push_matrix(const glm::mat4 &matrix, bool absolute = false);
     glm::mat4 pop_matrix();
     glm::mat4 peek_matrix();
 
@@ -73,23 +73,23 @@ public:
     void end();
 
     void tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
-             const glm::vec2 &pos2, const Color color);
+             const glm::vec2 &pos2, Color color);
 
-    void rect(const Rectf &r, const Color color);
-    void rect(const glm::vec2 &bl, const glm::vec2 &tr, const Color color);
-    void rect_line(const Rectf &r, const float t, const Color color);
+    void rect(const Rectf &r, Color color);
+    void rect(const glm::vec2 &bl, const glm::vec2 &tr, Color color);
+    void rect_line(const Rectf &r, float t, Color color);
 
-    void quad(const Quadf &q, const Color color);
+    void quad(const Quadf &q, Color color);
     void quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
-              const glm::vec2 &d, const Color color);
-    void quad_line(const Quadf &q, const float t, const Color color);
+              const glm::vec2 &d, Color color);
+    void quad_line(const Quadf &q, float t, Color color);
 
-    void circ(const glm::vec2 &center, const float radius,
-              const unsigned int steps, const Color color);
+    void circ(const glm::vec2 &center, float radius,
+              unsigned int steps, Color color);
 
-    void tex(const Texture *texture, const glm::vec2 &pos, const Color color);
+    void tex(const Texture *texture, const glm::vec2 &pos, Color color);
     void tex(const Subtexture &subtexture, const glm::vec2 &pos,
-             const Color color);
+             Color color);
 
 private:
     void make_vertex(float px, float py, float tx, float ty, Color color,

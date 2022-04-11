@@ -59,12 +59,12 @@ Renderer::Renderer()
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 
     // Specify vertex buffer layout
-    const size_t pos_offset = 2 * sizeof(GLfloat);
-    const size_t uv_offset = 2 * sizeof(GLfloat);
-    const size_t color_offset = 4 * sizeof(GLubyte);
-    const size_t mask_offset = 4 * sizeof(GLubyte);
+    size_t pos_offset = 2 * sizeof(GLfloat);
+    size_t uv_offset = 2 * sizeof(GLfloat);
+    size_t color_offset = 4 * sizeof(GLubyte);
+    size_t mask_offset = 4 * sizeof(GLubyte);
 
-    const GLsizei stride = pos_offset + uv_offset + color_offset + mask_offset;
+    GLsizei stride = pos_offset + uv_offset + color_offset + mask_offset;
 
     // Position
     glEnableVertexAttribArray(0);
@@ -232,7 +232,7 @@ Material *Renderer::pop_material()
     return was;
 }
 
-void Renderer::push_matrix(const glm::mat4 &matrix, const bool absolute)
+void Renderer::push_matrix(const glm::mat4 &matrix, bool absolute)
 {
     m_matrix_stack.push_back(m_matrix);
 
@@ -275,7 +275,7 @@ void Renderer::begin()
 }
 
 void Renderer::tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
-                   const glm::vec2 &pos2, const Color color)
+                   const glm::vec2 &pos2, Color color)
 {
     assert(m_vertex_map && m_index_map);
 
@@ -283,12 +283,12 @@ void Renderer::tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
                   0, color, color, color, 0, 0, 255);
 }
 
-void Renderer::rect(const Rectf &r, const Color color)
+void Renderer::rect(const Rectf &r, Color color)
 {
     rect(r.bl, r.tr, color);
 }
 
-void Renderer::rect(const glm::vec2 &bl, const glm::vec2 &tr, const Color color)
+void Renderer::rect(const glm::vec2 &bl, const glm::vec2 &tr, Color color)
 {
     assert(m_vertex_map && m_index_map);
 
@@ -296,7 +296,7 @@ void Renderer::rect(const glm::vec2 &bl, const glm::vec2 &tr, const Color color)
               0, 0, color, color, color, color, 0, 0, 255);
 }
 
-void Renderer::rect_line(const Rectf &r, const float t, const Color color)
+void Renderer::rect_line(const Rectf &r, float t, Color color)
 {
     // Bottom
     rect(r.bl, glm::vec2(r.tr.x, r.bl.y + t), color);
@@ -311,13 +311,13 @@ void Renderer::rect_line(const Rectf &r, const float t, const Color color)
     rect(glm::vec2(r.tr.x - t, r.bl.y), r.tr, color);
 }
 
-void Renderer::quad(const Quadf &q, const Color color)
+void Renderer::quad(const Quadf &q, Color color)
 {
     quad(q.a, q.b, q.c, q.d, color);
 }
 
 void Renderer::quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
-                    const glm::vec2 &d, const Color color)
+                    const glm::vec2 &d, Color color)
 {
     assert(m_vertex_map && m_index_map);
 
@@ -325,23 +325,22 @@ void Renderer::quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
               color, color, color, color, 0, 0, 255);
 }
 
-void Renderer::quad_line(const Quadf &q, const float t, const Color color)
+void Renderer::quad_line(const Quadf &q, float t, Color color)
 {
     glm::vec2 center = q.center();
 
-    std::vector<glm::vec2> all = { q.a, q.b, q.c, q.d };
     for (int i = 0; i < 4; i++)
     {
-        glm::vec2 p1 = all[i];
-        glm::vec2 p2 = all[(i + 1) % 4];
+        glm::vec2 p1 = q.values[i];
+        glm::vec2 p2 = q.values[(i + 1) % 4];
 
         glm::vec2 norm = Calc::normalize(center - (p1 + p2) / 2.0f);
         quad(p1, p1 + t * norm, p2 + t * norm, p2, color);
     }
 }
 
-void Renderer::circ(const glm::vec2 &center, const float radius,
-                    const unsigned int steps, const Color color)
+void Renderer::circ(const glm::vec2 &center, float radius, unsigned int steps,
+                    Color color)
 {
     float step_rad = Calc::TAU / (float)steps;
 
@@ -360,8 +359,7 @@ void Renderer::circ(const glm::vec2 &center, const float radius,
     }
 }
 
-void Renderer::tex(const Texture *texture, const glm::vec2 &pos,
-                   const Color color)
+void Renderer::tex(const Texture *texture, const glm::vec2 &pos, Color color)
 {
     assert(m_vertex_map && m_index_map);
 
@@ -375,7 +373,7 @@ void Renderer::tex(const Texture *texture, const glm::vec2 &pos,
 }
 
 void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos,
-                   const Color color)
+                   Color color)
 {
     assert(m_vertex_map && m_index_map);
 
@@ -385,8 +383,8 @@ void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos,
     // TODO: Const ref return?
     Recti bounds = subtexture.get_bounds();
 
-    const float mx = pos.x + bounds.width() - 1.0f;
-    const float my = pos.y + bounds.height() - 1.0f;
+    float mx = pos.x + bounds.width() - 1.0f;
+    float my = pos.y + bounds.height() - 1.0f;
 
     const std::array<glm::vec2, 4> &coords = subtexture.get_tex_coords();
 
@@ -446,12 +444,11 @@ void Renderer::render(const glm::mat4 &matrix)
         batch.material->set_value("u_matrix", &matrix[0][0]);
 
         // Upload uniform values
-        const auto &uniforms = shader->uniforms();
         GLint texture_slot = 0;
 
         auto val_iter = batch.material->get_values().begin();
 
-        for (auto &uniform : uniforms)
+        for (const auto &uniform : shader->uniforms())
         {
             const GLint location = shader->uniform_location(uniform.name);
 

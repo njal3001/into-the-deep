@@ -25,20 +25,20 @@ namespace Calc {
 
     template <class T>
     glm::tvec2<T> approach(const glm::tvec2<T> &val,
-                           const glm::tvec2<T> &target, const T amount)
+                           const glm::tvec2<T> &target, T amount)
     {
         if (glm::distance(val, target) <= amount)
         {
             return target;
         }
 
-        const glm::tvec2<T> dir = Calc::normalize(target - val);
+        glm::tvec2<T> dir = Calc::normalize(target - val);
 
         return val + dir * amount;
     }
 
     template <class T>
-    T approach(const T val, const T target, const T amount)
+    T approach(T val, T target, T amount)
     {
         if (val + amount < target)
         {
@@ -49,16 +49,17 @@ namespace Calc {
     }
 
     template <class T>
-    T sgn(const T val)
+    T sgn(T val)
     {
         return (T(0) < val) - (T(0) > val);
     }
 
     template <class T>
-    glm::tmat4x4<T> rotate(const T amount, const glm::tvec2<T> &pivot)
+    glm::tmat4x4<T> rotate(T amount, const glm::tvec2<T> &pivot)
     {
-        const glm::tvec3<T> pivot3 = glm::tvec3<T>(pivot, 0);
-        const glm::tmat4x4<T> result = glm::translate(
+        glm::tvec3<T> pivot3 = glm::tvec3<T>(pivot, 0);
+
+        glm::tmat4x4<T> result = glm::translate(
             glm::rotate(glm::translate(glm::tmat4x4<T>(1), pivot3), amount,
                         glm::tvec3<T>(0, 0, 1)),
             -pivot3);
@@ -68,8 +69,7 @@ namespace Calc {
 
     size_t hash_combine(size_t lhs, size_t rhs);
 
-    float shortest_rotation_approach(const float val, const float target,
-                                     const float period_multiplier);
+    float shortest_rotation_approach(float val, float target, float amount);
 
 }  // namespace Calc
 

@@ -9,21 +9,18 @@ size_t Calc::hash_combine(size_t lhs, size_t rhs)
     return lhs;
 }
 
-float Calc::shortest_rotation_approach(const float val, const float target,
-                                       const float period_multiplier)
+float Calc::shortest_rotation_approach(float val, float target, float amount)
 {
     // Find shortest rotation direction (clockwise or counter clockwise)
-    const float a = target - val;
-    const float b = target - val + 2 * M_PI;
-    const float c = target - val - 2 * M_PI;
+    float a = target - val;
+    float b = target - val + TAU;
+    float c = target - val - TAU;
 
     float min = std::abs(a) < std::abs(b) ? a : b;
     min = std::abs(min) < std::abs(c) ? min : c;
-    const float shortest_target_rotation = val + min;
+    float shortest_target_rotation = val + min;
 
-    return fmod(approach(val, shortest_target_rotation,
-                         (float)(TAU * period_multiplier)) +
-                    TAU,
+    return fmod(approach(val, shortest_target_rotation, (float)amount),
                 TAU);
 }
 

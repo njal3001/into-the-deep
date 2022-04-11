@@ -7,7 +7,7 @@ Mover::Mover()
 {
 }
 
-void Mover::update(const float elapsed)
+void Mover::update(float elapsed)
 {
     m_entity->translate(vel * elapsed);
 }

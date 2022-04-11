@@ -48,7 +48,7 @@ void Component::on_removed()
 {
 }
 
-void Component::update(const float elapsed)
+void Component::update(float elapsed)
 {
 }
 

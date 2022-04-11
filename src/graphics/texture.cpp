@@ -3,7 +3,7 @@
 
 namespace ITD {
 
-Texture::Texture(const size_t width, const size_t height,
+Texture::Texture(size_t width, size_t height,
                  const unsigned char *data)
     : Texture()
 {
@@ -23,7 +23,7 @@ Texture::Texture()
 {
 }
 
-void Texture::load(const size_t width, const size_t height,
+void Texture::load(size_t width, size_t height,
                    const unsigned char *data)
 {
     assert(m_id == 0);

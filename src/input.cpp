@@ -38,7 +38,7 @@ void Input::Mouse::clear()
 void Input::Mouse::update()
 {
     int x, y;
-    const uint32_t bmask = SDL_GetMouseState(&x, &y);
+    uint32_t bmask = SDL_GetMouseState(&x, &y);
 
     // Update buttons
     for (uint8_t b = 0; b < MOUSE_BUTTON_MAX; b++)

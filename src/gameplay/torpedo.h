@@ -9,8 +9,8 @@ private:
     static constexpr float life_time = 1.5f;
     static constexpr float collider_width = 8.0f;
     static constexpr float collider_height = 4.0f;
-    static constexpr float tracker_width = 72.0f;
-    static constexpr float tracker_height = 32.0f;
+    static constexpr float tracker_width = 144.0f;
+    static constexpr float tracker_height = 64.0f;
     static constexpr float rotation_multiplier = 0.1f;
     static constexpr float accel = 200.0f;
     static constexpr float explosion_duration = 0.15f;

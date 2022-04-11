@@ -22,10 +22,10 @@ public:
     const Shader *shader() const;
 
     bool set_texture(const std::string &name, const Texture *texture,
-                     const size_t slot = 0);
+                     size_t slot = 0);
     bool set_value(const std::string &name, const float *value);
 
-    const Texture *get_texture(const size_t slot) const;
+    const Texture *get_texture(size_t slot) const;
 
     const std::vector<float> &get_values() const;
 

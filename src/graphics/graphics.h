@@ -5,7 +5,7 @@ namespace ITD {
 
 namespace Graphics {
     bool init();
-    void clear(const Color color);
+    void clear(Color color);
     void present();
     void shutdown();
 }  // namespace Graphics

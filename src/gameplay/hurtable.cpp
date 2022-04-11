@@ -32,7 +32,7 @@ bool Hurtable::hurt(const glm::vec2 &dir)
     return false;
 }
 
-void Hurtable::update(const float elapsed)
+void Hurtable::update(float elapsed)
 {
     m_invincible_timer -= elapsed;
 }

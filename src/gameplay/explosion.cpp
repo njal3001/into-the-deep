@@ -5,12 +5,12 @@
 
 namespace ITD {
 
-Explosion::Explosion(const float duration)
+Explosion::Explosion(float duration)
     : m_duration_timer(duration)
 {
 }
 
-void Explosion::update(const float elapsed)
+void Explosion::update(float elapsed)
 {
     m_duration_timer -= elapsed;
     if (m_duration_timer <= 0.0f)
@@ -37,9 +37,9 @@ void Explosion::render(Renderer *renderer)
     renderer->quad(col->quad(), Color(255, 255, 0));
 }
 
-Entity *Explosion::create(Scene *scene, const glm::vec2 &pos,
-                          const float duration, const glm::vec2 &size,
-                          const float rotation, const uint32_t hurt_mask)
+Entity *Explosion::create(Scene *scene, const glm::vec2 &pos, float duration,
+                          const glm::vec2 &size, float rotation,
+                          uint32_t hurt_mask)
 {
     Entity *ent = scene->add_entity(pos);
     Explosion *explosion = new Explosion(duration);

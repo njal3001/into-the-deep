@@ -10,7 +10,7 @@ Color::Color()
 {
 }
 
-Color::Color(const int rgb)
+Color::Color(int rgb)
     : r((uint8_t)((rgb & 0xFF0000) >> 16))
     , g((uint8_t)((rgb & 0x00FF00) >> 8))
     , b((uint8_t)(rgb & 0x0000FF))

@@ -149,7 +149,7 @@ void Scene::render_hud(Renderer *renderer)
     }
 }
 
-void Scene::freeze(const float amount)
+void Scene::freeze(float amount)
 {
     m_freeze_timer += amount;
 }

@@ -11,7 +11,7 @@ private:
     GLsizei m_width, m_height;
 
 public:
-    Texture(const size_t width, const size_t height, const unsigned char *data);
+    Texture(size_t width, size_t height, const unsigned char *data);
     Texture(const Image &image);
     Texture();
     ~Texture();
@@ -19,7 +19,7 @@ public:
     Texture(const Texture &other) = delete;
     Texture &operator=(const Texture &other) = delete;
 
-    void load(const size_t width, const size_t height,
+    void load(size_t width, size_t height,
               const unsigned char *data);
     void load(const Image &image);
 
