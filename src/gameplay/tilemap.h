@@ -22,6 +22,9 @@ public:
 
     size_t width() const;
     size_t height() const;
+
+    float pixel_width() const;
+    float pixel_height() const;
 };
 
 }  // namespace ITD

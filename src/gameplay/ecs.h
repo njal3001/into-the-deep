@@ -4,6 +4,7 @@
 #include <vector>
 #include "../graphics/renderer.h"
 #include "collisionhandler.h"
+#include "camera.h"
 
 namespace ITD {
 
@@ -133,13 +134,18 @@ private:
 
     Tilemap *m_tilemap;
     CollisionHandler m_collision_handler;
+
+    glm::vec2 m_screen_size;
+    Camera m_camera;
+
     float m_freeze_timer;
+
     bool m_debug;
 
     static inline uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = {Property::None};
 
 public:
-    Scene(Tilemap *map);
+    Scene(Tilemap *map, const glm::vec2 &screen_size);
     ~Scene();
 
     template <class T>
@@ -165,6 +171,9 @@ public:
 
     const Tilemap *map() const;
     CollisionHandler *collision_handler();
+    Camera *camera();
+
+    glm::vec2 screen_size() const;
 
     void toggle_debug_mode();
 

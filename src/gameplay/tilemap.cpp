@@ -79,7 +79,7 @@ void Tilemap::fill_scene(Scene *scene)
     }
 
     // Entities
-    float pixel_height = m_height * 8.0f;
+    float pheight = pixel_height();
     auto entities = m_data["entities"];
     for (auto it = entities.begin(); it != entities.end(); it++)
     {
@@ -92,7 +92,7 @@ void Tilemap::fill_scene(Scene *scene)
             int x = ent_val["x"].get<int>();
             int y = ent_val["y"].get<int>();
 
-            glm::vec2 pos(x, pixel_height - y);
+            glm::vec2 pos(x, pheight - y);
 
             if (key == "Player")
             {
@@ -120,6 +120,16 @@ size_t Tilemap::width() const
 size_t Tilemap::height() const
 {
     return m_height;
+}
+
+float Tilemap::pixel_width() const
+{
+    return m_width * 8.0f;
+}
+
+float Tilemap::pixel_height() const
+{
+    return m_height * 8.0f;
 }
 
 }  // namespace ITD

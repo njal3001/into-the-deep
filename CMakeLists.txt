@@ -39,6 +39,7 @@ add_executable(itd
     src/gameplay/playerhud.cpp
     src/gameplay/animator.cpp
     src/gameplay/playerinput.cpp
+    src/gameplay/camera.cpp
     )
 
 target_link_libraries(itd ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES})

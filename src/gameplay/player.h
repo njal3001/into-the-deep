@@ -32,6 +32,8 @@ private:
 public:
     Player();
 
+    void awake() override;
+
     int torpedo_ammo() const;
 
     void update(float elapsed) override;

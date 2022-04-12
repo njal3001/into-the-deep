@@ -4,13 +4,15 @@
 
 namespace ITD {
 
-Scene::Scene(Tilemap *map)
+Scene::Scene(Tilemap *map, const glm::vec2 &screen_size)
     : m_tilemap(map)
+    , m_screen_size(screen_size)
     , m_freeze_timer(0.0f)
     , m_debug(false)
 {
     map->fill_scene(this);
     m_collision_handler.init(this);
+    m_camera.init(this);
 }
 
 Scene::~Scene()
@@ -77,6 +79,8 @@ void Scene::update(float elapsed)
     }
 
     m_collision_handler.update();
+
+    m_camera.update(elapsed);
 }
 
 void Scene::update_lists()
@@ -105,6 +109,8 @@ void Scene::update_lists()
 
 void Scene::render(Renderer *renderer)
 {
+    glm::mat4 cam_matrix = m_camera.get_matrix();
+    renderer->push_matrix(cam_matrix);
     m_tilemap->render(renderer);
 
     if (m_debug)
@@ -130,6 +136,8 @@ void Scene::render(Renderer *renderer)
     {
         m_collision_handler.render_collider_outlines(renderer);
     }
+
+    renderer->pop_matrix();
 }
 
 void Scene::render_hud(Renderer *renderer)
@@ -162,6 +170,16 @@ const Tilemap *Scene::map() const
 CollisionHandler *Scene::collision_handler()
 {
     return &m_collision_handler;
+}
+
+Camera *Scene::camera()
+{
+    return &m_camera;
+}
+
+glm::vec2 Scene::screen_size() const
+{
+    return m_screen_size;
 }
 
 void Scene::toggle_debug_mode()

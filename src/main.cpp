@@ -45,13 +45,9 @@ int main()
     Renderer renderer;
 
     Tilemap map("Level_0");
-    Scene scene(&map);
+    Scene scene(&map, glm::vec2(screen_width, screen_height));
 
-    glm::mat4 matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
-    glm::vec3 screen_center =
-        glm::vec3(screen_width, screen_height, 0.0f) / 2.0f;
-    float map_pwidth = map.width() * 8.0f;
-    float map_pheight = map.height() * 8.0f;
+    glm::mat4 screen_matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds
@@ -72,33 +68,17 @@ int main()
         // Render
         Graphics::clear(bg_color);
 
-        // Player camera
-        glm::mat4 camera = glm::mat4(1.0f);
-        // auto pfirst = scene.first<Player>();
-        // if (pfirst != scene.end<Player>())
-        // {
-        //     Player *player = (Player *)*pfirst;
-        //     glm::vec3 offset =
-        //         screen_center - glm::vec3(player->entity()->get_pos(), 1.0f);
-        //     offset.x = std::clamp(offset.x, screen_width - map_pwidth, 0.0f);
-        //     offset.y = std::clamp(offset.y, screen_height - map_pheight, 0.0f);
-        //     camera = glm::translate(camera, offset);
-        // }
-
-
         if (Input::keyboard()->pressed[SDL_SCANCODE_F12])
         {
             scene.toggle_debug_mode();
         }
 
         renderer.begin();
-        renderer.push_matrix(camera);
         scene.render(&renderer);
-        renderer.pop_matrix();
         scene.render_hud(&renderer);
         renderer.end();
 
-        renderer.render(matrix);
+        renderer.render(screen_matrix);
 
         Graphics::present();
     }
