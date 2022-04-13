@@ -1,5 +1,5 @@
 #include "subtexture.h"
-#include <assert.h>
+#include "../debug.h"
 
 namespace ITD {
 
@@ -51,9 +51,9 @@ void Subtexture::update_tex_coords()
     float tex_w = m_texture->width();
     float tex_h = m_texture->height();
 
-    // Check bounds
-    assert(m_bounds.bl.x >= 0 && m_bounds.tr.x <= tex_w && m_bounds.bl.y >= 0 &&
-           m_bounds.tr.y <= tex_h);
+    ITD_ASSERT(m_bounds.bl.x >= 0 && m_bounds.tr.x <= tex_w &&
+                   m_bounds.bl.y >= 0 && m_bounds.tr.y <= tex_h,
+               "Subtexture bounds are not valid");
 
     const float sx = 1.0f / tex_w;
     const float sy = 1.0f / tex_h;

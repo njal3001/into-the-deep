@@ -14,6 +14,7 @@ add_executable(itd
     src/platform.cpp
     src/input.cpp
     src/file.cpp
+    src/debug.cpp
     src/graphics/graphics.cpp
     src/graphics/renderer.cpp
     src/graphics/shader.cpp

@@ -1,7 +1,7 @@
 #include "renderer.h"
-#include <assert.h>
 #include <math.h>
 #include <memory>
+#include "../debug.h"
 #include "../maths/calc.h"
 
 namespace ITD {
@@ -216,7 +216,8 @@ void Renderer::push_material(Material *material)
 
 Material *Renderer::pop_material()
 {
-    assert(m_matrix_stack.size() > 0);
+    ITD_ASSERT(m_material_stack.size() > 0,
+               "Can't pop from empty material stack");
 
     Material *was = m_batch_front.material;
     Material *material = m_material_stack.back();
@@ -248,7 +249,7 @@ void Renderer::push_matrix(const glm::mat4 &matrix, bool absolute)
 
 glm::mat4 Renderer::pop_matrix()
 {
-    assert(m_matrix_stack.size() > 0);
+    ITD_ASSERT(m_matrix_stack.size() > 0, "Can't pop from empty matrix stack");
 
     glm::mat4 was = m_matrix;
     m_matrix = m_matrix_stack.back();
@@ -277,7 +278,8 @@ void Renderer::begin()
 void Renderer::tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
                    const glm::vec2 &pos2, Color color)
 {
-    assert(m_vertex_map && m_index_map);
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
 
     push_triangle(pos0.x, pos0.y, pos1.x, pos1.y, pos2.x, pos2.y, 0, 0, 0, 0, 0,
                   0, color, color, color, 0, 0, 255);
@@ -290,7 +292,8 @@ void Renderer::rect(const Rectf &r, Color color)
 
 void Renderer::rect(const glm::vec2 &bl, const glm::vec2 &tr, Color color)
 {
-    assert(m_vertex_map && m_index_map);
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
 
     push_quad(bl.x, bl.y, bl.x, tr.y, tr.x, tr.y, tr.x, bl.y, 0, 0, 0, 0, 0, 0,
               0, 0, color, color, color, color, 0, 0, 255);
@@ -319,7 +322,8 @@ void Renderer::quad(const Quadf &q, Color color)
 void Renderer::quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
                     const glm::vec2 &d, Color color)
 {
-    assert(m_vertex_map && m_index_map);
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
 
     push_quad(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y, 0, 0, 0, 0, 0, 0, 0, 0,
               color, color, color, color, 0, 0, 255);
@@ -361,7 +365,8 @@ void Renderer::circ(const glm::vec2 &center, float radius, unsigned int steps,
 
 void Renderer::tex(const Texture *texture, const glm::vec2 &pos, Color color)
 {
-    assert(m_vertex_map && m_index_map);
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
 
     set_texture(texture);
 
@@ -375,7 +380,8 @@ void Renderer::tex(const Texture *texture, const glm::vec2 &pos, Color color)
 void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos,
                    Color color)
 {
-    assert(m_vertex_map && m_index_map);
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
 
     // TODO: Check if texture is set?
     set_texture(subtexture.get_texture());
@@ -409,7 +415,8 @@ void Renderer::end()
 
 void Renderer::render(const glm::mat4 &matrix)
 {
-    assert(!m_vertex_map && !m_index_map);
+    ITD_ASSERT(!m_vertex_map && !m_index_map,
+               "Render phase has not been ended");
 
     // Nothing to draw
     if (m_batches.size() == 0 && m_batch_front.count == 0)
@@ -435,7 +442,7 @@ void Renderer::render(const glm::mat4 &matrix)
         }
 
         const Shader *shader = batch.material->shader();
-        assert(shader);
+        ITD_ASSERT(shader, "Material must have shader");
 
         glUseProgram(shader->id());
 

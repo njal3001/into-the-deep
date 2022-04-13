@@ -2,6 +2,7 @@
 #include "image.h"
 
 #include "../third_party/stb_image.h"
+#include "../debug.h"
 
 namespace ITD {
 
@@ -25,12 +26,12 @@ Image::~Image()
 
 void Image::load(const std::string &filename)
 {
-    assert(!m_pixels);
+    ITD_ASSERT(!m_pixels, "Can't load image multiple times");
 
     int x, y, comp;
     unsigned char *data = stbi_load(filename.c_str(), &x, &y, &comp, 0);
 
-    assert(data);
+    ITD_ASSERT(data, "Could not load image data");
 
     m_pixels = (Color *)data;
     m_width = (size_t)x;

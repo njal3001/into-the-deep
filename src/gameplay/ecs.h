@@ -1,10 +1,10 @@
 #pragma once
-#include <assert.h>
 #include <list>
 #include <vector>
+#include "../debug.h"
 #include "../graphics/renderer.h"
-#include "collisionhandler.h"
 #include "camera.h"
+#include "collisionhandler.h"
 
 namespace ITD {
 
@@ -180,14 +180,14 @@ private:
 template <class T>
 T *Component::get() const
 {
-    assert(m_entity);
+    ITD_ASSERT(m_entity, "Component must have an entity");
     return m_entity->get<T>();
 }
 
 template <class T>
 void Entity::add(T *component)
 {
-    assert(m_scene);
+    ITD_ASSERT(m_scene, "Entity must be part of a scene");
 
     uint8_t type = Component::Types::id<T>();
     component->m_type = type;

@@ -1,5 +1,5 @@
 #include "shader.h"
-#include <assert.h>
+#include "../debug.h"
 
 namespace ITD {
 
@@ -23,8 +23,7 @@ Shader::Shader(const std::string &vert_str, const std::string &frag_str)
     if (log_length)
     {
         glDeleteShader(vert);
-        printf("%s", log);
-        assert(false);
+        ITD_ASSERT(false, log);
     }
 
     glShaderSource(frag, 1, &frag_src, NULL);
@@ -36,8 +35,7 @@ Shader::Shader(const std::string &vert_str, const std::string &frag_str)
     {
         glDeleteShader(vert);
         glDeleteShader(frag);
-        printf("%s", log);
-        assert(false);
+        ITD_ASSERT(false, log);
     }
 
     m_id = glCreateProgram();
@@ -55,8 +53,7 @@ Shader::Shader(const std::string &vert_str, const std::string &frag_str)
     // Check if shader linking failed
     if (log_length)
     {
-        printf("%s", log);
-        assert(false);
+        ITD_ASSERT(false, log);
     }
 
     // Get uniforms

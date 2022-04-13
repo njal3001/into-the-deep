@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 
 #include "../platform.h"
+#include "../debug.h"
 
 #ifdef _WIN32
 #    define WIN32_LEAN_AND_MEAN
@@ -23,7 +24,68 @@ void APIENTRY gl_message_callback(GLenum source, GLenum type, GLuint id,
         return;
     }
 
-    printf("%s", message);
+    const char *type_name = "";
+    const char *severity_name = "";
+
+    switch (type)
+    {
+        case GL_DEBUG_TYPE_ERROR:
+            type_name = "ERROR";
+            break;
+        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+            type_name = "DEPRECATED BEHAVIOR";
+            break;
+        case GL_DEBUG_TYPE_MARKER:
+            type_name = "MARKER";
+            break;
+        case GL_DEBUG_TYPE_OTHER:
+            type_name = "OTHER";
+            break;
+        case GL_DEBUG_TYPE_PERFORMANCE:
+            type_name = "PEROFRMANCE";
+            break;
+        case GL_DEBUG_TYPE_POP_GROUP:
+            type_name = "POP GROUP";
+            break;
+        case GL_DEBUG_TYPE_PORTABILITY:
+            type_name = "PORTABILITY";
+            break;
+        case GL_DEBUG_TYPE_PUSH_GROUP:
+            type_name = "PUSH GROUP";
+            break;
+        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+            type_name = "UNDEFINED BEHAVIOR";
+            break;
+    }
+
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_HIGH:
+            severity_name = "HIGH";
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            severity_name = "MEDIUM";
+            break;
+        case GL_DEBUG_SEVERITY_LOW:
+            severity_name = "LOW";
+            break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION:
+            severity_name = "NOTIFICATION";
+            break;
+    }
+
+    if (type == GL_DEBUG_TYPE_ERROR)
+    {
+        Log::error("GL (%s:%s) %s", type_name, severity_name, message);
+    }
+    else if (severity != GL_DEBUG_SEVERITY_NOTIFICATION)
+    {
+        Log::warn("GL (%s:%s) %s", type_name, severity_name, message);
+    }
+    else
+    {
+        Log::info("GL (%s) %s", type_name, message);
+    }
 }
 
 namespace {
@@ -87,7 +149,8 @@ void Graphics::update_viewport(const glm::ivec2 &window_size)
     glEnable(GL_SCISSOR_TEST);
 
     // Keep viewport centered
-    glm::vec2 offset = glm::vec2((window_size.x - viewport_size.x) / 2.0f, (window_size.y - viewport_size.y) / 2.0f);
+    glm::vec2 offset = glm::vec2((window_size.x - viewport_size.x) / 2.0f,
+                                 (window_size.y - viewport_size.y) / 2.0f);
     glScissor(offset.x, offset.y, viewport_size.x, viewport_size.y);
     glViewport(offset.x, offset.y, viewport_size.x, viewport_size.y);
 }

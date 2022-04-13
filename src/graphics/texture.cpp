@@ -1,10 +1,9 @@
 #include "texture.h"
-#include <assert.h>
+#include "../debug.h"
 
 namespace ITD {
 
-Texture::Texture(size_t width, size_t height,
-                 const unsigned char *data)
+Texture::Texture(size_t width, size_t height, const unsigned char *data)
     : Texture()
 {
     load(width, height, data);
@@ -23,11 +22,11 @@ Texture::Texture()
 {
 }
 
-void Texture::load(size_t width, size_t height,
-                   const unsigned char *data)
+void Texture::load(size_t width, size_t height, const unsigned char *data)
 {
-    assert(m_id == 0);
-    assert(width > 0 && height > 0);
+    ITD_ASSERT(m_id == 0, "Can not load texture multiple times");
+    ITD_ASSERT(width > 0 && height > 0,
+               "Texture width and height must be greater than 0");
 
     m_width = width;
     m_height = height;

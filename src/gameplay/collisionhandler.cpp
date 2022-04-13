@@ -16,7 +16,7 @@ CollisionHandler::CollisionHandler()
 
 void CollisionHandler::init(Scene *scene)
 {
-    assert(!m_scene);
+    ITD_ASSERT(!m_scene, "Can't initialize collision handler multiple times");
     m_scene = scene;
 
     const Tilemap *map = m_scene->map();

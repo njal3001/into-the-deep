@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
+#include "debug.h"
 #include "gameplay/animator.h"
 #include "gameplay/chaser.h"
 #include "gameplay/collider.h"
@@ -45,8 +45,8 @@ int main()
     Tilemap map("Level_0");
     Scene scene(&map);
 
-    glm::mat4 screen_matrix =
-        glm::ortho(0.0f, Graphics::pixel_screen_size.x, 0.0f, Graphics::pixel_screen_size.y);
+    glm::mat4 screen_matrix = glm::ortho(0.0f, Graphics::pixel_screen_size.x,
+                                         0.0f, Graphics::pixel_screen_size.y);
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds

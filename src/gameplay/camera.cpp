@@ -15,7 +15,7 @@ Camera::Camera()
 
 void Camera::init(const Scene *scene)
 {
-    assert(!m_scene);
+    ITD_ASSERT(!m_scene, "Can't initialize camera multiple times");
     m_scene = scene;
 }
 
@@ -48,7 +48,6 @@ glm::vec2 Camera::to_screen_center(const glm::vec2 &pos)
 
 void Camera::update(float elapsed)
 {
-    // TODO: Approach target
     m_pos = Calc::approach(m_pos, m_target, speed * elapsed);
 }
 
