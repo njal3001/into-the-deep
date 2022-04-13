@@ -101,6 +101,7 @@ void Torpedo::explode()
                       explosion_duration,
                       glm::vec2(explosion_width, explosion_height),
                       col->get_rotation(), Mask::Enemy);
+
     tracker->destroy();
     m_entity->destroy();
 }

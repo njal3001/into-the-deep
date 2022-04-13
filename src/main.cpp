@@ -18,6 +18,7 @@
 #include "input.h"
 #include "maths/shapes.h"
 #include "platform.h"
+#include "sound.h"
 
 int main()
 {

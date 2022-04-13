@@ -2,11 +2,14 @@
 #include <glm/gtx/vector_angle.hpp>
 #include "../input.h"
 #include "../maths/calc.h"
+#include "../platform.h"
 #include "animator.h"
 #include "collider.h"
 #include "hurtable.h"
 #include "mover.h"
 #include "torpedo.h"
+#include "../sound.h"
+#include "content.h"
 
 namespace ITD {
 
@@ -67,6 +70,9 @@ void Player::update(float elapsed)
             mover->approach_target = false;
             m_dash_timer = dash_time;
             m_dash_cooldown_timer = dash_cooldown;
+
+            Sound *sfx = Content::find_sound("dash");
+            sfx->play();
         }
     }
     else if (m_dash_timer <= 0.0f)
@@ -102,6 +108,9 @@ void Player::update(float elapsed)
             m_torpedo_ammo--;
 
             mover->vel -= mover->facing * shoot_knockback;
+
+            Sound *shoot_sfx = Content::find_sound("shoot");
+            shoot_sfx->play();
         }
     }
     else
@@ -138,6 +147,11 @@ Entity *Player::create(Scene *scene, const glm::vec2 &pos)
 
     Hurtable *hur = new Hurtable();
     hur->health = 5;
+    hur->on_hurt = [](Hurtable *self, const glm::vec2 &force) {
+        Sound *sfx = Content::find_sound("hurt");
+        sfx->play();
+    };
+
     ent->add(hur);
 
     Animator *ani =

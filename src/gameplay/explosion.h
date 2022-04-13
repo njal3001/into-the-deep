@@ -11,6 +11,8 @@ private:
 public:
     Explosion(float duration);
 
+    void awake() override;
+
     void update(float elapsed) override;
     void render(Renderer *renderer) override;
 

@@ -2,12 +2,19 @@
 #include "collider.h"
 #include "hurtable.h"
 #include "mover.h"
+#include "content.h"
 
 namespace ITD {
 
 Explosion::Explosion(float duration)
     : m_duration_timer(duration)
 {
+}
+
+void Explosion::awake()
+{
+    Sound *sfx = Content::find_sound("explosion");
+    sfx->play();
 }
 
 void Explosion::update(float elapsed)

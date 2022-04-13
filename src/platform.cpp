@@ -1,4 +1,6 @@
 #include "platform.h"
+#include <SDL2/SDL_mixer.h>
+#include "debug.h"
 #include "graphics/graphics.h"
 #include "input.h"
 
@@ -13,19 +15,29 @@ namespace {
 
 bool Platform::init()
 {
-    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER |
+             SDL_INIT_AUDIO);
 
     g_window = SDL_CreateWindow("Into The Deep", SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED, 960, 540,
                                 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    if (!g_window)
+    {
+        Log::error("Could not create window");
+    }
 
-    // SDL_SetWindowFullscreen(g_window, SDL_WINDOW_FULLSCREEN);
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+    {
+        Log::error("Could not initialize audio");
+        return false;
+    }
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
     if (!Graphics::init())
     {
+        Log::error("Could not initialize graphics");
         return false;
     }
 
@@ -85,6 +97,7 @@ bool Platform::update()
 void Platform::shutdown()
 {
     Graphics::shutdown();
+    Mix_Quit();
     SDL_DestroyWindow(g_window);
     SDL_free((void *)g_app_path);
     SDL_Quit();
