@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 #include "gameplay/animator.h"
 #include "gameplay/chaser.h"
@@ -9,17 +10,14 @@
 #include "gameplay/mover.h"
 #include "gameplay/player.h"
 #include "gameplay/playerhud.h"
-#include "gameplay/torpedo.h"
 #include "gameplay/tilemap.h"
+#include "gameplay/torpedo.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
 #include "graphics/renderer.h"
 #include "input.h"
 #include "maths/shapes.h"
 #include "platform.h"
-
-constexpr float screen_width = 540.0f;
-constexpr float screen_height = 360.f;
 
 int main()
 {
@@ -33,7 +31,7 @@ int main()
     Scene::register_component<Chaser>(Property::Updatable |
                                       Property::Renderable);
     Scene::register_component<Torpedo>(Property::Updatable |
-                                      Property::Renderable);
+                                       Property::Renderable);
     Scene::register_component<Hurtable>(Property::Updatable);
     Scene::register_component<PlayerHUD>(Property::HUD);
     Scene::register_component<Explosion>(Property::Updatable |
@@ -45,9 +43,10 @@ int main()
     Renderer renderer;
 
     Tilemap map("Level_0");
-    Scene scene(&map, glm::vec2(screen_width, screen_height));
+    Scene scene(&map);
 
-    glm::mat4 screen_matrix = glm::ortho(0.0f, screen_width, 0.0f, screen_height);
+    glm::mat4 screen_matrix =
+        glm::ortho(0.0f, Graphics::pixel_screen_size.x, 0.0f, Graphics::pixel_screen_size.y);
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds
@@ -71,6 +70,11 @@ int main()
         if (Input::keyboard()->pressed[SDL_SCANCODE_F12])
         {
             scene.toggle_debug_mode();
+        }
+
+        if (Input::keyboard()->pressed[SDL_SCANCODE_F11])
+        {
+            Platform::toggle_fullscreen();
         }
 
         renderer.begin();

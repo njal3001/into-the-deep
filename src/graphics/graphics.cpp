@@ -54,6 +54,8 @@ bool Graphics::init()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glEnable(GL_SCISSOR_TEST);
+
     return true;
 }
 
@@ -62,6 +64,32 @@ void Graphics::clear(Color color)
     glClearColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f,
                  color.a / 255.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Graphics::update_viewport(const glm::ivec2 &window_size)
+{
+    float aspect_ratio = pixel_screen_size.x / (float)pixel_screen_size.y;
+
+    glm::ivec2 viewport_size = window_size;
+
+    if (window_size.x / aspect_ratio > window_size.y)
+    {
+        viewport_size.x = window_size.y * aspect_ratio;
+    }
+    else
+    {
+        viewport_size.y = window_size.x / aspect_ratio;
+    }
+
+    // Clear whole screen to black
+    glDisable(GL_SCISSOR_TEST);
+    clear(Color::black);
+    glEnable(GL_SCISSOR_TEST);
+
+    // Keep viewport centered
+    glm::vec2 offset = glm::vec2((window_size.x - viewport_size.x) / 2.0f, (window_size.y - viewport_size.y) / 2.0f);
+    glScissor(offset.x, offset.y, viewport_size.x, viewport_size.y);
+    glViewport(offset.x, offset.y, viewport_size.x, viewport_size.y);
 }
 
 void Graphics::present()

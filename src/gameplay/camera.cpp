@@ -2,6 +2,7 @@
 #include "ecs.h"
 #include "player.h"
 #include "tilemap.h"
+#include "../graphics/graphics.h"
 
 namespace ITD {
 
@@ -33,16 +34,14 @@ void Camera::set_target(const glm::vec2 &target)
 // in the center of the screen
 glm::vec2 Camera::to_screen_center(const glm::vec2 &pos)
 {
-    glm::vec2 screen_size = m_scene->screen_size();
+    glm::vec2 pixel_screen_size = Graphics::pixel_screen_size;
     const Tilemap *map = m_scene->map();
 
-    glm::vec2 screen_center = screen_size / 2.0f;
+    glm::vec2 cam_pos = pos - pixel_screen_size / 2.0f;
 
-    glm::vec2 cam_pos = pos - screen_center;
-
-    // // TODO: Why plus one?
-    cam_pos.x = std::clamp(cam_pos.x, 0.0f, map->pixel_width() - screen_size.x - 1.0f);
-    cam_pos.y = std::clamp(cam_pos.y, 0.0f, map->pixel_height() - screen_size.y);
+    // TODO: Why minus one?
+    cam_pos.x = std::clamp(cam_pos.x, 0.0f, map->pixel_width() - pixel_screen_size.x - 1.0f);
+    cam_pos.y = std::clamp(cam_pos.y, 0.0f, map->pixel_height() - pixel_screen_size.y - 1.0f);
 
     return cam_pos;
 }

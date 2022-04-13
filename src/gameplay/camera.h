@@ -10,7 +10,7 @@ class Camera
 {
 private:
     // TODO: Make this configurable?
-    static constexpr float speed = 100.0f;
+    static constexpr float speed = 150.0f;
 
     const Scene *m_scene;
     glm::vec2 m_pos;

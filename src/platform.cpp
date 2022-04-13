@@ -15,9 +15,11 @@ bool Platform::init()
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 
-    g_window =
-        SDL_CreateWindow("Into The Deep", SDL_WINDOWPOS_CENTERED,
-                         SDL_WINDOWPOS_CENTERED, 960, 540, SDL_WINDOW_OPENGL);
+    g_window = SDL_CreateWindow("Into The Deep", SDL_WINDOWPOS_CENTERED,
+                                SDL_WINDOWPOS_CENTERED, 960, 540,
+                                SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+
+    // SDL_SetWindowFullscreen(g_window, SDL_WINDOW_FULLSCREEN);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -65,6 +67,14 @@ bool Platform::update()
                 g_joystick = nullptr;
             }
         }
+        else if (event.type == SDL_WINDOWEVENT)
+        {
+            if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                Graphics::update_viewport(
+                    glm::ivec2(event.window.data1, event.window.data2));
+            }
+        }
     }
 
     Input::update();
@@ -100,6 +110,12 @@ uint64_t Platform::ticks()
     auto counter = SDL_GetPerformanceCounter();
     auto freq = (double)SDL_GetPerformanceFrequency();
     return (uint64_t)(counter * (ticks_per_sec / freq));
+}
+
+void Platform::toggle_fullscreen()
+{
+    bool is_fullscreen = SDL_GetWindowFlags(g_window) & SDL_WINDOW_FULLSCREEN;
+    SDL_SetWindowFullscreen(g_window, (!is_fullscreen) * SDL_WINDOW_FULLSCREEN);
 }
 
 }  // namespace ITD

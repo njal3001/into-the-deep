@@ -8,12 +8,12 @@ namespace ITD {
 
 namespace Calc {
 
-    static const float TAU = 2.0f * M_PI;
+    const float TAU = 2.0f * M_PI;
 
-    static constexpr glm::vec2 right = glm::vec2(1.0f, 0.0f);
-    static constexpr glm::vec2 left = glm::vec2(-1.0f, 0.0f);
-    static constexpr glm::vec2 up = glm::vec2(0.0f, 1.0f);
-    static constexpr glm::vec2 down = glm::vec2(0.0f, -1.0f);
+    constexpr glm::vec2 right = glm::vec2(1.0f, 0.0f);
+    constexpr glm::vec2 left = glm::vec2(-1.0f, 0.0f);
+    constexpr glm::vec2 up = glm::vec2(0.0f, 1.0f);
+    constexpr glm::vec2 down = glm::vec2(0.0f, -1.0f);
 
     template <class T>
     glm::tvec2<T> normalize(const glm::tvec2<T> &vec)

@@ -19,6 +19,8 @@ namespace Platform {
     std::string app_path();
 
     uint64_t ticks();
+
+    void toggle_fullscreen();
 }  // namespace Platform
 
 }  // namespace ITD

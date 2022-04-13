@@ -4,9 +4,8 @@
 
 namespace ITD {
 
-Scene::Scene(Tilemap *map, const glm::vec2 &screen_size)
+Scene::Scene(Tilemap *map)
     : m_tilemap(map)
-    , m_screen_size(screen_size)
     , m_freeze_timer(0.0f)
     , m_debug(false)
 {
@@ -175,11 +174,6 @@ CollisionHandler *Scene::collision_handler()
 Camera *Scene::camera()
 {
     return &m_camera;
-}
-
-glm::vec2 Scene::screen_size() const
-{
-    return m_screen_size;
 }
 
 void Scene::toggle_debug_mode()

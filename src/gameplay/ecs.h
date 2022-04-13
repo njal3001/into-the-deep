@@ -134,8 +134,6 @@ private:
 
     Tilemap *m_tilemap;
     CollisionHandler m_collision_handler;
-
-    glm::vec2 m_screen_size;
     Camera m_camera;
 
     float m_freeze_timer;
@@ -145,7 +143,7 @@ private:
     static inline uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = {Property::None};
 
 public:
-    Scene(Tilemap *map, const glm::vec2 &screen_size);
+    Scene(Tilemap *map);
     ~Scene();
 
     template <class T>
@@ -172,8 +170,6 @@ public:
     const Tilemap *map() const;
     CollisionHandler *collision_handler();
     Camera *camera();
-
-    glm::vec2 screen_size() const;
 
     void toggle_debug_mode();
 
