@@ -17,6 +17,11 @@ Torpedo::Torpedo()
 {
 }
 
+void Torpedo::death_notification(Component *dead)
+{
+    m_target = nullptr;
+}
+
 void Torpedo::update(float elapsed)
 {
     m_life_timer -= elapsed;
@@ -54,6 +59,12 @@ void Torpedo::update(float elapsed)
                     m_target = other->entity();
                 }
             }
+
+            if (m_target)
+            {
+                Collider *target_collider = m_target->get<Collider>();
+                target_collider->notify_on_death(this);
+            }
         }
 
         Mover *mov = get<Mover>();
@@ -75,6 +86,16 @@ void Torpedo::update(float elapsed)
 
 void Torpedo::explode()
 {
+    if (m_target)
+    {
+        Collider *target_collider = m_target->get<Collider>();
+        if (target_collider)
+        {
+            target_collider->stop_notify_on_death(this);
+            m_target = nullptr;
+        }
+    }
+
     Collider *col = get<Collider>();
     Explosion::create(scene(), m_entity->get_pos() + col->get_bounds().center(),
                       explosion_duration,

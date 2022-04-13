@@ -171,7 +171,7 @@ void CollisionHandler::update()
     {
         for (auto col : m_dynamic_colliders)
         {
-            if (col->active)
+            if (col->alive() && col->active)
             {
                 const Recti &buc_box = col->m_bucket_box;
                 const glm::ivec2 &bl = buc_box.bl;
@@ -189,7 +189,7 @@ void CollisionHandler::update()
 
                         for (Collider *ocol : bucket)
                         {
-                            if (ocol->active && col != ocol &&
+                            if (ocol->alive() && ocol->active && col != ocol &&
                                 ((col->collides_with & ocol->mask) ||
                                  (ocol->collides_with & col->mask)))
                             {

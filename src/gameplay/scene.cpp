@@ -24,8 +24,9 @@ Scene::~Scene()
 
     for (auto iter = m_entities.begin(); iter != m_entities.end();)
     {
+        (*iter)->removed();
         delete *iter;
-        iter = m_to_add.erase(iter);
+        iter = m_entities.erase(iter);
     }
 }
 

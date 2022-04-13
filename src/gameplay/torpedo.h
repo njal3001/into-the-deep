@@ -27,6 +27,8 @@ public:
 public:
     Torpedo();
 
+    void death_notification(Component *dead) override;
+
     void update(const float elapsed) override;
 
     static Entity *create(Scene *scene, const glm::vec2 &pos,

@@ -33,6 +33,8 @@ void Collider::awake()
 
 void Collider::on_removed()
 {
+    Component::on_removed();
+
     if (m_dynamic)
     {
         scene()->collision_handler()->deregister_dynamic(this);

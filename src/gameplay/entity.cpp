@@ -67,7 +67,10 @@ void Entity::removed()
     for (auto c : m_components)
     {
         m_scene->untrack_component(c);
+        c->destroy();
         c->on_removed();
+
+        c->m_entity = nullptr;
     }
 
     m_scene = nullptr;

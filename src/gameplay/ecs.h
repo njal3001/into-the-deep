@@ -34,6 +34,7 @@ private:
     bool m_alive;
 
     std::list<Component *>::iterator m_iterator;
+    std::vector<Component *> m_death_listeners;
 
     class Types
     {
@@ -68,6 +69,10 @@ public:
 
     template <class T>
     T *get() const;
+
+    void notify_on_death(Component *listener);
+    void stop_notify_on_death(Component *listener);
+    virtual void death_notification(Component *dead);
 
     virtual void destroy();
 

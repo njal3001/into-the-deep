@@ -144,6 +144,7 @@ void Graphics::update_viewport(const glm::ivec2 &window_size)
     }
 
     // Clear whole screen to black
+    // TODO: Might be slow?
     glDisable(GL_SCISSOR_TEST);
     clear(Color::black);
     glEnable(GL_SCISSOR_TEST);
