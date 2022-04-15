@@ -34,19 +34,27 @@ void Chaser::update(float elapsed)
 {
     Collider *collider = get<Collider>();
     Mover *mover = get<Mover>();
-    float moving = 1.0f;
+    float moving = 0.0f;
+
+    Player *player = nullptr;
 
     auto pfirst = scene()->first<Player>();
     if (pfirst != scene()->end<Player>())
     {
-        // Rotate towards player
         Player *player = (Player *)*pfirst;
-        glm::vec2 dir = Calc::normalize(player->entity()->get_pos() - entity()->get_pos());
-        mover->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
-    }
-    else
-    {
-        moving = 0.0f;
+
+        glm::vec2 player_diff =
+            player->entity()->get_pos() - m_entity->get_pos();
+        float player_distance = glm::length(player_diff);
+        if (player_distance <= aggro_range)
+        {
+            moving = 1.0f;
+
+            glm::vec2 dir = Calc::normalize(player->entity()->get_pos() -
+                                            m_entity->get_pos());
+            mover->rotate_towards(dir,
+                                  Calc::TAU * rotation_multiplier * elapsed);
+        }
     }
 
     mover->target_speed = max_speed * moving;

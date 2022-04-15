@@ -8,8 +8,6 @@
 
 namespace ITD {
 
-#define MAX_COMPONENT_TYPES 256
-
 class Entity;
 class Scene;
 
@@ -34,7 +32,6 @@ private:
     bool m_alive;
 
     std::list<Component *>::iterator m_iterator;
-    std::vector<Component *> m_death_listeners;
 
     class Types
     {
@@ -70,10 +67,6 @@ public:
     template <class T>
     T *get() const;
 
-    void notify_on_death(Component *listener);
-    void stop_notify_on_death(Component *listener);
-    virtual void death_notification(Component *dead);
-
     virtual void destroy();
 
     virtual void update(float elapsed);
@@ -102,6 +95,8 @@ private:
 
     std::list<Entity *>::iterator m_iterator;
 
+    uint32_t m_id;
+
 public:
     Entity(const glm::vec2 &pos);
     ~Entity();
@@ -112,6 +107,8 @@ public:
 
     bool alive() const;
     Scene *scene() const;
+
+    uint32_t id() const;
 
     template <class T>
     void add(T *component);
@@ -132,10 +129,27 @@ class Tilemap;
 
 class Scene
 {
+public:
+    static const uint16_t max_component_types = 256;
+    static const uint16_t max_entities = 1024;
+
 private:
+    struct EntityRef
+    {
+        uint16_t version;
+        Entity *entity;
+
+        EntityRef();
+    };
+
+    // TODO: Shift away from linked lists
     std::list<Entity *> m_entities;
     std::list<Entity *> m_to_add;
-    std::list<Component *> m_components[MAX_COMPONENT_TYPES];
+    std::list<Component *> m_components[max_component_types];
+
+    EntityRef m_entity_registry[max_entities];
+    uint16_t m_entity_registry_tail;
+    std::vector<uint16_t> m_entity_freelist;
 
     Tilemap *m_tilemap;
     CollisionHandler m_collision_handler;
@@ -145,7 +159,7 @@ private:
 
     bool m_debug;
 
-    static inline uint8_t s_prop_masks[MAX_COMPONENT_TYPES] = {Property::None};
+    static inline uint8_t s_prop_masks[max_component_types] = {Property::None};
 
 public:
     Scene(Tilemap *map);
@@ -156,6 +170,8 @@ public:
 
     Entity *add_entity(const glm::vec2 &pos);
     void remove_entity(Entity *entity);
+
+    Entity *get_entity(uint32_t id);
 
     void track_component(Component *component);
     void untrack_component(Component *component);

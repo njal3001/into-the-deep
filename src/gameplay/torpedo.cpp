@@ -12,14 +12,10 @@ namespace ITD {
 
 Torpedo::Torpedo()
     : m_life_timer(life_time)
-    , m_target(nullptr)
+    , m_target_id(0)
     , tracker(nullptr)
-{
-}
 
-void Torpedo::death_notification(Component *dead)
 {
-    m_target = nullptr;
 }
 
 void Torpedo::update(float elapsed)
@@ -33,7 +29,7 @@ void Torpedo::update(float elapsed)
     {
         Collider *collider = get<Collider>();
         Collider *tracker_collider = tracker->get<Collider>();
-        if (!m_target && tracker_collider)
+        if (!m_target_id && tracker_collider)
         {
             // Update tracker position and rotation
             glm::vec2 tracker_dir =
@@ -56,25 +52,28 @@ void Torpedo::update(float elapsed)
                 if (dist < min_dist)
                 {
                     min_dist = dist;
-                    m_target = other->entity();
+                    m_target_id = other->entity()->id();
                 }
-            }
-
-            if (m_target)
-            {
-                Collider *target_collider = m_target->get<Collider>();
-                target_collider->notify_on_death(this);
             }
         }
 
         Mover *mov = get<Mover>();
         glm::vec2 facing;
-        if (m_target)
+        if (m_target_id)
         {
-            glm::vec2 dir =
-                Calc::normalize(m_target->get_pos() - entity()->get_pos());
+            Entity *target = scene()->get_entity(m_target_id);
 
-            mov->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
+            if (target)
+            {
+                glm::vec2 dir =
+                    Calc::normalize(target->get_pos() - entity()->get_pos());
+
+                mov->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
+            }
+            else
+            {
+                m_target_id = 0;
+            }
         }
 
         collider->face_towards(mov->facing);
@@ -86,16 +85,6 @@ void Torpedo::update(float elapsed)
 
 void Torpedo::explode()
 {
-    if (m_target)
-    {
-        Collider *target_collider = m_target->get<Collider>();
-        if (target_collider)
-        {
-            target_collider->stop_notify_on_death(this);
-            m_target = nullptr;
-        }
-    }
-
     Collider *col = get<Collider>();
     Explosion::create(scene(), m_entity->get_pos() + col->get_bounds().center(),
                       explosion_duration,

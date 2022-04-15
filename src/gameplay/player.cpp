@@ -66,6 +66,7 @@ void Player::update(float elapsed)
     {
         if (m_player_input.consume_dash())
         {
+            mover->facing = dir;
             mover->vel = mover->facing * dash_speed;
             mover->approach_target = false;
             m_dash_timer = dash_time;

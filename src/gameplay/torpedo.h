@@ -19,15 +19,13 @@ private:
     static constexpr float max_speed = 220.0f;
 
     float m_life_timer;
-    Entity *m_target;
+    uint32_t m_target_id;
 
 public:
     Entity *tracker;
 
 public:
     Torpedo();
-
-    void death_notification(Component *dead) override;
 
     void update(const float elapsed) override;
 

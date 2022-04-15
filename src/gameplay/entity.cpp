@@ -57,6 +57,11 @@ bool Entity::alive() const
     return m_alive;
 }
 
+uint32_t Entity::id() const
+{
+    return m_id;
+}
+
 Scene *Entity::scene() const
 {
     return m_scene;

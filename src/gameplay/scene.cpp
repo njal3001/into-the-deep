@@ -4,10 +4,17 @@
 
 namespace ITD {
 
+Scene::EntityRef::EntityRef()
+    : version(1)
+    , entity(nullptr)
+{
+}
+
 Scene::Scene(Tilemap *map)
     : m_tilemap(map)
     , m_freeze_timer(0.0f)
     , m_debug(false)
+    , m_entity_registry_tail(0)
 {
     map->fill_scene(this);
     m_collision_handler.init(this);
@@ -52,6 +59,21 @@ void Scene::untrack_component(Component *component)
     m_components[component->type()].erase(component->m_iterator);
 }
 
+Entity *Scene::get_entity(uint32_t id)
+{
+    uint16_t index = id & 0xFFFF;
+    uint16_t version = (id >> 16) & 0xFFFF;
+
+    EntityRef *ref = &m_entity_registry[index];
+
+    if (ref->version != version)
+    {
+        return nullptr;
+    }
+
+    return ref->entity;
+}
+
 void Scene::update(float elapsed)
 {
     if (m_freeze_timer > 0)
@@ -87,10 +109,25 @@ void Scene::update_lists()
 {
     for (auto iter = m_entities.begin(); iter != m_entities.end();)
     {
-        if (!(*iter)->m_alive)
+        Entity *ent = *iter;
+        if (!ent->m_alive)
         {
-            (*iter)->removed();
-            delete *iter;
+            uint16_t index = ent->m_id & 0xFFFF;
+            EntityRef *ref = &m_entity_registry[index];
+            ref->version++;
+            ref->entity = nullptr;
+
+            if (index == m_entity_registry_tail - 1)
+            {
+                m_entity_registry_tail--;
+            }
+            else
+            {
+                m_entity_freelist.push_back(index);
+            }
+
+            ent->removed();
+            delete ent;
             iter = m_entities.erase(iter);
         }
         else
@@ -101,9 +138,31 @@ void Scene::update_lists()
 
     for (auto iter = m_to_add.begin(); iter != m_to_add.end();)
     {
-        m_entities.push_back(*iter);
-        (*iter)->m_iterator = --m_entities.end();
+        Entity *ent = *iter;
+        m_entities.push_back(ent);
+        ent->m_iterator = --m_entities.end();
         iter = m_entities.erase(iter);
+
+        ITD_ASSERT(m_entity_registry_tail < max_entities ||
+                       m_entity_freelist.size() > 0,
+                   "Exceeded max entities");
+
+        uint16_t index;
+        if (m_entity_registry_tail < max_entities)
+        {
+            index = m_entity_registry_tail;
+            m_entity_registry_tail++;
+        }
+        else
+        {
+            index = m_entity_freelist.back();
+            m_entity_freelist.pop_back();
+        }
+
+        EntityRef *ref = &m_entity_registry[index];
+        ref->entity = ent;
+
+        ent->m_id = (ref->version << 16) | index;
     }
 }
 
