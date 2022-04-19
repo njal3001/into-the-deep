@@ -23,11 +23,6 @@ Player::Player()
 {
 }
 
-void Player::awake()
-{
-    scene()->camera()->set_pos(m_entity->get_pos());
-}
-
 void Player::update(float elapsed)
 {
     m_player_input.update(elapsed);
@@ -123,8 +118,6 @@ void Player::update(float elapsed)
 
     auto anim = get<Animator>();
     anim->rotation = col->get_rotation();
-
-    scene()->camera()->set_target(m_entity->get_pos());
 }
 
 int Player::torpedo_ammo() const

@@ -12,18 +12,22 @@ void PlayerHUD::render(Renderer *renderer)
         const Player *player = (Player *)*pfirst;
         const Hurtable *hurtable = player->get<Hurtable>();
 
+        Rectf screen_bounds = scene()->screen_bounds();
+        glm::vec2 top_left = screen_bounds.top_left();
+
         glm::vec2 size = glm::vec2(width, height);
         for (int i = 0; i < hurtable->health; i++)
         {
             // TODO: Don't hardcode screen height
-            glm::vec2 pos = glm::vec2(offset_x + margin * i, 360.0f - offset_y);
+            glm::vec2 pos =
+                top_left + glm::vec2(offset_x + margin * i, -offset_y);
             renderer->rect(pos, pos + size, Color::green);
         }
 
         for (int i = 0; i < player->torpedo_ammo(); i++)
         {
             const glm::vec2 pos =
-                glm::vec2(offset_x + margin * i, 360.0f - offset_y - 10.0f);
+                top_left + glm::vec2(offset_x + margin * i, -offset_y - 10.0f);
             renderer->rect(pos, pos + size, Color::red);
         }
     }

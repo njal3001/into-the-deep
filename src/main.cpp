@@ -3,6 +3,7 @@
 
 #include "debug.h"
 #include "gameplay/animator.h"
+#include "gameplay/camera.h"
 #include "gameplay/chaser.h"
 #include "gameplay/collider.h"
 #include "gameplay/explosion.h"
@@ -44,10 +45,15 @@ int main()
     Renderer renderer;
 
     Tilemap map("Level_0");
-    Scene scene(&map);
 
-    glm::mat4 screen_matrix = glm::ortho(0.0f, Graphics::pixel_screen_size.x,
-                                         0.0f, Graphics::pixel_screen_size.y);
+    Rectf screen_bounds = Camera::make_fit(
+        glm::vec2(map.pixel_width(), map.pixel_height()), 1920.0f / 1080.0f);
+
+    Scene scene(&map, screen_bounds);
+
+    glm::mat4 screen_matrix =
+        glm::ortho(screen_bounds.bl.x, screen_bounds.tr.x, screen_bounds.bl.y,
+                   screen_bounds.tr.y);
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds
