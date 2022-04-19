@@ -11,6 +11,7 @@ namespace {
     SDL_Joystick *g_joystick = nullptr;
     uint64_t g_ticks = 0;
     const char *g_app_path;
+    bool g_muted = false;
 }  // namespace
 
 bool Platform::init()
@@ -129,6 +130,24 @@ void Platform::toggle_fullscreen()
 {
     bool is_fullscreen = SDL_GetWindowFlags(g_window) & SDL_WINDOW_FULLSCREEN;
     SDL_SetWindowFullscreen(g_window, (!is_fullscreen) * SDL_WINDOW_FULLSCREEN);
+}
+
+glm::ivec2 Platform::screen_size()
+{
+    glm::ivec2 size;
+    SDL_GetWindowSize(g_window, &size.x, &size.y);
+
+    return size;
+}
+
+void Platform::toggle_mute()
+{
+    g_muted = !g_muted;
+}
+
+bool Platform::muted()
+{
+    return g_muted;
 }
 
 }  // namespace ITD

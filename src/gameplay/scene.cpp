@@ -10,10 +10,10 @@ Scene::EntityRef::EntityRef()
 {
 }
 
-Scene::Scene(Tilemap *map, const Rectf &screen_bounds)
+Scene::Scene(Tilemap *map, const Rectf &world_bounds)
     : m_tilemap(map)
     , m_freeze_timer(0.0f)
-    , m_screen_bounds(screen_bounds)
+    , m_world_bounds(world_bounds)
     , m_debug(false)
     , m_entity_registry_tail(0)
 {
@@ -225,9 +225,9 @@ CollisionHandler *Scene::collision_handler()
     return &m_collision_handler;
 }
 
-Rectf Scene::screen_bounds() const
+Rectf Scene::world_bounds() const
 {
-    return m_screen_bounds;
+    return m_world_bounds;
 }
 
 void Scene::toggle_debug_mode()

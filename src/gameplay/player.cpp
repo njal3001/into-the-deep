@@ -3,13 +3,13 @@
 #include "../input.h"
 #include "../maths/calc.h"
 #include "../platform.h"
+#include "../sound.h"
 #include "animator.h"
 #include "collider.h"
+#include "content.h"
 #include "hurtable.h"
 #include "mover.h"
 #include "torpedo.h"
-#include "../sound.h"
-#include "content.h"
 
 namespace ITD {
 
@@ -25,17 +25,18 @@ Player::Player()
 
 void Player::update(float elapsed)
 {
-    m_player_input.update(elapsed);
-    glm::vec2 dir = m_player_input.dir();
+    m_player_input.update(this, elapsed);
+    glm::vec2 move_dir = m_player_input.move_dir();
 
     float moving = 1.0f;
 
     auto mover = get<Mover>();
 
     auto col = get<Collider>();
-    if (dir.x != 0 || dir.y != 0)
+    if (move_dir.x != 0 || move_dir.y != 0)
     {
-        mover->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
+        mover->rotate_towards(move_dir,
+                              Calc::TAU * rotation_multiplier * elapsed);
     }
     else
     {
@@ -61,7 +62,7 @@ void Player::update(float elapsed)
     {
         if (m_player_input.consume_dash())
         {
-            mover->facing = dir;
+            mover->facing = move_dir;
             mover->vel = mover->facing * dash_speed;
             mover->approach_target = false;
             m_dash_timer = dash_time;
@@ -96,14 +97,16 @@ void Player::update(float elapsed)
             auto vel_norm = Calc::normalize(mover->vel);
             float cos = glm::dot(vel_norm, mover->facing);
 
-            Torpedo::create(scene(), m_entity->get_pos(), mover->facing,
+            glm::vec2 shoot_dir = m_player_input.shoot_dir();
+
+            Torpedo::create(scene(), m_entity->get_pos(), shoot_dir,
                             std::max(0.0f, cos) * mover->vel.length() +
                                 torpedo_start_speed);
 
             m_shoot_delay_timer = shoot_delay;
             m_torpedo_ammo--;
 
-            mover->vel -= mover->facing * shoot_knockback;
+            mover->vel -= shoot_dir * shoot_knockback;
 
             Sound *shoot_sfx = Content::find_sound("shoot");
             shoot_sfx->play();

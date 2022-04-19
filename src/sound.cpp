@@ -1,5 +1,6 @@
 #include "sound.h"
 #include "debug.h"
+#include "platform.h"
 
 namespace ITD {
 
@@ -24,7 +25,8 @@ Sound::~Sound()
 
 void Sound::play(int channel, bool loop)
 {
-    if (m_data)
+    // TODO: Should propably have some audio player that plays all sounds
+    if (m_data && !Platform::muted())
     {
         Mix_PlayChannel(channel, m_data, loop);
     }

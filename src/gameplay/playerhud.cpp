@@ -12,8 +12,8 @@ void PlayerHUD::render(Renderer *renderer)
         const Player *player = (Player *)*pfirst;
         const Hurtable *hurtable = player->get<Hurtable>();
 
-        Rectf screen_bounds = scene()->screen_bounds();
-        glm::vec2 top_left = screen_bounds.top_left();
+        Rectf world_bounds = scene()->world_bounds();
+        glm::vec2 top_left = world_bounds.top_left();
 
         glm::vec2 size = glm::vec2(width, height);
         for (int i = 0; i < hurtable->health; i++)

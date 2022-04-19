@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <glm/glm.hpp>
 #include <string>
 
 namespace ITD {
@@ -21,6 +22,11 @@ namespace Platform {
     uint64_t ticks();
 
     void toggle_fullscreen();
+    glm::ivec2 screen_size();
+
+    void toggle_mute();
+    bool muted();
+
 }  // namespace Platform
 
 }  // namespace ITD

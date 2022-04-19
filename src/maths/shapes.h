@@ -63,6 +63,11 @@ struct Rect {
         return tr.y - bl.y + 1;
     }
 
+    glm::tvec2<T> size() const
+    {
+        return tr - bl + glm::tvec2<T>(1, 1);
+    }
+
     Rect operator+(const glm::tvec2<T> &rhs) const
     {
         return Rect(bl + rhs, tr + rhs);

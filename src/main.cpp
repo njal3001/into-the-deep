@@ -40,7 +40,6 @@ int main()
                                          Property::Renderable);
     Scene::register_component<Animator>(Property::Updatable |
                                         Property::Renderable);
-
     Platform::init();
     Renderer renderer;
 
@@ -82,6 +81,11 @@ int main()
         if (Input::keyboard()->pressed[SDL_SCANCODE_F11])
         {
             Platform::toggle_fullscreen();
+        }
+
+        if (Input::keyboard()->pressed[SDL_SCANCODE_F10])
+        {
+            Platform::toggle_mute();
         }
 
         renderer.begin();

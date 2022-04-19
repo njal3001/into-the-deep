@@ -155,7 +155,7 @@ private:
 
     float m_freeze_timer;
 
-    Rectf m_screen_bounds;
+    Rectf m_world_bounds;
 
     bool m_debug;
 
@@ -163,7 +163,7 @@ private:
     static inline uint8_t s_prop_masks[max_component_types] = {Property::None};
 
 public:
-    Scene(Tilemap *map, const Rectf &screen_bounds);
+    Scene(Tilemap *map, const Rectf &world_bounds);
     ~Scene();
 
     template <class T>
@@ -192,7 +192,7 @@ public:
     const Tilemap *map() const;
     CollisionHandler *collision_handler();
 
-    Rectf screen_bounds() const;
+    Rectf world_bounds() const;
     void toggle_debug_mode();
 
 private:
