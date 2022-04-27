@@ -97,7 +97,7 @@ void Player::update(float elapsed)
             auto vel_norm = Calc::normalize(mover->vel);
             float cos = glm::dot(vel_norm, mover->facing);
 
-            glm::vec2 shoot_dir = m_player_input.shoot_dir();
+            glm::vec2 shoot_dir = mover->facing;
 
             Torpedo::create(scene(), m_entity->get_pos(), shoot_dir,
                             std::max(0.0f, cos) * mover->vel.length() +

@@ -13,7 +13,7 @@ private:
     static constexpr float explosion_duration = 0.2f;
     static constexpr float explosion_width = 12.0f;
     static constexpr float explosion_height = 12.0f;
-    static constexpr float aggro_range = 200.0f;
+    static constexpr float aggro_range = 100000.0f;
 
 public:
     bool on_collide(Collider *other, const glm::vec2 &dir);

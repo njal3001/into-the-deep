@@ -59,6 +59,9 @@ int main()
 
     Color bg_color(0x29366f);
 
+    Platform::show_cursor(false);
+    Platform::toggle_mute();
+
     while (Platform::update())
     {
         // Calculate elapsed time
@@ -66,12 +69,6 @@ int main()
         uint64_t tick_diff = current_ticks - prev_ticks;
         elapsed = (tick_diff) / (float)Platform::ticks_per_sec;
         prev_ticks = current_ticks;
-
-        // Update
-        scene.update(elapsed);
-
-        // Render
-        Graphics::clear(bg_color);
 
         if (Input::keyboard()->pressed[SDL_SCANCODE_F12])
         {
@@ -87,6 +84,12 @@ int main()
         {
             Platform::toggle_mute();
         }
+
+        // Update
+        scene.update(elapsed);
+
+        // Render
+        Graphics::clear(bg_color);
 
         renderer.begin();
         scene.render(&renderer);

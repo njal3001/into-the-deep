@@ -17,16 +17,15 @@ PlayerInput::PlayerInput()
 
 void PlayerInput::update(Player *player, float elapsed)
 {
+    const Input::Keyboard *keyboard = Input::keyboard();
     const Input::Controller *controller = Input::controller();
-    const Input::Mouse *mouse = Input::mouse();
+
+    glm::vec2 player_pos = player->entity()->get_pos();
 
     if (controller->active())
     {
         m_move_dir.x = controller->axes[0];
         m_move_dir.y = -controller->axes[1];
-
-        m_shoot_dir.x = controller->axes[2];
-        m_shoot_dir.y = -controller->axes[3];
     }
     else
     {
@@ -35,34 +34,14 @@ void PlayerInput::update(Player *player, float elapsed)
 
         m_move_dir.y = Input::keyboard()->down[SDL_SCANCODE_W] -
                        Input::keyboard()->down[SDL_SCANCODE_S];
-
-        Collider *player_collider = player->get<Collider>();
-        if (player_collider)
-        {
-            Quadf quad = player_collider->quad();
-            glm::vec2 center = quad.center();
-
-            glm::vec2 screen_size = glm::vec2(Platform::screen_size());
-
-            glm::vec2 target_pos = Camera::screen_to_world_pos(
-                screen_size,
-                player->scene()->world_bounds(),
-                glm::vec2(mouse->pos.x, screen_size.y - mouse->pos.y));
-            m_shoot_dir = target_pos - center;
-        }
-        else
-        {
-            m_shoot_dir = m_move_dir;
-        }
     }
 
     m_move_dir = Calc::normalize(m_move_dir);
-    m_shoot_dir = Calc::normalize(m_shoot_dir);
 
     m_dash_buffer_timer = std::max(0.0f, m_dash_buffer_timer - elapsed);
     m_shoot_buffer_timer = std::max(0.0f, m_shoot_buffer_timer - elapsed);
 
-    bool shoot_input = mouse->pressed[1];
+    bool shoot_input = keyboard->pressed[SDL_SCANCODE_X];
     if (controller->active())
     {
         shoot_input |= controller->pressed[3];
@@ -73,7 +52,7 @@ void PlayerInput::update(Player *player, float elapsed)
         m_shoot_buffer_timer = input_buffer_time;
     }
 
-    bool dash_input = Input::keyboard()->pressed[SDL_SCANCODE_SPACE];
+    bool dash_input = Input::keyboard()->pressed[SDL_SCANCODE_C];
     if (controller->active())
     {
         dash_input |= controller->pressed[0];
@@ -88,11 +67,6 @@ void PlayerInput::update(Player *player, float elapsed)
 glm::vec2 PlayerInput::move_dir() const
 {
     return m_move_dir;
-}
-
-glm::vec2 PlayerInput::shoot_dir() const
-{
-    return m_shoot_dir;
 }
 
 bool PlayerInput::shoot() const

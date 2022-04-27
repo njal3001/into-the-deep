@@ -150,4 +150,14 @@ bool Platform::muted()
     return g_muted;
 }
 
+void Platform::show_cursor(bool val)
+{
+    SDL_ShowCursor(val ? SDL_ENABLE : SDL_DISABLE);
+}
+
+void Platform::set_cursor_pos(const glm::ivec2 &new_pos)
+{
+    SDL_WarpMouseInWindow(Platform::get_window(), new_pos.x, new_pos.y);
+}
+
 }  // namespace ITD

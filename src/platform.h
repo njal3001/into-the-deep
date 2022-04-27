@@ -27,6 +27,10 @@ namespace Platform {
     void toggle_mute();
     bool muted();
 
+    // TODO: This should be in Input
+    void show_cursor(bool val);
+    void set_cursor_pos(const glm::ivec2 &new_pos);
+
 }  // namespace Platform
 
 }  // namespace ITD

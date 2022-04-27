@@ -13,7 +13,7 @@ private:
     static constexpr float dash_time = 0.05f;
     static constexpr float dash_deaccel = 600.0f;
     static constexpr float dash_cooldown = 1.0f;
-    static constexpr float shoot_knockback = 85.0f;
+    static constexpr float shoot_knockback = 5.0f;
     static constexpr float rotation_multiplier = 0.90f;
     static constexpr int max_torpedo_ammo = 3;
     static constexpr float shoot_delay = 0.2f;

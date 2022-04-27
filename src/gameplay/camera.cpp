@@ -27,4 +27,11 @@ glm::vec2 Camera::screen_to_world_pos(const glm::vec2 &screen_size, const Rectf 
     return normalized_pos * world_bounds.size() + world_bounds.bl;
 }
 
+glm::vec2 Camera::world_to_screen_pos(const glm::vec2 &screen_size, const Rectf &world_bounds, const glm::vec2 &pos)
+{
+    glm::vec2 normalized_pos = (pos + world_bounds.bl) / world_bounds.size(); 
+
+    return normalized_pos * screen_size;
+}
+
 }  // namespace ITD
