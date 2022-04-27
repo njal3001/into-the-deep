@@ -6,6 +6,7 @@
 #include "factory.h"
 #include "player.h"
 #include "playerhud.h"
+#include "wall.h"
 
 namespace ITD {
 
@@ -53,23 +54,32 @@ void Tilemap::fill_scene(Scene *scene)
             {
                 case WALL: {
                     bool redundant = true;
-                    for (int oy = std::max(0, y - 1);
-                         oy <= std::min(m_height - 1, y + 1); oy++)
+                    uint8_t direction_mask = 0;
+
+                    glm::ivec2 directions[4] = {
+                        glm::ivec2(0, -1), glm::ivec2(1, 0), glm::ivec2(-1, 0),
+                        glm::ivec2(0, 1)};
+
+                    for (uint8_t i = 0; i < 4; i++)
                     {
-                        for (int ox = std::max(0, x - 1);
-                             ox <= std::min(m_width - 1, x + 1); ox++)
+                        glm::ivec2 direction = directions[i];
+                        int ox = direction.x + x;
+                        int oy = direction.y + y;
+
+                        if (ox >= 0 && ox < m_width && oy >= 0 && oy < m_height)
                         {
                             Color neighbor = pixels[ox + oy * m_igrid.width()];
                             if (neighbor.rgb() != WALL)
                             {
                                 redundant = false;
+                                direction_mask |= (1 << i);
                             }
                         }
                     }
 
                     if (!redundant)
                     {
-                        Factory::wall(scene, pos);
+                        Wall::create(scene, pos, direction_mask);
                     }
 
                     break;
@@ -109,7 +119,7 @@ void Tilemap::fill_scene(Scene *scene)
 
 void Tilemap::render(Renderer *renderer)
 {
-    renderer->tex(&m_texture, glm::vec2(), Color::white);
+    // renderer->tex(&m_texture, glm::vec2(), Color::white);
 }
 
 size_t Tilemap::width() const

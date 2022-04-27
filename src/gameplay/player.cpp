@@ -31,6 +31,7 @@ void Player::update(float elapsed)
     float moving = 1.0f;
 
     auto mover = get<Mover>();
+    auto hurtable = get<Hurtable>();
 
     auto col = get<Collider>();
     if (move_dir.x != 0 || move_dir.y != 0)
@@ -46,6 +47,11 @@ void Player::update(float elapsed)
     if (m_dash_timer > 0.0f)
     {
         m_dash_timer -= elapsed;
+
+        if (m_dash_timer <= 0.0f)
+        {
+            hurtable->invincible = false;
+        }
     }
     else
     {
@@ -67,6 +73,8 @@ void Player::update(float elapsed)
             mover->approach_target = false;
             m_dash_timer = dash_time;
             m_dash_cooldown_timer = dash_cooldown;
+
+            hurtable->invincible = true;
 
             Sound *sfx = Content::find_sound("dash");
             sfx->play();
@@ -95,13 +103,14 @@ void Player::update(float elapsed)
         if (m_player_input.consume_shoot())
         {
             auto vel_norm = Calc::normalize(mover->vel);
-            float cos = glm::dot(vel_norm, mover->facing);
+            float vel_facing_cos = glm::dot(vel_norm, mover->facing);
 
             glm::vec2 shoot_dir = mover->facing;
 
-            Torpedo::create(scene(), m_entity->get_pos(), shoot_dir,
-                            std::max(0.0f, cos) * mover->vel.length() +
-                                torpedo_start_speed);
+            Torpedo::create(
+                scene(), m_entity->get_pos(), shoot_dir,
+                std::max(0.0f, vel_facing_cos) * mover->vel.length() +
+                    torpedo_start_speed);
 
             m_shoot_delay_timer = shoot_delay;
             m_torpedo_ammo--;
@@ -121,6 +130,19 @@ void Player::update(float elapsed)
 
     auto anim = get<Animator>();
     anim->rotation = col->get_rotation();
+
+    // TODO: Implement dash shield
+}
+
+void Player::render(Renderer *renderer)
+{
+    if (m_dash_timer > 0.0f)
+    {
+        Collider *collider = get<Collider>();
+        glm::vec2 center = collider->quad().center();
+
+        renderer->circ(center, 20.0f, 128, Color::green);
+    }
 }
 
 int Player::torpedo_ammo() const

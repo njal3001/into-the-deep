@@ -10,7 +10,7 @@ private:
     static constexpr float max_speed = 100.0f;
     static constexpr float accel = 150.0f;
     static constexpr float dash_speed = 250.0f;
-    static constexpr float dash_time = 0.05f;
+    static constexpr float dash_time = 0.2f;
     static constexpr float dash_deaccel = 600.0f;
     static constexpr float dash_cooldown = 1.0f;
     static constexpr float shoot_knockback = 5.0f;
@@ -35,6 +35,7 @@ public:
     int torpedo_ammo() const;
 
     void update(float elapsed) override;
+    void render(Renderer *renderer) override;
 
     static Entity *create(Scene *scene, const glm::vec2 &pos);
 };

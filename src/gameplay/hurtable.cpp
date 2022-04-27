@@ -3,14 +3,15 @@
 namespace ITD {
 
 Hurtable::Hurtable()
-    : m_invincible_timer(0.0f)
-    , invincible_time(0.5f)
+    : m_flicker_timer(0.0f)
+    , flicker_time(0.5f)
+    , invincible(false)
 {
 }
 
 bool Hurtable::hurt(const glm::vec2 &dir)
 {
-    if (m_invincible_timer <= 0.0f)
+    if (!invincible  && m_flicker_timer <= 0.0f)
     {
         health--;
 
@@ -24,7 +25,7 @@ bool Hurtable::hurt(const glm::vec2 &dir)
             m_entity->destroy();
         }
 
-        m_invincible_timer = invincible_time;
+        m_flicker_timer = flicker_time;
 
         return true;
     }
@@ -34,7 +35,7 @@ bool Hurtable::hurt(const glm::vec2 &dir)
 
 void Hurtable::update(float elapsed)
 {
-    m_invincible_timer -= elapsed;
+    m_flicker_timer -= elapsed;
 }
 
 }  // namespace ITD

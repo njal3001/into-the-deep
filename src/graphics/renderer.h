@@ -84,12 +84,17 @@ public:
               const glm::vec2 &d, Color color);
     void quad_line(const Quadf &q, float t, Color color);
 
-    void circ(const glm::vec2 &center, float radius,
-              unsigned int steps, Color color);
+    void line(const glm::vec2 &start, const glm::vec2 &end, float t,
+              Color color);
+
+    void line(const glm::vec2 &start, const glm::vec2 &end, float t,
+              const glm::vec2 &t_dir, Color color);
+
+    void circ(const glm::vec2 &center, float radius, unsigned int steps,
+              Color color);
 
     void tex(const Texture *texture, const glm::vec2 &pos, Color color);
-    void tex(const Subtexture &subtexture, const glm::vec2 &pos,
-             Color color);
+    void tex(const Subtexture &subtexture, const glm::vec2 &pos, Color color);
 
 private:
     void make_vertex(float px, float py, float tx, float ty, Color color,

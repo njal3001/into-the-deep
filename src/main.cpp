@@ -20,6 +20,7 @@
 #include "maths/shapes.h"
 #include "platform.h"
 #include "sound.h"
+#include "gameplay/wall.h"
 
 int main()
 {
@@ -40,6 +41,8 @@ int main()
                                          Property::Renderable);
     Scene::register_component<Animator>(Property::Updatable |
                                         Property::Renderable);
+    Scene::register_component<Wall>(Property::Renderable);
+
     Platform::init();
     Renderer renderer;
 
@@ -57,7 +60,7 @@ int main()
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds
 
-    Color bg_color(0x29366f);
+    Color bg_color(0x0);
 
     Platform::show_cursor(false);
     Platform::toggle_mute();

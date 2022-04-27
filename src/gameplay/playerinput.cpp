@@ -29,11 +29,11 @@ void PlayerInput::update(Player *player, float elapsed)
     }
     else
     {
-        m_move_dir.x = Input::keyboard()->down[SDL_SCANCODE_D] -
-                       Input::keyboard()->down[SDL_SCANCODE_A];
+        m_move_dir.x = Input::keyboard()->down[SDL_SCANCODE_RIGHT] -
+                       Input::keyboard()->down[SDL_SCANCODE_LEFT];
 
-        m_move_dir.y = Input::keyboard()->down[SDL_SCANCODE_W] -
-                       Input::keyboard()->down[SDL_SCANCODE_S];
+        m_move_dir.y = Input::keyboard()->down[SDL_SCANCODE_UP] -
+                       Input::keyboard()->down[SDL_SCANCODE_DOWN];
     }
 
     m_move_dir = Calc::normalize(m_move_dir);
@@ -44,7 +44,7 @@ void PlayerInput::update(Player *player, float elapsed)
     bool shoot_input = keyboard->pressed[SDL_SCANCODE_X];
     if (controller->active())
     {
-        shoot_input |= controller->pressed[3];
+        shoot_input |= controller->pressed[0];
     }
 
     if (shoot_input)
@@ -55,7 +55,7 @@ void PlayerInput::update(Player *player, float elapsed)
     bool dash_input = Input::keyboard()->pressed[SDL_SCANCODE_C];
     if (controller->active())
     {
-        dash_input |= controller->pressed[0];
+        dash_input |= controller->pressed[3];
     }
 
     if (dash_input)

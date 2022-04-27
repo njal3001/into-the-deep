@@ -343,6 +343,25 @@ void Renderer::quad_line(const Quadf &q, float t, Color color)
     }
 }
 
+void Renderer::line(const glm::vec2 &start, const glm::vec2 &end, float t,
+                    Color color)
+{
+    glm::vec2 dir = Calc::normalize(end - start);
+    glm::vec2 norm = glm::vec2(-dir.y, dir.x);
+
+    line(start, end, t, norm, color);
+}
+
+void Renderer::line(const glm::vec2 &start, const glm::vec2 &end, float t,
+          const glm::vec2 &t_dir, Color color)
+{
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
+
+    quad(start, start + t * t_dir, end + t * t_dir, end, color);
+}
+
+
 void Renderer::circ(const glm::vec2 &center, float radius, unsigned int steps,
                     Color color)
 {
@@ -464,7 +483,10 @@ void Renderer::render(const glm::mat4 &matrix)
                 const Texture *tex = batch.material->get_texture(texture_slot);
 
                 glActiveTexture(GL_TEXTURE0 + texture_slot);
-                if (tex)
+
+                // TODO: No need to check if a texture is valid if they are kept active
+                // for the whole game
+                if (tex && glIsTexture(tex->id()))
                 {
                     glBindTexture(GL_TEXTURE_2D, tex->id());
                 }
@@ -475,6 +497,7 @@ void Renderer::render(const glm::mat4 &matrix)
 
                 glUniform1i(location, texture_slot);
                 texture_slot++;
+
                 continue;
             }
 

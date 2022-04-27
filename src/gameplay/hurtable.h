@@ -7,11 +7,12 @@ namespace ITD {
 class Hurtable : public Component
 {
 private:
-    float m_invincible_timer;
+    float m_flicker_timer;
 
 public:
     int health;
-    float invincible_time;
+    float flicker_time;
+    bool invincible;
     std::function<void(Hurtable *self, const glm::vec2 &force)> on_hurt;
 
 public:
