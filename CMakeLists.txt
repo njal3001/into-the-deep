@@ -38,7 +38,6 @@ add_executable(itd
     src/gameplay/tilemap.cpp
     src/gameplay/collider.cpp
     src/gameplay/player.cpp
-    src/gameplay/factory.cpp
     src/gameplay/collisionhandler.cpp
     src/gameplay/mover.cpp
     src/gameplay/chaser.cpp

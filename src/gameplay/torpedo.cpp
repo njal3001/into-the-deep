@@ -68,7 +68,8 @@ void Torpedo::update(float elapsed)
                 glm::vec2 dir =
                     Calc::normalize(target->get_pos() - entity()->get_pos());
 
-                mov->rotate_towards(dir, Calc::TAU * rotation_multiplier * elapsed);
+                mov->rotate_towards(dir,
+                                    Calc::TAU * rotation_multiplier * elapsed);
             }
             else
             {
@@ -77,10 +78,14 @@ void Torpedo::update(float elapsed)
         }
 
         collider->face_towards(mov->facing);
-
-        Animator *anim = get<Animator>();
-        anim->rotation = collider->get_rotation();
     }
+}
+
+void Torpedo::render(Renderer *renderer)
+{
+    Collider *collider = get<Collider>();
+    Quadf quad = collider->quad();
+    renderer->quad_line(quad, 1.0f, Color::blue);
 }
 
 void Torpedo::explode()
@@ -135,11 +140,6 @@ Entity *Torpedo::create(Scene *scene, const glm::vec2 &pos,
 
     tracker->add(tracker_collider);
     torpedo->tracker = tracker;
-
-    Animator *anim =
-        new Animator("torpedo", Recti(glm::ivec2(), glm::ivec2(8, 4)), 1, 0.0f,
-                     glm::vec2(), glm::vec2(4.0f, 2.0f));
-    ent->add(anim);
 
     return ent;
 }

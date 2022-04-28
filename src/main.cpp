@@ -65,12 +65,17 @@ int main()
     Platform::show_cursor(false);
     Platform::toggle_mute();
 
+    // Avoid physics problems by capping the
+    // elapsed time
+    float max_elapsed = 1.0f / 60.0f;
+
     while (Platform::update())
     {
         // Calculate elapsed time
         uint64_t current_ticks = Platform::ticks();
         uint64_t tick_diff = current_ticks - prev_ticks;
         elapsed = (tick_diff) / (float)Platform::ticks_per_sec;
+        elapsed = std::min(elapsed, max_elapsed);
         prev_ticks = current_ticks;
 
         if (Input::keyboard()->pressed[SDL_SCANCODE_F12])

@@ -3,7 +3,6 @@
 #include "../file.h"
 #include "../platform.h"
 #include "chaser.h"
-#include "factory.h"
 #include "player.h"
 #include "playerhud.h"
 #include "wall.h"

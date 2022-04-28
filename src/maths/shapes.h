@@ -10,10 +10,13 @@ template <class T>
 struct Rect;
 template <class T>
 struct Quad;
+template <class T>
+struct Tri;
 
 using Rectf = Rect<float>;
 using Recti = Rect<int>;
 using Quadf = Quad<float>;
+using Trif = Tri<float>;
 
 template <class T>
 struct Rect {
@@ -132,7 +135,7 @@ struct Quad {
         d = glm::tvec2<T>(mat * glm::tvec4<T>(d, 0, 1));
     }
 
-    glm::vec2 center() const
+    glm::tvec2<T> center() const
     {
         return (a + b + c + d) / (T)4;
     }
@@ -149,6 +152,24 @@ struct Quad {
         c += rhs;
         d += rhs;
         return *this;
+    }
+};
+
+template <class T>
+struct Tri {
+    union {
+        struct {
+            glm::tvec2<T> a;
+            glm::tvec2<T> b;
+            glm::tvec2<T> c;
+        };
+
+        glm::tvec2<T> values[3];
+    };
+
+    glm::tvec2<T> center() const
+    {
+        return (a + b + c) / (T)3;
     }
 };
 

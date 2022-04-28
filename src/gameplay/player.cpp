@@ -53,7 +53,8 @@ void Player::update(float elapsed)
             hurtable->invincible = false;
         }
     }
-    else
+    
+    if (m_dash_timer - dash_time + dash_max_speed_time <= 0.0f)
     {
         mover->approach_target = true;
         mover->accel = glm::length2(mover->vel) > max_speed * max_speed
@@ -68,7 +69,11 @@ void Player::update(float elapsed)
     {
         if (m_player_input.consume_dash())
         {
-            mover->facing = move_dir;
+            if (move_dir != glm::vec2())
+            {
+                mover->facing = move_dir;
+            }
+
             mover->vel = mover->facing * dash_speed;
             mover->approach_target = false;
             m_dash_timer = dash_time;
@@ -128,21 +133,61 @@ void Player::update(float elapsed)
 
     col->face_towards(mover->facing);
 
-    auto anim = get<Animator>();
-    anim->rotation = col->get_rotation();
-
     // TODO: Implement dash shield
 }
 
 void Player::render(Renderer *renderer)
 {
-    if (m_dash_timer > 0.0f)
-    {
-        Collider *collider = get<Collider>();
-        glm::vec2 center = collider->quad().center();
+    Collider *collider = get<Collider>();
+    Quadf quad = collider->quad();
+    glm::vec2 center = quad.center();
 
-        renderer->circ(center, 20.0f, 128, Color::green);
+    bool is_dashing = m_dash_timer > 0.0f;
+    if (is_dashing)
+    {
+        // renderer->circ(center, 20.0f, 128, Color::green);
     }
+
+    Trif right_wing = create_wing(quad.a, quad.d, -5.0f);
+    Trif left_wing = create_wing(quad.b, quad.c, 5.0f);
+
+    float quad_scale = 1.25f;
+    renderer->push_matrix(Calc::scale(glm::vec2(quad_scale, quad_scale), center));
+
+    renderer->quad_line(quad, 1.0f, Color::yellow);
+
+    if (is_dashing)
+    {
+        float wing_scale = 1.75f;
+        renderer->push_matrix(Calc::scale(glm::vec2(wing_scale, wing_scale), right_wing.center()));
+        renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
+        renderer->pop_matrix();
+
+        renderer->push_matrix(Calc::scale(glm::vec2(wing_scale, wing_scale), left_wing.center()));
+        renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
+        renderer->pop_matrix();
+    }
+    else
+    {
+        renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
+        renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
+    }
+
+    renderer->pop_matrix();
+}
+
+Trif Player::create_wing(const glm::vec2 &line_start, const glm::vec2 &line_end, float span) const
+{
+    Trif result;
+    result.a = line_start;
+    result.b = (line_start + line_end) / 2.0f;
+
+    glm::vec2 line_dir = Calc::normalize(line_end - line_start);
+    glm::vec line_normal = glm::vec2(-line_dir.y, line_dir.x);
+
+    result.c = result.a + line_normal * span;
+
+    return result;
 }
 
 int Player::torpedo_ammo() const
@@ -172,11 +217,6 @@ Entity *Player::create(Scene *scene, const glm::vec2 &pos)
     };
 
     ent->add(hur);
-
-    Animator *ani =
-        new Animator("player", Recti(glm::ivec2(0, 0), glm::ivec2(15, 9)), 1,
-                     0.0f, glm::vec2(-2.0f, -1.0f), glm::vec2(6.0f, 3.5f));
-    ent->add(ani);
 
     return ent;
 }

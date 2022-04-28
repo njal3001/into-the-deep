@@ -71,6 +71,19 @@ namespace Calc {
         return result;
     }
 
+    template <class T>
+    glm::tmat4x4<T> scale(const glm::tvec2<T> &value,
+                          const glm::tvec2<T> &reference)
+    {
+        glm::tvec3<T> ref3 = glm::tvec3<T>(reference, 0);
+        glm::tvec3<T> val3 = glm::tvec3<T>(value, 1);
+
+        glm::tmat4x4<T> result = glm::translate(
+            glm::scale(glm::translate(glm::tmat4x4<T>(1), ref3), val3), -ref3);
+
+        return result;
+    }
+
     size_t hash_combine(size_t lhs, size_t rhs);
 
     float shortest_rotation_approach(float val, float target, float amount);
