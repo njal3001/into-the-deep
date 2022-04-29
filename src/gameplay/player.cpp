@@ -20,6 +20,7 @@ Player::Player()
     , m_torpedo_ammo(max_torpedo_ammo)
     , m_reload_timer(0.0f)
     , m_shoot_delay_timer(0.0f)
+    , m_wing_rotation(0.0f)
 {
 }
 
@@ -114,7 +115,7 @@ void Player::update(float elapsed)
 
             Torpedo::create(
                 scene(), m_entity->get_pos(), shoot_dir,
-                std::max(0.0f, vel_facing_cos) * mover->vel.length() +
+                std::max(0.0f, vel_facing_cos) * glm::length(mover->vel) +
                     torpedo_start_speed);
 
             m_shoot_delay_timer = shoot_delay;
@@ -133,6 +134,11 @@ void Player::update(float elapsed)
 
     col->face_towards(mover->facing);
 
+    // Update wing rotation
+    float movedir_facing_cos = glm::dot(mover->facing, move_dir);
+    float wing_rotation_delta = std::max(movedir_facing_cos, 0.0f) * 30.0f * elapsed;
+    m_wing_rotation = fmod(m_wing_rotation + wing_rotation_delta, Calc::TAU);
+
     // TODO: Implement dash shield
 }
 
@@ -140,23 +146,23 @@ void Player::render(Renderer *renderer)
 {
     Collider *collider = get<Collider>();
     Quadf quad = collider->quad();
-    glm::vec2 center = quad.center();
+    glm::vec2 quad_center = quad.center();
 
-    bool is_dashing = m_dash_timer > 0.0f;
-    if (is_dashing)
-    {
-        // renderer->circ(center, 20.0f, 128, Color::green);
-    }
+    float wing_span = 5.0f;
+    Trif right_wing = create_wing(quad.a, quad.d, -wing_span);
+    Trif left_wing = create_wing(quad.b, quad.c, wing_span);
 
-    Trif right_wing = create_wing(quad.a, quad.d, -5.0f);
-    Trif left_wing = create_wing(quad.b, quad.c, 5.0f);
+    float all_scale = 1.25f;
+    glm::mat4 all_scale_matrix = Calc::scale(glm::vec2(all_scale, all_scale), quad_center);
 
-    float quad_scale = 1.25f;
-    renderer->push_matrix(Calc::scale(glm::vec2(quad_scale, quad_scale), center));
-
+    renderer->push_matrix(all_scale_matrix);
     renderer->quad_line(quad, 1.0f, Color::yellow);
+    renderer->pop_matrix();
 
-    if (is_dashing)
+    renderer->push_matrix(Calc::rotate(m_wing_rotation, quad_center, glm::vec3(quad.d - quad.a, 0.0f))); 
+    renderer->push_matrix(all_scale_matrix);
+
+    if (m_dash_timer > 0.0f)
     {
         float wing_scale = 1.75f;
         renderer->push_matrix(Calc::scale(glm::vec2(wing_scale, wing_scale), right_wing.center()));
@@ -173,6 +179,7 @@ void Player::render(Renderer *renderer)
         renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
     }
 
+    renderer->pop_matrix();
     renderer->pop_matrix();
 }
 

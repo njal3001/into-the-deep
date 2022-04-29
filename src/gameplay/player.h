@@ -13,7 +13,7 @@ private:
     static constexpr float dash_time = 0.4f;
     static constexpr float dash_max_speed_time = 0.2f;
     static constexpr float dash_deaccel = 600.0f;
-    static constexpr float dash_cooldown = 1.0f;
+    static constexpr float dash_cooldown = 0.8f;
     static constexpr float shoot_knockback = 5.0f;
     static constexpr float rotation_multiplier = 0.90f;
     static constexpr int max_torpedo_ammo = 3;
@@ -27,6 +27,7 @@ private:
     int m_torpedo_ammo;
     float m_shoot_delay_timer;
     float m_reload_timer;
+    float m_wing_rotation;
 
     PlayerInput m_player_input;
 

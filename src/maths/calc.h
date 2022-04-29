@@ -59,13 +59,13 @@ namespace Calc {
     }
 
     template <class T>
-    glm::tmat4x4<T> rotate(T amount, const glm::tvec2<T> &pivot)
+    glm::tmat4x4<T> rotate(T amount, const glm::tvec2<T> &pivot, const glm::tvec3<T> &axis = glm::tvec3<T>(0, 0, 1))
     {
         glm::tvec3<T> pivot3 = glm::tvec3<T>(pivot, 0);
 
         glm::tmat4x4<T> result = glm::translate(
             glm::rotate(glm::translate(glm::tmat4x4<T>(1), pivot3), amount,
-                        glm::tvec3<T>(0, 0, 1)),
+                        axis),
             -pivot3);
 
         return result;
