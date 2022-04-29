@@ -54,7 +54,7 @@ void Player::update(float elapsed)
             hurtable->invincible = false;
         }
     }
-    
+
     if (m_dash_timer - dash_time + dash_max_speed_time <= 0.0f)
     {
         mover->approach_target = true;
@@ -136,7 +136,8 @@ void Player::update(float elapsed)
 
     // Update wing rotation
     float movedir_facing_cos = glm::dot(mover->facing, move_dir);
-    float wing_rotation_delta = std::max(movedir_facing_cos, 0.0f) * 30.0f * elapsed;
+    float wing_rotation_delta =
+        std::max(movedir_facing_cos, 0.0f) * 30.0f * elapsed;
     m_wing_rotation = fmod(m_wing_rotation + wing_rotation_delta, Calc::TAU);
 
     // TODO: Implement dash shield
@@ -144,46 +145,61 @@ void Player::update(float elapsed)
 
 void Player::render(Renderer *renderer)
 {
+    // TODO: Major cleanup
     Collider *collider = get<Collider>();
     Quadf quad = collider->quad();
-    glm::vec2 quad_center = quad.center();
+    float quad_depth = 2.0f;
+    glm::vec3 quad_center = glm::vec3(quad.center(), -quad_depth / 2.0f);
 
-    float wing_span = 5.0f;
+    float wing_span = 4.0f;
     Trif right_wing = create_wing(quad.a, quad.d, -wing_span);
     Trif left_wing = create_wing(quad.b, quad.c, wing_span);
 
     float all_scale = 1.25f;
-    glm::mat4 all_scale_matrix = Calc::scale(glm::vec2(all_scale, all_scale), quad_center);
+    glm::mat4 all_scale_matrix =
+        Calc::scale(glm::vec3(all_scale, all_scale, all_scale), quad_center);
 
-    renderer->push_matrix(all_scale_matrix);
+    // renderer->push_matrix(all_scale_matrix);
     renderer->quad_line(quad, 1.0f, Color::yellow);
-    renderer->pop_matrix();
+    // renderer->quad(quad, Color::yellow);
+    // renderer->pop_matrix();
 
-    renderer->push_matrix(Calc::rotate(m_wing_rotation, quad_center, glm::vec3(quad.d - quad.a, 0.0f))); 
-    renderer->push_matrix(all_scale_matrix);
+    // TODO: Hide wing that has rotated behind quad. Try depth testing?
+    renderer->push_matrix(Calc::rotate(m_wing_rotation, glm::vec3(quad_center.x, quad_center.y, 0.0f),
+                                       glm::vec3(quad.d - quad.a, 0.0f)));
+    // renderer->push_matrix(all_scale_matrix);
 
     if (m_dash_timer > 0.0f)
     {
         float wing_scale = 1.75f;
-        renderer->push_matrix(Calc::scale(glm::vec2(wing_scale, wing_scale), right_wing.center()));
-        renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
+        renderer->push_matrix(
+            Calc::scale(glm::vec3(wing_scale, wing_scale, wing_scale),
+                        glm::vec3(right_wing.center(), -quad_depth / 2.0f)));
+        render_wing(renderer, right_wing, 0.0f, quad_depth, Color::yellow);
+        // renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
         renderer->pop_matrix();
 
-        renderer->push_matrix(Calc::scale(glm::vec2(wing_scale, wing_scale), left_wing.center()));
-        renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
+        renderer->push_matrix(
+            Calc::scale(glm::vec3(wing_scale, wing_scale, wing_scale),
+                        glm::vec3(left_wing.center(), -quad_depth / 2.0f)));
+        render_wing(renderer, left_wing, 0.0f, quad_depth, Color::yellow);
+        // renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
         renderer->pop_matrix();
     }
     else
     {
-        renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
-        renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
+        render_wing(renderer, right_wing, 0.0f, quad_depth, Color::yellow);
+        render_wing(renderer, left_wing, 0.0f, quad_depth, Color::yellow);
+        // renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
+        // renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
     }
 
     renderer->pop_matrix();
-    renderer->pop_matrix();
+    // renderer->pop_matrix();
 }
 
-Trif Player::create_wing(const glm::vec2 &line_start, const glm::vec2 &line_end, float span) const
+Trif Player::create_wing(const glm::vec2 &line_start, const glm::vec2 &line_end,
+                         float span) const
 {
     Trif result;
     result.a = line_start;
@@ -195,6 +211,26 @@ Trif Player::create_wing(const glm::vec2 &line_start, const glm::vec2 &line_end,
     result.c = result.a + line_normal * span;
 
     return result;
+}
+
+void Player::render_wing(Renderer *renderer, const Trif &wing, float z,
+                         float depth, Color color) const
+{
+    glm::vec3 a_upper = glm::vec3(wing.a, z);
+    glm::vec3 b_upper = glm::vec3(wing.b, z);
+    glm::vec3 c_upper = glm::vec3(wing.c, z);
+
+    glm::vec3 a_lower = glm::vec3(wing.a, z + depth);
+    glm::vec3 b_lower = glm::vec3(wing.b, z + depth);
+    glm::vec3 c_lower = glm::vec3(wing.c, z + depth);
+
+    renderer->tri(a_upper, b_upper, c_upper, color);
+    renderer->tri(a_lower, b_lower, c_lower, color);
+
+    // Quads connecting upper and lower triangle
+    renderer->quad(a_upper, a_lower, b_upper, b_lower, color);
+    renderer->quad(b_upper, b_lower, c_upper, c_lower, color);
+    renderer->quad(c_upper, c_lower, a_upper, a_lower, color);
 }
 
 int Player::torpedo_ammo() const

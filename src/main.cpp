@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "debug.h"
@@ -13,6 +12,7 @@
 #include "gameplay/playerhud.h"
 #include "gameplay/tilemap.h"
 #include "gameplay/torpedo.h"
+#include "gameplay/wall.h"
 #include "graphics/graphics.h"
 #include "graphics/image.h"
 #include "graphics/renderer.h"
@@ -20,7 +20,6 @@
 #include "maths/shapes.h"
 #include "platform.h"
 #include "sound.h"
-#include "gameplay/wall.h"
 
 int main()
 {
@@ -55,7 +54,7 @@ int main()
 
     glm::mat4 screen_matrix =
         glm::ortho(screen_bounds.bl.x, screen_bounds.tr.x, screen_bounds.bl.y,
-                   screen_bounds.tr.y);
+                   screen_bounds.tr.y, -100.0f, 100.0f);
 
     uint64_t prev_ticks = Platform::ticks();
     float elapsed = 0.0f;  // In seconds

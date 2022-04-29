@@ -19,7 +19,7 @@ class Renderer
 {
 private:
     struct Vertex {
-        glm::vec2 pos;
+        glm::vec3 pos;
         glm::vec2 uv;
         Color color;
         uint8_t mult;
@@ -74,6 +74,8 @@ public:
 
     void tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
              const glm::vec2 &pos2, Color color);
+    void tri(const glm::vec3 &pos0, const glm::vec3 &pos1,
+             const glm::vec3 &pos2, Color color);
 
     void rect(const Rectf &r, Color color);
     void rect(const glm::vec2 &bl, const glm::vec2 &tr, Color color);
@@ -82,6 +84,8 @@ public:
     void quad(const Quadf &q, Color color);
     void quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
               const glm::vec2 &d, Color color);
+    void quad(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c,
+              const glm::vec3 &d, Color color);
     void quad_line(const Quadf &q, float t, Color color);
 
     void line(const glm::vec2 &start, const glm::vec2 &end, float t,
@@ -97,19 +101,21 @@ public:
     void tex(const Subtexture &subtexture, const glm::vec2 &pos, Color color);
 
 private:
-    void make_vertex(float px, float py, float tx, float ty, Color color,
-                     uint8_t mult, uint8_t wash, uint8_t fill);
+    void make_vertex(float px, float py, float pz, float tx, float ty,
+                     Color color, uint8_t mult, uint8_t wash, uint8_t fill);
 
-    void push_triangle(float px0, float py0, float px1, float py1, float px2,
-                       float py2, float tx0, float ty0, float tx1, float ty1,
-                       float tx2, float ty2, Color c0, Color c1, Color c2,
-                       uint8_t mult, uint8_t wash, uint8_t fill);
+    void push_triangle(float px0, float py0, float pz0, float px1, float py1,
+                       float pz1, float px2, float py2, float pz2, float tx0,
+                       float ty0, float tx1, float ty1, float tx2, float ty2,
+                       Color c0, Color c1, Color c2, uint8_t mult, uint8_t wash,
+                       uint8_t fill);
 
-    void push_quad(float px0, float py0, float px1, float py1, float px2,
-                   float py2, float px3, float py3, float tx0, float ty0,
-                   float tx1, float ty1, float tx2, float ty2, float tx3,
-                   float ty3, Color c0, Color c1, Color c2, Color c3,
-                   uint8_t mult, uint8_t wash, uint8_t fill);
+    void push_quad(float px0, float py0, float pz0, float px1, float py1,
+                   float pz1, float px2, float py2, float pz2, float px3,
+                   float py3, float pz3, float tx0, float ty0, float tx1,
+                   float ty1, float tx2, float ty2, float tx3, float ty3,
+                   Color c0, Color c1, Color c2, Color c3, uint8_t mult,
+                   uint8_t wash, uint8_t fill);
 };
 
 }  // namespace ITD

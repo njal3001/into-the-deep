@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "ecs.h"
 #include "tilemap.h"
+#include "player.h"
 
 namespace ITD {
 

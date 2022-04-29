@@ -10,7 +10,7 @@ namespace {
     const std::string default_vert_str =
         "#version 330\n"
         "uniform mat4 u_matrix;\n"
-        "layout(location=0) in vec2 a_position;\n"
+        "layout(location=0) in vec3 a_position;\n"
         "layout(location=1) in vec2 a_uv;\n"
         "layout(location=2) in vec4 a_color;\n"
         "layout(location=3) in vec4 a_mask;\n"
@@ -19,7 +19,7 @@ namespace {
         "out vec4 v_mask;\n"
         "void main(void)\n"
         "{\n"
-        "	gl_Position = u_matrix * vec4(a_position.xy, 0, 1);\n"
+        "	gl_Position = u_matrix * vec4(a_position.xyz, 1);\n"
         "	v_uv = a_uv;\n"
         "	v_col = a_color;\n"
         "	v_mask = a_mask;\n"
@@ -59,7 +59,7 @@ Renderer::Renderer()
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 
     // Specify vertex buffer layout
-    size_t pos_offset = 2 * sizeof(GLfloat);
+    size_t pos_offset = 3 * sizeof(GLfloat);
     size_t uv_offset = 2 * sizeof(GLfloat);
     size_t color_offset = 4 * sizeof(GLubyte);
     size_t mask_offset = 4 * sizeof(GLubyte);
@@ -68,7 +68,7 @@ Renderer::Renderer()
 
     // Position
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (const GLvoid *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (const GLvoid *)0);
 
     // Texture uv
     glEnableVertexAttribArray(1);
@@ -122,14 +122,18 @@ Renderer::~Renderer()
     glDeleteVertexArrays(1, &m_vertex_array);
 }
 
-void Renderer::make_vertex(float px, float py, float tx, float ty, Color color,
-                           uint8_t mult, uint8_t wash, uint8_t fill)
+void Renderer::make_vertex(float px, float py, float pz, float tx, float ty,
+                           Color color, uint8_t mult, uint8_t wash,
+                           uint8_t fill)
 {
     m_vertex_map->pos.x = m_matrix[0][0] * px + m_matrix[1][0] * py +
-                          m_matrix[2][0] + m_matrix[3][0];
+                          m_matrix[2][0] * pz + m_matrix[3][0];
 
     m_vertex_map->pos.y = m_matrix[0][1] * px + m_matrix[1][1] * py +
-                          m_matrix[2][1] + m_matrix[3][1];
+                          m_matrix[2][1] * pz + m_matrix[3][1];
+
+    m_vertex_map->pos.z = m_matrix[0][2] * px + m_matrix[1][2] * py +
+                          m_matrix[2][2] * pz + m_matrix[3][2];
 
     m_vertex_map->uv.x = tx;
     m_vertex_map->uv.y = ty;
@@ -140,15 +144,16 @@ void Renderer::make_vertex(float px, float py, float tx, float ty, Color color,
     m_vertex_map++;
 }
 
-void Renderer::push_triangle(float px0, float py0, float px1, float py1,
-                             float px2, float py2, float tx0, float ty0,
-                             float tx1, float ty1, float tx2, float ty2,
-                             Color c0, Color c1, Color c2, uint8_t mult,
-                             uint8_t wash, uint8_t fill)
+void Renderer::push_triangle(float px0, float py0, float pz0, float px1,
+                             float py1, float pz1, float px2, float py2,
+                             float pz2, float tx0, float ty0, float tx1,
+                             float ty1, float tx2, float ty2, Color c0,
+                             Color c1, Color c2, uint8_t mult, uint8_t wash,
+                             uint8_t fill)
 {
-    make_vertex(px0, py0, tx0, ty0, c0, mult, wash, fill);
-    make_vertex(px1, py1, tx1, ty1, c1, mult, wash, fill);
-    make_vertex(px2, py2, tx2, ty2, c2, mult, wash, fill);
+    make_vertex(px0, py0, pz0, tx0, ty0, c0, mult, wash, fill);
+    make_vertex(px1, py1, pz1, tx1, ty1, c1, mult, wash, fill);
+    make_vertex(px2, py2, pz2, tx2, ty2, c2, mult, wash, fill);
 
     *m_index_map = m_vertex_count;
     m_index_map++;
@@ -161,16 +166,17 @@ void Renderer::push_triangle(float px0, float py0, float px1, float py1,
     m_vertex_count += 3;
 }
 
-void Renderer::push_quad(float px0, float py0, float px1, float py1, float px2,
-                         float py2, float px3, float py3, float tx0, float ty0,
-                         float tx1, float ty1, float tx2, float ty2, float tx3,
-                         float ty3, Color c0, Color c1, Color c2, Color c3,
-                         uint8_t mult, uint8_t wash, uint8_t fill)
+void Renderer::push_quad(float px0, float py0, float pz0, float px1, float py1,
+                         float pz1, float px2, float py2, float pz2, float px3,
+                         float py3, float pz3, float tx0, float ty0, float tx1,
+                         float ty1, float tx2, float ty2, float tx3, float ty3,
+                         Color c0, Color c1, Color c2, Color c3, uint8_t mult,
+                         uint8_t wash, uint8_t fill)
 {
-    make_vertex(px0, py0, tx0, ty0, c0, mult, wash, fill);
-    make_vertex(px1, py1, tx1, ty1, c1, mult, wash, fill);
-    make_vertex(px2, py2, tx2, ty2, c2, mult, wash, fill);
-    make_vertex(px3, py3, tx3, ty3, c3, mult, wash, fill);
+    make_vertex(px0, py0, pz0, tx0, ty0, c0, mult, wash, fill);
+    make_vertex(px1, py1, pz1, tx1, ty1, c1, mult, wash, fill);
+    make_vertex(px2, py2, pz2, tx2, ty2, c2, mult, wash, fill);
+    make_vertex(px3, py3, pz3, tx3, ty3, c3, mult, wash, fill);
 
     *m_index_map = m_vertex_count;
     m_index_map++;
@@ -281,8 +287,19 @@ void Renderer::tri(const glm::vec2 &pos0, const glm::vec2 &pos1,
     ITD_ASSERT(m_vertex_map && m_index_map,
                "Render phase has not been started");
 
-    push_triangle(pos0.x, pos0.y, pos1.x, pos1.y, pos2.x, pos2.y, 0, 0, 0, 0, 0,
-                  0, color, color, color, 0, 0, 255);
+    push_triangle(pos0.x, pos0.y, 0.0f, pos1.x, pos1.y, 0.0f, pos2.x, pos2.y,
+                  0.0f, 0, 0, 0, 0, 0, 0, color, color, color, 0, 0, 255);
+}
+
+void Renderer::tri(const glm::vec3 &pos0, const glm::vec3 &pos1,
+                   const glm::vec3 &pos2, Color color)
+{
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
+
+    push_triangle(pos0.x, pos0.y, pos0.z, pos1.x, pos1.y, pos1.z, pos2.x,
+                  pos2.y, pos2.z, 0, 0, 0, 0, 0, 0, color, color, color, 0, 0,
+                  255);
 }
 
 void Renderer::rect(const Rectf &r, Color color)
@@ -295,8 +312,9 @@ void Renderer::rect(const glm::vec2 &bl, const glm::vec2 &tr, Color color)
     ITD_ASSERT(m_vertex_map && m_index_map,
                "Render phase has not been started");
 
-    push_quad(bl.x, bl.y, bl.x, tr.y, tr.x, tr.y, tr.x, bl.y, 0, 0, 0, 0, 0, 0,
-              0, 0, color, color, color, color, 0, 0, 255);
+    push_quad(bl.x, bl.y, 0.0f, bl.x, tr.y, 0.0f, tr.x, tr.y, 0.0f, tr.x, bl.y,
+              0.0f, 0, 0, 0, 0, 0, 0, 0, 0, color, color, color, color, 0, 0,
+              255);
 }
 
 void Renderer::rect_line(const Rectf &r, float t, Color color)
@@ -325,8 +343,18 @@ void Renderer::quad(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c,
     ITD_ASSERT(m_vertex_map && m_index_map,
                "Render phase has not been started");
 
-    push_quad(a.x, a.y, b.x, b.y, c.x, c.y, d.x, d.y, 0, 0, 0, 0, 0, 0, 0, 0,
-              color, color, color, color, 0, 0, 255);
+    push_quad(a.x, a.y, 0.0f, b.x, b.y, 0.0f, c.x, c.y, 0.0f, d.x, d.y, 0.0f, 0,
+              0, 0, 0, 0, 0, 0, 0, color, color, color, color, 0, 0, 255);
+}
+
+void Renderer::quad(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c,
+                    const glm::vec3 &d, Color color)
+{
+    ITD_ASSERT(m_vertex_map && m_index_map,
+               "Render phase has not been started");
+
+    push_quad(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z, d.x, d.y, d.z, 0, 0,
+              0, 0, 0, 0, 0, 0, color, color, color, color, 0, 0, 255);
 }
 
 void Renderer::quad_line(const Quadf &q, float t, Color color)
@@ -353,14 +381,13 @@ void Renderer::line(const glm::vec2 &start, const glm::vec2 &end, float t,
 }
 
 void Renderer::line(const glm::vec2 &start, const glm::vec2 &end, float t,
-          const glm::vec2 &t_dir, Color color)
+                    const glm::vec2 &t_dir, Color color)
 {
     ITD_ASSERT(m_vertex_map && m_index_map,
                "Render phase has not been started");
 
     quad(start, start + t * t_dir, end + t * t_dir, end, color);
 }
-
 
 void Renderer::circ(const glm::vec2 &center, float radius, unsigned int steps,
                     Color color)
@@ -392,8 +419,9 @@ void Renderer::tex(const Texture *texture, const glm::vec2 &pos, Color color)
     float mx = pos.x + texture->width() - 1.0f;
     float my = pos.y + texture->height() - 1.0f;
 
-    push_quad(pos.x, pos.y, pos.x, my, mx, my, mx, pos.y, 0, 1, 0, 0, 1, 0, 1,
-              1, color, color, color, color, 255, 0, 0);
+    push_quad(pos.x, pos.y, 0.0f, pos.x, my, 0.0f, mx, my, 0.0f, mx, pos.y,
+              0.0f, 0, 1, 0, 0, 1, 0, 1, 1, color, color, color, color, 255, 0,
+              0);
 }
 
 void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos,
@@ -413,10 +441,10 @@ void Renderer::tex(const Subtexture &subtexture, const glm::vec2 &pos,
 
     const std::array<glm::vec2, 4> &coords = subtexture.get_tex_coords();
 
-    push_quad(pos.x, pos.y, pos.x, my, mx, my, mx, pos.y, coords[0].x,
-              1.0f - coords[0].y, coords[1].x, 1.0f - coords[1].y, coords[2].x,
-              1.0f - coords[2].y, coords[3].x, 1.0f - coords[3].y, color, color,
-              color, color, 255, 0, 0);
+    push_quad(pos.x, pos.y, 0.0f, pos.x, my, 0.0, mx, my, 0.0f, mx, pos.y, 0.0f,
+              coords[0].x, 1.0f - coords[0].y, coords[1].x, 1.0f - coords[1].y,
+              coords[2].x, 1.0f - coords[2].y, coords[3].x, 1.0f - coords[3].y,
+              color, color, color, color, 255, 0, 0);
 }
 
 void Renderer::end()

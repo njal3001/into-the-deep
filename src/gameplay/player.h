@@ -44,6 +44,8 @@ public:
 private:
     Trif create_wing(const glm::vec2 &line_start, const glm::vec2 &line_end,
                      float span) const;
+
+    void render_wing(Renderer *renderer, const Trif &wing, float z, float depth, Color color) const;
 };
 
 }  // namespace ITD
