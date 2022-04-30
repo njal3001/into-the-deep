@@ -1,5 +1,6 @@
 #include "player.h"
 #include <glm/gtx/vector_angle.hpp>
+#include <random>
 #include "../input.h"
 #include "../maths/calc.h"
 #include "../platform.h"
@@ -21,6 +22,7 @@ Player::Player()
     , m_reload_timer(0.0f)
     , m_shoot_delay_timer(0.0f)
     , m_wing_rotation(0.0f)
+    , m_new_particle_timer(new_particle_time)
 {
 }
 
@@ -134,24 +136,39 @@ void Player::update(float elapsed)
 
     col->face_towards(mover->facing);
 
+    float positive_accel_multiplier =
+        std::max(glm::dot(mover->facing, move_dir), 0.0f);
+
     // Update wing rotation
-    float movedir_facing_cos = glm::dot(mover->facing, move_dir);
-    float wing_rotation_delta =
-        std::max(movedir_facing_cos, 0.0f) * 30.0f * elapsed;
-    m_wing_rotation = fmod(m_wing_rotation + wing_rotation_delta, Calc::TAU);
+    m_wing_rotation =
+        fmod(m_wing_rotation + positive_accel_multiplier * 30.0f * elapsed,
+             Calc::TAU);
+
+    // Add particles
+    m_new_particle_timer -= elapsed * positive_accel_multiplier;
+    if (m_new_particle_timer <= 0.0f)
+    {
+        Quadf quad = col->quad();
+        glm::vec2 pos = (quad.a + quad.b) / 2.0f;
+        float speed = std::min(glm::length(mover->vel), 50.0f) * positive_accel_multiplier;
+
+        ParticleSystem *psystem = scene()->particle_system();
+        psystem->add_particle(pos, -Calc::normalize(mover->vel) * speed, 3.0f,
+                              1.0f);
+        m_new_particle_timer = new_particle_time;
+    }
 
     // TODO: Implement dash shield
 }
 
 void Player::render(Renderer *renderer)
 {
-    // TODO: Major cleanup
     Collider *collider = get<Collider>();
     Quadf quad = collider->quad();
     float quad_depth = 2.0f;
     glm::vec3 quad_center = glm::vec3(quad.center(), -quad_depth / 2.0f);
 
-    float wing_span = 4.0f;
+    float wing_span = 3.0f;
     Trif right_wing = create_wing(quad.a, quad.d, -wing_span);
     Trif left_wing = create_wing(quad.b, quad.c, wing_span);
 
@@ -159,43 +176,21 @@ void Player::render(Renderer *renderer)
     glm::mat4 all_scale_matrix =
         Calc::scale(glm::vec3(all_scale, all_scale, all_scale), quad_center);
 
-    // renderer->push_matrix(all_scale_matrix);
+    renderer->push_matrix(all_scale_matrix);
     renderer->quad_line(quad, 1.0f, Color::yellow);
-    // renderer->quad(quad, Color::yellow);
-    // renderer->pop_matrix();
+    renderer->pop_matrix();
 
     // TODO: Hide wing that has rotated behind quad. Try depth testing?
-    renderer->push_matrix(Calc::rotate(m_wing_rotation, glm::vec3(quad_center.x, quad_center.y, 0.0f),
-                                       glm::vec3(quad.d - quad.a, 0.0f)));
-    // renderer->push_matrix(all_scale_matrix);
+    renderer->push_matrix(Calc::rotate(
+        m_wing_rotation, glm::vec3(quad_center.x, quad_center.y, 0.0f),
+        glm::vec3(quad.d - quad.a, 0.0f)));
+    renderer->push_matrix(all_scale_matrix);
 
-    if (m_dash_timer > 0.0f)
-    {
-        float wing_scale = 1.75f;
-        renderer->push_matrix(
-            Calc::scale(glm::vec3(wing_scale, wing_scale, wing_scale),
-                        glm::vec3(right_wing.center(), -quad_depth / 2.0f)));
-        render_wing(renderer, right_wing, 0.0f, quad_depth, Color::yellow);
-        // renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
-        renderer->pop_matrix();
-
-        renderer->push_matrix(
-            Calc::scale(glm::vec3(wing_scale, wing_scale, wing_scale),
-                        glm::vec3(left_wing.center(), -quad_depth / 2.0f)));
-        render_wing(renderer, left_wing, 0.0f, quad_depth, Color::yellow);
-        // renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
-        renderer->pop_matrix();
-    }
-    else
-    {
-        render_wing(renderer, right_wing, 0.0f, quad_depth, Color::yellow);
-        render_wing(renderer, left_wing, 0.0f, quad_depth, Color::yellow);
-        // renderer->tri(right_wing.a, right_wing.b, right_wing.c, Color::yellow);
-        // renderer->tri(left_wing.a, left_wing.b, left_wing.c, Color::yellow);
-    }
+    render_wing(renderer, right_wing, 0.0f, quad_depth, Color::yellow);
+    render_wing(renderer, left_wing, 0.0f, quad_depth, Color::yellow);
 
     renderer->pop_matrix();
-    // renderer->pop_matrix();
+    renderer->pop_matrix();
 }
 
 Trif Player::create_wing(const glm::vec2 &line_start, const glm::vec2 &line_end,

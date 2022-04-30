@@ -101,6 +101,7 @@ void Scene::update(float elapsed)
         }
     }
 
+    m_particle_system.update(elapsed);
     m_collision_handler.update();
 }
 
@@ -188,6 +189,8 @@ void Scene::render(Renderer *renderer)
         }
     }
 
+    m_particle_system.render(renderer);
+
     if (m_debug)
     {
         m_collision_handler.render_collider_outlines(renderer);
@@ -224,6 +227,11 @@ const Tilemap *Scene::map() const
 CollisionHandler *Scene::collision_handler()
 {
     return &m_collision_handler;
+}
+
+ParticleSystem *Scene::particle_system()
+{
+    return &m_particle_system;
 }
 
 Rectf Scene::world_bounds() const

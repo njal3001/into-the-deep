@@ -20,6 +20,7 @@ private:
     static constexpr float shoot_delay = 0.2f;
     static constexpr float reload_time = 1.5f;
     static constexpr float torpedo_start_speed = 20.0f;
+    static constexpr float new_particle_time = 0.08f;
 
     float m_dash_timer;
     float m_dash_cooldown_timer;
@@ -28,6 +29,7 @@ private:
     float m_shoot_delay_timer;
     float m_reload_timer;
     float m_wing_rotation;
+    float m_new_particle_timer;
 
     PlayerInput m_player_input;
 

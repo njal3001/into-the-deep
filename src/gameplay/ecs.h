@@ -4,6 +4,7 @@
 #include "../debug.h"
 #include "../graphics/renderer.h"
 #include "collisionhandler.h"
+#include "particlesystem.h"
 
 namespace ITD {
 
@@ -152,6 +153,7 @@ private:
 
     Tilemap *m_tilemap;
     CollisionHandler m_collision_handler;
+    ParticleSystem m_particle_system;
 
     float m_freeze_timer;
 
@@ -191,6 +193,7 @@ public:
 
     const Tilemap *map() const;
     CollisionHandler *collision_handler();
+    ParticleSystem *particle_system();
 
     Rectf world_bounds() const;
     void toggle_debug_mode();

@@ -7,7 +7,6 @@
 namespace ITD {
 
 namespace Calc {
-
     const float TAU = 2.0f * M_PI;
 
     constexpr glm::vec2 right = glm::vec2(1.0f, 0.0f);
@@ -47,6 +46,8 @@ namespace Calc {
     size_t hash_combine(size_t lhs, size_t rhs);
 
     float shortest_rotation_approach(float val, float target, float amount);
+
+    float randf(float lower, float upper);
 
     template <class T>
     glm::tvec2<T> normalize(const glm::tvec2<T> &vec)

@@ -49,6 +49,7 @@ add_executable(itd
     src/gameplay/playerinput.cpp
     src/gameplay/camera.cpp
     src/gameplay/wall.cpp
+    src/gameplay/particlesystem.cpp
     )
 
 target_link_libraries(itd ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SDL2_MIXER_LIBRARIES})

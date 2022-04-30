@@ -1,4 +1,5 @@
 #include "calc.h"
+#include <random>
 
 namespace ITD {
 
@@ -21,6 +22,14 @@ float Calc::shortest_rotation_approach(float val, float target, float amount)
     float shortest_target_rotation = val + min;
 
     return fmod(approach(val, shortest_target_rotation, amount), TAU);
+}
+
+float Calc::randf(float lower, float upper)
+{
+    static std::default_random_engine generator;
+    std::uniform_real_distribution<float> distribution(lower, upper);
+
+    return distribution(generator);
 }
 
 }  // namespace ITD
