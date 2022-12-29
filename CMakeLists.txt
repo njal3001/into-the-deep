@@ -52,7 +52,7 @@ add_executable(itd
     src/gameplay/particlesystem.cpp
     )
 
-target_link_libraries(itd ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${SDL2_MIXER_LIBRARIES})
+target_link_libraries(itd ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} GLEW::GLEW ${SDL2_MIXER_LIBRARIES})
 
 add_custom_target(run
     COMMAND itd
